@@ -1,5 +1,4 @@
 // import 'dart:math' as math show Random;
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
@@ -238,6 +237,10 @@ class _NoteWidgetState extends State<NoteWidget> {
                                                     // side: BorderSide(color: Colors.black)
                                                   ),
                                                   onPressed: () {
+                                                    setState(() {
+                                                      isDeleted = true;
+                                                      isEdited = true;
+                                                    });
                                                     dbHelper
                                                         ?.update(NotesModel(
                                                       id: widget.id,
@@ -294,14 +297,10 @@ class _NoteWidgetState extends State<NoteWidget> {
                                   itemBuilder: (context) {
                                     return [
                                       PopupMenuItem(
-                                          child: ListTile(
-                                        leading: Icon(
-                                          Icons.restore,
-                                          color: Colors.blue[400],
-                                        ),
-                                        onTap: () {
+                                        onTap: () async {
                                           setState(() {
                                             isDeleted = false;
+                                            isEdited = true;
                                           });
                                           dbHelper
                                               ?.update(NotesModel(
@@ -316,22 +315,26 @@ class _NoteWidgetState extends State<NoteWidget> {
                                             edited_date: widget.editedDate,
                                           ))
                                               .then((value) {
-                                            Navigator.pop(context);
-                                            Navigator.pop(
-                                                  context,
-                                                  isEdited == true
-                                                      ? true
-                                                      : false);
+                                            if (value == 1) {
+                                              widget.onUpdateComplete();
+                                            }
                                           });
+                                          Navigator.pop(context);
                                         },
-                                        title: Text("Restore"),
-                                      )),
-                                      PopupMenuItem(
-                                          child: ListTile(
-                                        leading: Icon(
-                                          Icons.delete_forever,
-                                          color: Colors.red[400],
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.restore,
+                                              color: Colors.blue[400],
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text("Restore")
+                                          ],
                                         ),
+                                      ),
+                                      PopupMenuItem(
                                         onTap: () {
                                           dbHelper?.delete(widget.id).then(
                                             (value) {
@@ -345,8 +348,19 @@ class _NoteWidgetState extends State<NoteWidget> {
                                             },
                                           );
                                         },
-                                        title: Text("Delete forever"),
-                                      ))
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.delete_forever,
+                                              color: Colors.red[400],
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text("Delete forever")
+                                          ],
+                                        ),
+                                      )
                                     ];
                                   },
                                 ),
@@ -462,11 +476,13 @@ class _NoteWidgetState extends State<NoteWidget> {
               }),
             );
           },
-        ).then((value) {
-          if (value == true) {
-            widget.onUpdateComplete();
-          }
-        });
+        );
+        // .then((value) {
+        //   if (value == true) {
+        //     // widget.onUpdateComplete();
+        //     Navigator.pop(context);
+        //   }
+        // });
       },
       child: Dismissible(
         key: widget.keyvalue,

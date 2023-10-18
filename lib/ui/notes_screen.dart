@@ -1,19 +1,27 @@
-import 'package:flutter/gestures.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
+import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/note_model.dart';
 import 'package:notes_sqflite/widget/note_widget.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class NotesScreen extends StatefulWidget {
-  const NotesScreen({super.key});
+  NotesScreen({super.key, required this.refreshPage});
+  void Function() refreshPage;
 
   @override
-  State<NotesScreen> createState() => _NotesScreenState();
+  State<NotesScreen> createState() => _NotesScreenState(
+        refreshPage: refreshPage,
+      );
 }
 
 class _NotesScreenState extends State<NotesScreen> {
+  _NotesScreenState({required this.refreshPage});
+
+  void Function() refreshPage;
+
   DBHelper? dbHelper;
 
   late Future<List<NotesModel>> noteList;
@@ -35,6 +43,18 @@ class _NotesScreenState extends State<NotesScreen> {
     noteCtr = TextEditingController();
     emailCtr = TextEditingController();
     loadData();
+    checkData();
+  }
+
+  checkData() {
+    Timer.periodic(Duration(milliseconds: 300), (timer) {
+      if (isUpdateNote)
+        setState(() {
+          loadData();
+          print("data updated $isUpdateNote");
+          isUpdateNote = false;
+        });
+    });
   }
 
   void loadData() async {
@@ -229,7 +249,6 @@ class _NotesScreenState extends State<NotesScreen> {
               borderRadius: BorderRadius.circular(50),
               radius: 10,
               onTap: () {
-                
                 showGeneralDialog(
                   context: context,
                   transitionDuration: Duration(milliseconds: 300),

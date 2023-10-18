@@ -19,8 +19,10 @@ class Base extends StatefulWidget {
   State<Base> createState() => _BaseState();
 }
 
-class _BaseState extends State<Base>with WidgetsBindingObserver {
+class _BaseState extends State<Base> with WidgetsBindingObserver {
   bool isNotes = true, isTodos = false;
+  // bool isChange = false;
+
   DBHelper? dbHelper;
   late GlobalKey<ScaffoldState> globalScaffoldKey;
   late Future<List<NotesModel>> noteList;
@@ -61,7 +63,6 @@ class _BaseState extends State<Base>with WidgetsBindingObserver {
     return Scaffold(
       backgroundColor: Colors.black,
       key: globalScaffoldKey,
-      // extendBody: true,
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: Icon(
@@ -313,7 +314,11 @@ class _BaseState extends State<Base>with WidgetsBindingObserver {
           ],
         ),
       ),
-      body: isNotes ? NotesScreen() : TodoScreen(),
+      body: isNotes
+          ? NotesScreen(
+              refreshPage: () {},
+            )
+          : TodoScreen(),
     );
   }
 }

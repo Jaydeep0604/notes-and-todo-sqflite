@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:notes_sqflite/ui/base_screen.dart';
 
+bool isUpdateNote = false;
+bool isUpdateTodo = false;
+
 void main() {
   runApp(const MyApp());
 }

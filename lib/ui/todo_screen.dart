@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/db/list_data.dart';
+import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
 import 'package:notes_sqflite/widget/todo_widget.dart';
 
@@ -35,6 +38,7 @@ class _TodoScreenState extends State<TodoScreen> {
     dbHelper = DBHelper();
     categoryName = ListData.category[0];
     loadData();
+    checkData();
   }
 
   void loadData() {
@@ -49,8 +53,19 @@ class _TodoScreenState extends State<TodoScreen> {
     dateCtr.clear();
   }
 
-  void dispose() {
-    super.dispose();
+  // void dispose() {
+  //   super.dispose();
+  // }
+
+  checkData() {
+    Timer.periodic(Duration(milliseconds: 300), (timer) {
+      if (isUpdateTodo)
+        setState(() {
+          loadData();
+          print("data updated $isUpdateTodo");
+          isUpdateTodo = false;
+        });
+    });
   }
 
   Future<void> _selectDate(BuildContext context) async {
