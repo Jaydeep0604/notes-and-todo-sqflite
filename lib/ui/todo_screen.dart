@@ -8,10 +8,14 @@ import 'package:notes_sqflite/widget/todo_widget.dart';
 class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});
 
+  static reFreshScreen(BuildContext context) {
+    _TodoScreenState? state =
+        context.findAncestorStateOfType<_TodoScreenState>();
+    return state?.loadData();
+  }
+
   @override
   State<TodoScreen> createState() => _TodoScreenState();
-
-  
 }
 
 class _TodoScreenState extends State<TodoScreen> {
@@ -33,7 +37,7 @@ class _TodoScreenState extends State<TodoScreen> {
     loadData();
   }
 
-  void loadData() async {
+  void loadData() {
     setState(() {
       todoList = dbHelper!.getTodosList();
     });
@@ -43,6 +47,10 @@ class _TodoScreenState extends State<TodoScreen> {
     todoCtr.clear();
     timeCtr.clear();
     dateCtr.clear();
+  }
+
+  void dispose() {
+    super.dispose();
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -65,7 +73,6 @@ class _TodoScreenState extends State<TodoScreen> {
       context: context,
       initialTime: timeOfDay,
     );
-
     if (time != null) {
       setState(() {
         timeCtr.text = "${time.format(context).toLowerCase()}";
@@ -98,65 +105,79 @@ class _TodoScreenState extends State<TodoScreen> {
           Expanded(
             child: Stack(
               children: [
-                FutureBuilder(
-                  future: todoList,
-                  builder: (context, AsyncSnapshot<List<TodoModel>> snapshot) {
-                    if (snapshot.hasData) {
-                      return ListView.separated(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 10,
-                        ),
-                        itemCount: snapshot.data!.length,
-                        reverse: true,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return snapshot.data![index].finished == 0
-                              ? TodoWidget(
-                                  description: snapshot.data![index].todo,
-                                  categoryName: snapshot.data![index].category,
-                                  dueDate: snapshot.data![index].dueDate,
-                                  dueTime: snapshot.data![index].dueTime,
-                                  finished: snapshot.data![index].finished,
-                                  onDelete: () {
-                                    setState(() {
-                                      dbHelper!.deleteTodo(
-                                          snapshot.data![index].id!);
-                                      todoList = dbHelper!.getTodosList();
-                                    });
-                                  },
-                                  onDone: (status) {
-                                    dbHelper!
-                                        .updateTodo(TodoModel(
-                                      id: snapshot.data![index].id,
-                                      todo: snapshot.data![index].todo,
-                                      finished: status,
-                                      dueDate: snapshot.data![index].dueDate,
-                                      dueTime: snapshot.data![index].dueTime,
-                                      category: snapshot.data![index].category,
-                                    ))
-                                        .then((value) {
+                RefreshIndicator(
+                  color: Colors.blue,
+                  // backgroundColor: Colors.trransparent,
+                  onRefresh: () =>
+                      Future.delayed(Duration(seconds: 1), loadData),
+                  child: FutureBuilder(
+                    future: todoList,
+                    builder:
+                        (context, AsyncSnapshot<List<TodoModel>> snapshot) {
+                      if (snapshot.hasData) {
+                        return ListView.separated(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 10,
+                          ),
+                          itemCount: snapshot.data!.length,
+                          reverse: true,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (snapshot.data![index].finished == 0)
+                                  TodoWidget(
+                                    description: snapshot.data![index].todo,
+                                    categoryName:
+                                        snapshot.data![index].category,
+                                    dueDate: snapshot.data![index].dueDate,
+                                    dueTime: snapshot.data![index].dueTime,
+                                    finished: snapshot.data![index].finished,
+                                    onDelete: () {
                                       setState(() {
+                                        dbHelper!.deleteTodo(
+                                            snapshot.data![index].id!);
                                         todoList = dbHelper!.getTodosList();
                                       });
-                                    });
-                                  },
-                                )
-                              : SizedBox();
-                        },
-                        separatorBuilder: (context, index) {
-                          return SizedBox(
-                            height: 10,
-                          );
-                        },
-                      );
-                    } else {
-                      return Center(
-                          child: CircularProgressIndicator(
-                        color: Colors.white,
-                      ));
-                    }
-                  },
+                                    },
+                                    onDone:
+                                        (todo, date, time, status, category) {
+                                      dbHelper!
+                                          .updateTodo(TodoModel(
+                                        id: snapshot.data![index].id,
+                                        todo: todo,
+                                        finished: status,
+                                        dueDate: date,
+                                        dueTime: time,
+                                        category: category,
+                                      ))
+                                          .then((value) {
+                                        setState(() {
+                                          todoList = dbHelper!.getTodosList();
+                                        });
+                                      });
+                                    },
+                                  ),
+                              ],
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return SizedBox(
+                              height:
+                                  snapshot.data![index].finished == 0 ? 10 : 0,
+                            );
+                          },
+                        );
+                      } else {
+                        return Center(
+                            child: CircularProgressIndicator(
+                          color: Colors.white,
+                        ));
+                      }
+                    },
+                  ),
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
@@ -439,216 +460,6 @@ class _TodoScreenState extends State<TodoScreen> {
                                 ),
                               );
                             });
-                            // StatefulBuilder(
-                            //   builder: (context, setState) => AlertDialog(
-                            //     shape: RoundedRectangleBorder(
-                            //         borderRadius: BorderRadius.circular(10)),
-                            //     content: Column(
-                            //       mainAxisAlignment: MainAxisAlignment.center,
-                            //       crossAxisAlignment: CrossAxisAlignment.center,
-                            //       mainAxisSize: MainAxisSize.min,
-                            //       children: [
-                            //         SizedBox(
-                            //           height: 10,
-                            //         ),
-                            //         Text(
-                            //           "Add Sedules",
-                            //           style: TextStyle(
-                            //               color: Colors.black,
-                            //               fontWeight: FontWeight.bold,
-                            //               fontSize: 18),
-                            //         ),
-                            //         SizedBox(
-                            //           height: 10,
-                            //         ),
-                            //         TextFormField(
-                            //           controller: descriptionCtr,
-                            //           decoration: InputDecoration(
-                            //             hintText: "Description",
-                            //           ),
-                            //           inputFormatters: [
-                            //             // FilteringTextInputFormatter.deny(" "),
-                            //           ],
-                            //         ),
-                            //         SizedBox(
-                            //           height: 10,
-                            //         ),
-                            //         TextFormField(
-                            //           controller: dateCtr,
-                            //           readOnly: true,
-                            //           onTap: () {
-                            //             _selectDate(context);
-                            //           },
-                            //           minLines: 1,
-                            //           maxLines: 1,
-                            //           decoration: InputDecoration(
-                            //             hintText: "Date not set",
-                            //           ),
-                            //         ),
-                            //         SizedBox(
-                            //           height: 10,
-                            //         ),
-                            //         Row(
-                            //           children: [
-                            //             Expanded(
-                            //               flex: 1,
-                            //               child: TextFormField(
-                            //                 controller: timeCtr,
-                            //                 onTap: () {
-                            //                   displayTimePicker(context);
-                            //                 },
-                            //                 readOnly: true,
-                            //                 minLines: 1,
-                            //                 maxLines: 1,
-                            //                 decoration: InputDecoration(
-                            //                     hintText: "Set time"),
-                            //               ),
-                            //             ),
-                            //             SizedBox(
-                            //               width: 10,
-                            //             ),
-                            //             Expanded(
-                            //                 flex: 2,
-                            //                 child: Padding(
-                            //                   padding:
-                            //                       const EdgeInsets.all(8.0),
-                            //                   child: InkWell(
-                            //                     borderRadius:
-                            //                         BorderRadius.circular(10),
-                            //                     onTap: () {
-                            //                       showMenu(
-                            //                         context: context,
-                            //                         initialValue: category[0],
-                            //                         color: Color.fromARGB(
-                            //                             255, 255, 255, 255),
-                            //                         surfaceTintColor:
-                            //                             Colors.amberAccent,
-                            //                         shape:
-                            //                             RoundedRectangleBorder(
-                            //                                 borderRadius:
-                            //                                     BorderRadius
-                            //                                         .circular(
-                            //                                             10)),
-                            //                         position:
-                            //                             buttonMenuPosition(
-                            //                                 context),
-                            //                         items: List.generate(
-                            //                           category.length,
-                            //                           (index) => PopupMenuItem(
-                            //                             onTap: () {
-                            //                               setState(() {
-                            //                                 categoryName =
-                            //                                     category[index];
-                            //                               });
-                            //                             },
-                            //                             child: Text(
-                            //                               category[index],
-                            //                               style: TextStyle(
-                            //                                   color:
-                            //                                       Colors.black),
-                            //                             ),
-                            //                           ),
-                            //                         ),
-                            //                       );
-                            //                     },
-                            //                     child: Container(
-                            //                       padding: const EdgeInsets
-                            //                           .symmetric(
-                            //                         horizontal: 10,
-                            //                         vertical: 5,
-                            //                       ),
-                            //                       decoration: BoxDecoration(
-                            //                           border: Border.all(
-                            //                               color: Colors.black),
-                            //                           borderRadius:
-                            //                               BorderRadius.circular(
-                            //                                   10)),
-                            //                       child: Center(
-                            //                           child: Row(
-                            //                         mainAxisAlignment:
-                            //                             MainAxisAlignment
-                            //                                 .center,
-                            //                         crossAxisAlignment:
-                            //                             CrossAxisAlignment
-                            //                                 .center,
-                            //                         children: [
-                            //                           Text("$categoryName"),
-                            //                           SizedBox(
-                            //                             width: 10,
-                            //                           ),
-                            //                           Icon(Icons
-                            //                               .arrow_drop_down_sharp)
-                            //                         ],
-                            //                       )),
-                            //                     ),
-                            //                   ),
-                            //                 )),
-                            //           ],
-                            //         ),
-                            //         SizedBox(
-                            //           height: 10,
-                            //         ),
-                            //         Row(
-                            //           children: [
-                            //             Expanded(
-                            //                 child: MaterialButton(
-                            //               shape: RoundedRectangleBorder(
-                            //                   borderRadius:
-                            //                       BorderRadius.circular(10)),
-                            //               color:
-                            //                   Color.fromARGB(255, 57, 149, 199),
-                            //               onPressed: () {
-                            //                 // clear();
-                            //                 Navigator.pop(context);
-                            //               },
-                            //               child: Text(
-                            //                 "Cancel",
-                            //                 style:
-                            //                     TextStyle(color: Colors.white),
-                            //               ),
-                            //             )),
-                            //             SizedBox(
-                            //               width: 20,
-                            //             ),
-                            //             Expanded(
-                            //                 child: MaterialButton(
-                            //               shape: RoundedRectangleBorder(
-                            //                   borderRadius:
-                            //                       BorderRadius.circular(10)),
-                            //               color: Colors.blueGrey.shade900
-                            //                   .withGreen(140),
-                            //               onPressed: () {
-                            //                 dbHelper!
-                            //                     .insertTodo(TodoModel(
-                            //                         description:
-                            //                             descriptionCtr.text,
-                            //                         todoDone: 0,
-                            //                         dueDate:
-                            //                             "${dateCtr.text}, ${timeCtr.text}",
-                            //                         category: categoryName
-                            //                             .toString()))
-                            //                     .then((value) {
-                            //                   print("data added");
-                            //                   clear();
-                            //                   loadData();
-                            //                   Navigator.pop(context);
-                            //                 }).onError((error, stackTrace) {
-                            //                   print(error.toString());
-                            //                   print(stackTrace.toString());
-                            //                 });
-                            //               },
-                            //               child: Text(
-                            //                 "Add",
-                            //                 style:
-                            //                     TextStyle(color: Colors.white),
-                            //               ),
-                            //             ))
-                            //           ],
-                            //         )
-                            //       ],
-                            //     ),
-                            //   ),
-                            // );
                           },
                         );
                       },

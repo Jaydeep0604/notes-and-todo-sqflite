@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/db/list_data.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
+import 'package:notes_sqflite/ui/todo_screen.dart';
 import 'package:notes_sqflite/widget/todo_widget.dart';
 
 class TodoDoneScreen extends StatefulWidget {
@@ -28,6 +29,10 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
     });
   }
 
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +41,7 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
         backgroundColor: Colors.black,
         leading: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(context,TodoScreen());
             },
             icon: Icon(
               Icons.arrow_back,
@@ -75,15 +80,15 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
                               todoList = dbHelper!.getTodosList();
                             });
                           },
-                          onDone: (status) {
+                          onDone: (todo, date, time, status, category) {
                             dbHelper!
                                 .updateTodo(TodoModel(
                               id: snapshot.data![index].id,
-                              todo: snapshot.data![index].todo,
+                              todo: todo,
                               finished: status,
-                              dueDate: snapshot.data![index].dueDate,
-                              dueTime: snapshot.data![index].dueTime,
-                              category: snapshot.data![index].category,
+                              dueDate: date,
+                              dueTime: time,
+                              category: category,
                             ))
                                 .then((value) {
                               setState(() {
@@ -96,8 +101,8 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
                 },
                 separatorBuilder: (context, index) {
                   return SizedBox(
-                            height: 10,
-                          );
+                    height: snapshot.data![index].finished == 1 ? 10 : 0,
+                  );
                 },
               );
             } else {

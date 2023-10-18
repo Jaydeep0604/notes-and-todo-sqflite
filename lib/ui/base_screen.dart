@@ -2,18 +2,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/model/note_model.dart';
+import 'package:notes_sqflite/ui/archive_note_screen.dart';
+import 'package:notes_sqflite/ui/delete_screen.dart';
 import 'package:notes_sqflite/ui/notes_screen.dart';
 import 'package:notes_sqflite/ui/todo_done_screen.dart';
 import 'package:notes_sqflite/ui/todo_screen.dart';
 
 class Base extends StatefulWidget {
   const Base({super.key});
+  static openDrawer(BuildContext context) {
+    _BaseState? state = context.findAncestorStateOfType<_BaseState>();
+    state?.openDrawer();
+  }
 
   @override
   State<Base> createState() => _BaseState();
 }
 
-class _BaseState extends State<Base> {
+class _BaseState extends State<Base>with WidgetsBindingObserver {
   bool isNotes = true, isTodos = false;
   DBHelper? dbHelper;
   late GlobalKey<ScaffoldState> globalScaffoldKey;
@@ -32,11 +38,30 @@ class _BaseState extends State<Base> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print("app in resumed");
+        break;
+      case AppLifecycleState.inactive:
+        print("app in inactive");
+        break;
+      case AppLifecycleState.paused:
+        print("app in paused");
+        break;
+      case AppLifecycleState.detached:
+        print("app in detached");
+        break;
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       key: globalScaffoldKey,
-      extendBody: true,
+      // extendBody: true,
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: Icon(
@@ -127,7 +152,9 @@ class _BaseState extends State<Base> {
               ),
               ListTile(
                 splashColor: Colors.deepPurple[400],
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                },
                 title: Text(
                   "Category",
                   style: TextStyle(color: Colors.white),
@@ -144,7 +171,15 @@ class _BaseState extends State<Base> {
               ),
               ListTile(
                 splashColor: Colors.deepOrange[400],
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ArchiveNoteScreen(),
+                    ),
+                  );
+                },
                 title: Text(
                   "Archive",
                   style: TextStyle(color: Colors.white),
@@ -161,7 +196,15 @@ class _BaseState extends State<Base> {
               ),
               ListTile(
                 splashColor: Colors.red[400],
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DeleteScreen(),
+                    ),
+                  );
+                },
                 title: Text(
                   "Deleted",
                   style: TextStyle(color: Colors.white),
@@ -178,7 +221,9 @@ class _BaseState extends State<Base> {
               ),
               ListTile(
                 splashColor: Colors.grey[400],
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                },
                 title: Text(
                   "Settings",
                   style: TextStyle(color: Colors.white),
@@ -194,7 +239,7 @@ class _BaseState extends State<Base> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.transparent,
+          color: Colors.black87,
           borderRadius: BorderRadius.only(
             topRight: Radius.circular(10),
             topLeft: Radius.circular(10),

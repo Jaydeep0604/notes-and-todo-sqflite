@@ -25,7 +25,7 @@ class DBHelper {
 
   _onCreate(Database db, int version) async {
     await db.execute(
-        "CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, age INTEGER NOT NULL, description TEXT NOT NULL, email TEXT)");
+        "CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, note TEXT NOT NULL, pin INTEGER NOT NULL, archive INTEGER NOT NULL, email TEXT NOT NULL, deleted INTEGER NOT NULL, create_date TEXT NOT NULL, edited_date Text)");
     await db.execute(
         "CREATE TABLE todos (id INTEGER PRIMARY KEY AUTOINCREMENT, todo TEXT NOT NULL, finished INTEGER NOT NULL, due_date TEXT NOT NULL,due_time TEXT NOT NULL, category TEXT NOT NULL)");
   }
@@ -71,6 +71,7 @@ class DBHelper {
     return await dbClient!.update('notes', notesModel.toMap(),
         where: 'id = ?', whereArgs: [notesModel.id]);
   }
+  
 
   Future<int> updateTodo(TodoModel todoModel) async {
     var dbClient = await db;
