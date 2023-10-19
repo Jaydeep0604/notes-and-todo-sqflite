@@ -5,6 +5,7 @@ import 'package:notes_sqflite/model/note_model.dart';
 import 'package:notes_sqflite/ui/archive_note_screen.dart';
 import 'package:notes_sqflite/ui/delete_screen.dart';
 import 'package:notes_sqflite/ui/notes_screen.dart';
+import 'package:notes_sqflite/ui/setting_screen.dart';
 import 'package:notes_sqflite/ui/todo_done_screen.dart';
 import 'package:notes_sqflite/ui/todo_screen.dart';
 
@@ -65,10 +66,23 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
       key: globalScaffoldKey,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        leading: Icon(
-          CupertinoIcons.pencil_outline,
-          color: Colors.white,
-        ),
+        leading: isNotes
+            ? Icon(
+                CupertinoIcons.pencil_outline,
+                color: Colors.white,
+              )
+            : IconButton(
+                onPressed: () {
+                  setState(() {
+                    isNotes = true;
+                    isTodos = false;
+                  });
+                },
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                ),
+              ),
         title: Text(
           isNotes ? "Notes" : "schedules",
           style: TextStyle(color: Colors.white),
@@ -151,25 +165,25 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 indent: 10,
                 color: Colors.white38,
               ),
-              ListTile(
-                splashColor: Colors.deepPurple[400],
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                title: Text(
-                  "Category",
-                  style: TextStyle(color: Colors.white),
-                ),
-                leading: Icon(
-                  Icons.archive_outlined,
-                  color: Colors.white,
-                ),
-              ),
-              Divider(
-                endIndent: 10,
-                indent: 10,
-                color: Colors.white38,
-              ),
+              // ListTile(
+              //   splashColor: Colors.deepPurple[400],
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //   },
+              //   title: Text(
+              //     "Category",
+              //     style: TextStyle(color: Colors.white),
+              //   ),
+              //   leading: Icon(
+              //     Icons.archive_outlined,
+              //     color: Colors.white,
+              //   ),
+              // ),
+              // Divider(
+              //   endIndent: 10,
+              //   indent: 10,
+              //   color: Colors.white38,
+              // ),
               ListTile(
                 splashColor: Colors.deepOrange[400],
                 onTap: () {
@@ -224,6 +238,12 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 splashColor: Colors.grey[400],
                 onTap: () {
                   Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SettingScreen(),
+                    ),
+                  );
                 },
                 title: Text(
                   "Settings",

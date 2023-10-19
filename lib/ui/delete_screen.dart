@@ -78,7 +78,7 @@ class _DeleteScreenState extends State<DeleteScreen> {
               builder: (context, AsyncSnapshot<List<NotesModel>> snapshot) {
                 if (snapshot.hasData) {
                   return MasonryGridView.count(
-                    padding: EdgeInsets.zero,
+                    padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
                     crossAxisCount: 2,
                     crossAxisSpacing: 8,
                     mainAxisSpacing: 8,

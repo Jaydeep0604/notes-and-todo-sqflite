@@ -3,7 +3,6 @@ import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/db/list_data.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
-import 'package:notes_sqflite/ui/todo_screen.dart';
 import 'package:notes_sqflite/widget/todo_widget.dart';
 
 class TodoDoneScreen extends StatefulWidget {
