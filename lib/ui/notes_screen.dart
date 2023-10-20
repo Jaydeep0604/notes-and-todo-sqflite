@@ -43,11 +43,11 @@ class _NotesScreenState extends State<NotesScreen> {
     noteCtr = TextEditingController();
     emailCtr = TextEditingController();
     loadData();
-    checkData();
+    // checkData();
   }
 
   checkData() {
-    Timer.periodic(Duration(milliseconds: 300), (timer) {
+    Timer.periodic(Duration(microseconds: 500), (timer) {
       if (isUpdateNote)
         setState(() {
           loadData();
@@ -249,218 +249,7 @@ class _NotesScreenState extends State<NotesScreen> {
               borderRadius: BorderRadius.circular(50),
               radius: 10,
               onTap: () {
-                showGeneralDialog(
-                  context: context,
-                  transitionDuration: Duration(milliseconds: 300),
-                  pageBuilder: (context, animation, secondaryAnimation) {
-                    return Material(
-                      type: MaterialType.card,
-                      color: Colors.black,
-                      child: StatefulBuilder(builder: (context, setState) {
-                        void isPinedChange() {
-                          setState(() {
-                            isPined = !isPined;
-                          });
-                        }
-
-                        void isArchivedChange() {
-                          setState(() {
-                            isArchived = !isArchived;
-                            setState;
-                          });
-                        }
-
-                        return Stack(
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                SizedBox(
-                                  height: 40,
-                                ),
-                                Container(
-                                  child: Row(
-                                    children: [
-                                      IconButton(
-                                        tooltip: "Navigate up",
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        icon: Icon(
-                                          Icons.arrow_back,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      Spacer(),
-                                      IconButton(
-                                        tooltip: "Pin",
-                                        onPressed: () {
-                                          isPinedChange();
-                                          // Navigator.pop(context);
-                                        },
-                                        icon: Transform.scale(
-                                          scale: 1,
-                                          child: isPined
-                                              ? Icon(
-                                                  Icons.push_pin,
-                                                  color: Colors.white,
-                                                )
-                                              : Icon(
-                                                  Icons.push_pin_outlined,
-                                                  color: Colors.white,
-                                                ),
-                                        ),
-                                      ),
-                                      IconButton(
-                                        tooltip: "Archive",
-                                        onPressed: () {
-                                          isArchivedChange();
-                                          // Navigator.pop(context);
-                                        },
-                                        icon: Transform.scale(
-                                          scale: 1,
-                                          child: isArchived
-                                              ? Icon(
-                                                  Icons.archive,
-                                                  color: Colors.white,
-                                                )
-                                              : Icon(
-                                                  Icons.archive_outlined,
-                                                  color: Colors.white,
-                                                ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 15,
-                                  ),
-                                  child: TextFormField(
-                                    controller: titleCtr,
-                                    maxLines: null,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 20,
-                                      color: Colors.white,
-                                    ),
-                                    decoration: InputDecoration(
-                                        hintText: "Title",
-                                        hintStyle: TextStyle(
-                                            color: Colors.white60,
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 20),
-                                        enabledBorder: InputBorder.none,
-                                        border: InputBorder.none,
-                                        disabledBorder: InputBorder.none),
-                                    inputFormatters: [],
-                                  ),
-                                ),
-                                Expanded(
-                                    child: SingleChildScrollView(
-                                  child: Container(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 15),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        TextFormField(
-                                          controller: noteCtr,
-                                          minLines: 1,
-                                          maxLines: null,
-                                          style: TextStyle(color: Colors.white),
-                                          decoration: InputDecoration(
-                                            hintText: "Note",
-                                            hintStyle: TextStyle(
-                                                color: Colors.white60,
-                                                fontSize: 16),
-                                            enabledBorder: InputBorder.none,
-                                            border: InputBorder.none,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ))
-                              ],
-                            ),
-                            Align(
-                              alignment: Alignment.bottomRight,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    bottom: 20, right: 20),
-                                child: InkWell(
-                                  splashColor: Colors.blueGrey,
-                                  borderRadius: BorderRadius.circular(50),
-                                  radius: 10,
-                                  onTap: () {
-                                    final date = DateFormat('EEEEEEEEE,d MMM y')
-                                        .format(DateTime.now());
-                                    final time = DateFormat('kk:mm a')
-                                        .format(DateTime.now());
-                                    print("$date, $time");
-                                    dbHelper!
-                                        .insert(
-                                      NotesModel(
-                                        title: titleCtr.text.toString(),
-                                        note: noteCtr.text.toString(),
-                                        pin: isPined == true ? 1 : 0,
-                                        archive: isArchived == true ? 1 : 0,
-                                        email: '',
-                                        deleted: 1,
-                                        create_date: date.toString(),
-                                        edited_date:
-                                            time.toLowerCase().toString(),
-                                      ),
-                                    )
-                                        .then((value) {
-                                      print("data added");
-                                      clear();
-                                      setState(() {
-                                        noteList = dbHelper!.getNotesList();
-                                      });
-                                      Navigator.pop(context);
-                                    }).onError((error, stackTrace) {
-                                      print(error.toString());
-                                      print(stackTrace.toString());
-                                    });
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.yellow,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                            color:
-                                                Colors.white.withOpacity(0.4))),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Icon(
-                                        Icons.check,
-                                        color: Colors.black,
-                                        size: 30,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }),
-                    );
-                  },
-                );
+                addNoteDialoge();
               },
               child: Container(
                   decoration: BoxDecoration(
@@ -479,6 +268,216 @@ class _NotesScreenState extends State<NotesScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  void addNote() {
+    final date = DateFormat('EEEEEEEEE,d MMM y').format(DateTime.now());
+    final time = DateFormat('kk:mm a').format(DateTime.now());
+    print("$date, $time");
+    dbHelper!
+        .insert(
+      NotesModel(
+        title: titleCtr.text.toString(),
+        note: noteCtr.text.toString(),
+        pin: isPined == true ? 1 : 0,
+        archive: isArchived == true ? 1 : 0,
+        email: '',
+        deleted: 1,
+        create_date: date.toString(),
+        edited_date: time.toLowerCase().toString(),
+      ),
+    )
+        .then((value) {
+      print("data added");
+      clear();
+      setState(() {
+        noteList = dbHelper!.getNotesList();
+      });
+      Navigator.pop(context);
+    }).onError((error, stackTrace) {
+      print(error.toString());
+      print(stackTrace.toString());
+    });
+  }
+
+  void addNoteDialoge() {
+    showGeneralDialog(
+      context: context,
+      transitionDuration: Duration(milliseconds: 300),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Material(
+          type: MaterialType.card,
+          color: Colors.black,
+          child: StatefulBuilder(builder: (context, setState) {
+            void isPinedChange() {
+              setState(() {
+                isPined = !isPined;
+              });
+            }
+
+            void isArchivedChange() {
+              setState(() {
+                isArchived = !isArchived;
+                setState;
+              });
+            }
+
+            return Stack(
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(
+                      height: 40,
+                    ),
+                    Container(
+                      child: Row(
+                        children: [
+                          IconButton(
+                            tooltip: "Navigate up",
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Spacer(),
+                          IconButton(
+                            tooltip: "Pin",
+                            onPressed: () {
+                              isPinedChange();
+                              // Navigator.pop(context);
+                            },
+                            icon: Transform.scale(
+                              scale: 1,
+                              child: isPined
+                                  ? Icon(
+                                      Icons.push_pin,
+                                      color: Colors.white,
+                                    )
+                                  : Icon(
+                                      Icons.push_pin_outlined,
+                                      color: Colors.white,
+                                    ),
+                            ),
+                          ),
+                          IconButton(
+                            tooltip: "Archive",
+                            onPressed: () {
+                              isArchivedChange();
+                              // Navigator.pop(context);
+                            },
+                            icon: Transform.scale(
+                              scale: 1,
+                              child: isArchived
+                                  ? Icon(
+                                      Icons.archive,
+                                      color: Colors.white,
+                                    )
+                                  : Icon(
+                                      Icons.archive_outlined,
+                                      color: Colors.white,
+                                    ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 15,
+                      ),
+                      child: TextFormField(
+                        controller: titleCtr,
+                        maxLines: null,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                        decoration: InputDecoration(
+                            hintText: "Title",
+                            hintStyle: TextStyle(
+                                color: Colors.white60,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 20),
+                            enabledBorder: InputBorder.none,
+                            border: InputBorder.none,
+                            disabledBorder: InputBorder.none),
+                        inputFormatters: [],
+                      ),
+                    ),
+                    Expanded(
+                        child: SingleChildScrollView(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 15),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextFormField(
+                              controller: noteCtr,
+                              minLines: 1,
+                              maxLines: null,
+                              style: TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                hintText: "Note",
+                                hintStyle: TextStyle(
+                                    color: Colors.white60, fontSize: 16),
+                                enabledBorder: InputBorder.none,
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ))
+                  ],
+                ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 20, right: 20),
+                    child: InkWell(
+                      splashColor: Colors.blueGrey,
+                      borderRadius: BorderRadius.circular(50),
+                      radius: 10,
+                      onTap: () {
+                        addNote();
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.yellow,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                                color: Colors.white.withOpacity(0.4))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.check,
+                            color: Colors.black,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }),
+        );
+      },
     );
   }
 }

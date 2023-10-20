@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -31,10 +32,63 @@ class _SettingScreenState extends State<SettingScreen> {
         ),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-           
-          ],
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "Dark Mode",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Switch(
+                      value: true,
+                      onChanged: (v) {},
+                    ),
+                  ],
+                ),
+              ),
+              Divider(
+                color: Colors.blue,
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "Push Notifications",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Switch(
+                      value: true,
+                      onChanged: (v) {},
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

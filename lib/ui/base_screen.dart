@@ -234,26 +234,26 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 indent: 10,
                 color: Colors.white38,
               ),
-              ListTile(
-                splashColor: Colors.grey[400],
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SettingScreen(),
-                    ),
-                  );
-                },
-                title: Text(
-                  "Settings",
-                  style: TextStyle(color: Colors.white),
-                ),
-                leading: Icon(
-                  Icons.settings,
-                  color: Colors.white,
-                ),
-              ),
+              // ListTile(
+              //   splashColor: Colors.grey[400],
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => SettingScreen(),
+              //       ),
+              //     );
+              //   },
+              //   title: Text(
+              //     "Settings",
+              //     style: TextStyle(color: Colors.white),
+              //   ),
+              //   leading: Icon(
+              //     Icons.settings,
+              //     color: Colors.white,
+              //   ),
+              // ),
             ],
           ),
         ),

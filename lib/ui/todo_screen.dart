@@ -1,33 +1,41 @@
 import 'dart:async';
-
+import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/db/list_data.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
+import 'package:notes_sqflite/services/notification_services.dart';
 import 'package:notes_sqflite/widget/todo_widget.dart';
+import 'package:timezone/standalone.dart'as tz;
+import 'package:timezone/timezone.dart';
 
 class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});
 
-  static reFreshScreen(BuildContext context) {
-    _TodoScreenState? state =
-        context.findAncestorStateOfType<_TodoScreenState>();
-    return state?.loadData();
-  }
+  // static reFreshScreen(BuildContext context) {
+  //   _TodoScreenState? state =
+  //       context.findAncestorStateOfType<_TodoScreenState>();
+  //   return state?.loadData();
+  // }
 
   @override
   State<TodoScreen> createState() => _TodoScreenState();
 }
 
 class _TodoScreenState extends State<TodoScreen> {
-  late Future<List<TodoModel>> todoList;
-  bool isFinished = false;
-  DBHelper? dbHelper;
+  final formKey = GlobalKey<FormState>();
+
   final timeCtr = TextEditingController();
   final dateCtr = TextEditingController();
   final todoCtr = TextEditingController();
+
+  DBHelper? dbHelper;
+  late Future<List<TodoModel>> todoList;
+
+  bool isFinished = false;
   String? categoryName;
 
   DateTime currentDate = DateTime.now();
@@ -38,7 +46,7 @@ class _TodoScreenState extends State<TodoScreen> {
     dbHelper = DBHelper();
     categoryName = ListData.category[0];
     loadData();
-    checkData();
+    // checkData();
   }
 
   void loadData() {
@@ -58,7 +66,7 @@ class _TodoScreenState extends State<TodoScreen> {
   // }
 
   checkData() {
-    Timer.periodic(Duration(milliseconds: 300), (timer) {
+    Timer.periodic(Duration(milliseconds: 500), (timer) {
       if (isUpdateTodo)
         setState(() {
           loadData();
@@ -96,8 +104,6 @@ class _TodoScreenState extends State<TodoScreen> {
   }
 
   RelativeRect buttonMenuPosition(BuildContext context) {
-    // final bool isEnglish =
-    //     LocalizedApp.of(context).delegate.currentLocale.languageCode == 'en';
     final RenderBox bar = context.findRenderObject() as RenderBox;
     final RenderBox overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox;
@@ -203,280 +209,8 @@ class _TodoScreenState extends State<TodoScreen> {
                       borderRadius: BorderRadius.circular(50),
                       radius: 10,
                       onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return StatefulBuilder(
-                                builder: (context, setState) {
-                              return Material(
-                                color: Colors.black,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    AppBar(
-                                      backgroundColor: Colors.black,
-                                      leading: IconButton(
-                                        tooltip: "Navigate up",
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        icon: Icon(
-                                          Icons.arrow_back,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                        child: Stack(
-                                      children: [
-                                        SingleChildScrollView(
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 15),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "What is to be done?",
-                                                  style: TextStyle(
-                                                      color: Colors.blue,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontSize: 18),
-                                                ),
-                                                TextFormField(
-                                                  controller: todoCtr,
-                                                  minLines: 1,
-                                                  maxLines: null,
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                  decoration: InputDecoration(
-                                                    hintText:
-                                                        "Enter schedule here",
-                                                    hintStyle: TextStyle(
-                                                        color: Colors.white54,
-                                                        fontSize: 16),
-                                                    // enabledBorder: InputBorder.none,
-                                                    // border: InputBorder.none,
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: 20,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Checkbox(
-                                                        value: isFinished,
-                                                        checkColor:
-                                                            Colors.white,
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(3),
-                                                        ),
-                                                        activeColor: Colors
-                                                            .blueGrey.shade900
-                                                            .withGreen(140),
-                                                        side: BorderSide(
-                                                            color:
-                                                                Colors.white),
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            isFinished = value!;
-                                                          });
-                                                        }),
-                                                    Text(
-                                                      "Schedule complated?",
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          // fontWeight: FontWeight.w500,
-                                                          fontSize: 14),
-                                                    ),
-                                                  ],
-                                                ),
-                                                SizedBox(
-                                                  height: 30,
-                                                ),
-                                                Text(
-                                                  "Due date",
-                                                  style: TextStyle(
-                                                      color: Colors.blue,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontSize: 18),
-                                                ),
-                                                SizedBox(
-                                                  height: 10,
-                                                ),
-                                                TextFormField(
-                                                  controller: dateCtr,
-                                                  readOnly: true,
-                                                  style: TextStyle(
-                                                      color: Colors.red[400]),
-                                                  onTap: () {
-                                                    _selectDate(context);
-                                                  },
-                                                  minLines: 1,
-                                                  maxLines: 1,
-                                                  decoration: InputDecoration(
-                                                      hintText: "Date not set",
-                                                      hintStyle: TextStyle(
-                                                          color:
-                                                              Colors.red[400])),
-                                                ),
-                                                SizedBox(
-                                                  height: 10,
-                                                ),
-                                                TextFormField(
-                                                  controller: timeCtr,
-                                                  onTap: () {
-                                                    displayTimePicker(context);
-                                                  },
-                                                  readOnly: true,
-                                                  minLines: 1,
-                                                  maxLines: 1,
-                                                  style: TextStyle(
-                                                      color: Colors.red[400]),
-                                                  decoration: InputDecoration(
-                                                      hintText: "Set time",
-                                                      hintStyle: TextStyle(
-                                                          color:
-                                                              Colors.red[400])),
-                                                ),
-                                                SizedBox(
-                                                  height: 20,
-                                                ),
-                                                PopupMenuButton(
-                                                  color: Colors.white,
-                                                  child: Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 5,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                            color: Colors.blue),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10)),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Text(
-                                                          "${categoryName}",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white),
-                                                        ),
-                                                        SizedBox(
-                                                          width: 10,
-                                                        ),
-                                                        Icon(
-                                                          Icons
-                                                              .arrow_drop_down_sharp,
-                                                          color: Colors.blue,
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  itemBuilder: (context) =>
-                                                      List.generate(
-                                                    ListData.category.length,
-                                                    (index) => PopupMenuItem(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          categoryName =
-                                                              ListData.category[
-                                                                  index];
-                                                        });
-                                                      },
-                                                      child: Text(
-                                                        ListData
-                                                            .category[index],
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.black),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        Align(
-                                          alignment: Alignment.bottomRight,
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 20, right: 20),
-                                            child: InkWell(
-                                              splashColor: Colors.blueGrey,
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              radius: 10,
-                                              onTap: () {
-                                                dbHelper!
-                                                    .insertTodo(TodoModel(
-                                                        todo: todoCtr.text,
-                                                        finished:
-                                                            isFinished == false
-                                                                ? 0
-                                                                : 1,
-                                                        dueDate: dateCtr.text,
-                                                        dueTime: timeCtr.text,
-                                                        category: categoryName
-                                                            .toString()))
-                                                    .then((value) {
-                                                  print("data added");
-                                                  clear();
-                                                  loadData();
-                                                  Navigator.pop(context);
-                                                }).onError((error, stackTrace) {
-                                                  print(error.toString());
-                                                  print(stackTrace.toString());
-                                                });
-                                              },
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                    color: Colors.yellow,
-                                                    shape: BoxShape.circle,
-                                                    border: Border.all(
-                                                        color: Colors.white
-                                                            .withOpacity(0.4))),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Icon(
-                                                    Icons.check,
-                                                    color: Colors.black,
-                                                    size: 30,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ))
-                                  ],
-                                ),
-                              );
-                            });
-                          },
-                        );
+                        notificationServices.showNotification();
+                        // addTodoDialoge();
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -501,6 +235,260 @@ class _TodoScreenState extends State<TodoScreen> {
           ),
         ],
       ),
+    );
+  }
+
+ 
+
+  void addTodoDialoge() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return Material(
+            color: Colors.black,
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  AppBar(
+                    backgroundColor: Colors.black,
+                    leading: IconButton(
+                      tooltip: "Navigate up",
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                      child: Stack(
+                    children: [
+                      SingleChildScrollView(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 15),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "What is to be done?",
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 18),
+                              ),
+                              TextFormField(
+                                controller: todoCtr,
+                                minLines: 1,
+                                maxLines: null,
+                                style: TextStyle(color: Colors.white),
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return "Enter schedule";
+                                  }
+                                  return null;
+                                },
+                                decoration: InputDecoration(
+                                  hintText: "Enter schedule here",
+                                  errorStyle: TextStyle(color: Colors.red[400]),
+                                  hintStyle: TextStyle(
+                                      color: Colors.white, fontSize: 16),
+                                  errorBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.red.shade400,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Row(
+                                children: [
+                                  Checkbox(
+                                      value: isFinished,
+                                      checkColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(3),
+                                      ),
+                                      activeColor: Colors.blueGrey.shade900
+                                          .withGreen(140),
+                                      side: BorderSide(color: Colors.white),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          isFinished = value!;
+                                        });
+                                      }),
+                                  Text(
+                                    "Schedule complated?",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        // fontWeight: FontWeight.w500,
+                                        fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 30,
+                              ),
+                              Text(
+                                "Due date",
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 18),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              TextFormField(
+                                controller: dateCtr,
+                                readOnly: true,
+                                style: TextStyle(color: Colors.red[400]),
+                                onTap: () {
+                                  _selectDate(context);
+                                },
+                                minLines: 1,
+                                maxLines: 1,
+                                decoration: InputDecoration(
+                                    hintText: "Date not set",
+                                    hintStyle:
+                                        TextStyle(color: Colors.red[400])),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              TextFormField(
+                                controller: timeCtr,
+                                onTap: () {
+                                  displayTimePicker(context);
+                                },
+                                readOnly: true,
+                                minLines: 1,
+                                maxLines: 1,
+                                style: TextStyle(color: Colors.red[400]),
+                                decoration: InputDecoration(
+                                    hintText: "Set time",
+                                    hintStyle:
+                                        TextStyle(color: Colors.red[400])),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              PopupMenuButton(
+                                color: Colors.white,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.blue),
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "${categoryName}",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Icon(
+                                        Icons.arrow_drop_down_sharp,
+                                        color: Colors.blue,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                itemBuilder: (context) => List.generate(
+                                  ListData.category.length,
+                                  (index) => PopupMenuItem(
+                                    onTap: () {
+                                      setState(() {
+                                        categoryName = ListData.category[index];
+                                      });
+                                    },
+                                    child: Text(
+                                      ListData.category[index],
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 20, right: 20),
+                          child: InkWell(
+                            splashColor: Colors.blueGrey,
+                            borderRadius: BorderRadius.circular(50),
+                            radius: 10,
+                            onTap: () {
+                              if (formKey.currentState!.validate()) {
+                                // DateTime scheduleTime = DateTime.now().add(
+                                //   Duration(seconds: 5),
+                                // );
+                                // notificationServices
+                                //       .showNotification(scheduleTime);
+                                dbHelper!
+                                    .insertTodo(TodoModel(
+                                        todo: todoCtr.text,
+                                        finished: isFinished == false ? 0 : 1,
+                                        dueDate: dateCtr.text,
+                                        dueTime: timeCtr.text,
+                                        category: categoryName.toString()))
+                                    .then((value) {
+                                  print("data added");
+                                  clear();
+                                  loadData();
+                                  Navigator.pop(context);
+                                }).onError((error, stackTrace) {
+                                  print(error.toString());
+                                  print(stackTrace.toString());
+                                });
+                              }
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.yellow,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: Colors.white.withOpacity(0.4))),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(
+                                  Icons.check,
+                                  color: Colors.black,
+                                  size: 30,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ))
+                ],
+              ),
+            ),
+          );
+        });
+      },
     );
   }
 }
