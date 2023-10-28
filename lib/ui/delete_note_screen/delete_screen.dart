@@ -5,14 +5,14 @@ import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/note_model.dart';
 import 'package:notes_sqflite/widget/note_widget.dart';
 
-class DeleteScreen extends StatefulWidget {
-  const DeleteScreen({super.key});
+class DeleteNoteScreen extends StatefulWidget {
+  const DeleteNoteScreen({super.key});
 
   @override
-  State<DeleteScreen> createState() => _DeleteScreenState();
+  State<DeleteNoteScreen> createState() => _DeleteNoteScreenState();
 }
 
-class _DeleteScreenState extends State<DeleteScreen> {
+class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
   DBHelper? dbHelper;
   late Future<List<NotesModel>> noteList;
   @override
@@ -32,7 +32,7 @@ class _DeleteScreenState extends State<DeleteScreen> {
     return WillPopScope(
       onWillPop: () async {
         setState(() {
-          isUpdateNote = true;
+          isUpdateNoteScreen = true;
         });
         Navigator.pop(context);
         return true;
@@ -44,7 +44,7 @@ class _DeleteScreenState extends State<DeleteScreen> {
           leading: IconButton(
               onPressed: () {
                 setState(() {
-                  isUpdateNote = true;
+                  isUpdateNoteScreen = true;
                 });
                 Navigator.pop(context);
               },
@@ -109,7 +109,7 @@ class _DeleteScreenState extends State<DeleteScreen> {
                               },
                               onDismissed: () {
                                 setState(() {
-                                  dbHelper!.delete(snapshot.data![index].id!);
+                                  // dbHelper!.delete(snapshot.data![index].id!);
                                   noteList = dbHelper!.getNotesList();
                                   snapshot.data!.remove(snapshot.data![index]);
                                 });

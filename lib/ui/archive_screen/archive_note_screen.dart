@@ -32,7 +32,7 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
     return WillPopScope(
       onWillPop: () async {
         setState(() {
-          isUpdateNote = true;
+          isUpdateNoteScreen = true;
         });
         return true;
       },
@@ -43,7 +43,7 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
           leading: IconButton(
               onPressed: () {
                 setState(() {
-                  isUpdateNote = true;
+                  isUpdateNoteScreen = true;
                 });
                 Navigator.pop(context);
               },
@@ -86,7 +86,8 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
                       return snapshot.data![index].archive == 1
-                          ? NoteWidget(
+                          ? snapshot.data![index].deleted==0?
+                          NoteWidget(
                               dbHelper: dbHelper!,
                               keyvalue:
                                   ValueKey<int>(snapshot.data![index].id!),
@@ -96,7 +97,7 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
                               pin: snapshot.data![index].pin!,
                               archive: snapshot.data![index].archive!,
                               email: snapshot.data![index].email.toString(),
-                              deleted: 0,
+                              deleted: snapshot.data![index].deleted!,
                               createDate:
                                   snapshot.data![index].create_date.toString(),
                               editedDate:
@@ -108,11 +109,13 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
                               },
                               onDismissed: () {
                                 setState(() {
-                                  dbHelper!.delete(snapshot.data![index].id!);
+                                  // dbHelper!.delete(snapshot.data![index].id!);
                                   noteList = dbHelper!.getNotesList();
                                   snapshot.data!.remove(snapshot.data![index]);
                                 });
-                              })
+                              },
+                            )
+                          :Container()
                           : Container();
                     },
                   );

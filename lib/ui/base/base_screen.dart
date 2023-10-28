@@ -2,12 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/model/note_model.dart';
-import 'package:notes_sqflite/ui/archive_note_screen.dart';
-import 'package:notes_sqflite/ui/delete_screen.dart';
-import 'package:notes_sqflite/ui/notes_screen.dart';
-import 'package:notes_sqflite/ui/setting_screen.dart';
-import 'package:notes_sqflite/ui/todo_done_screen.dart';
-import 'package:notes_sqflite/ui/todo_screen.dart';
+import 'package:notes_sqflite/ui/archive_screen/archive_note_screen.dart';
+import 'package:notes_sqflite/ui/delete_note_screen/delete_screen.dart';
+import 'package:notes_sqflite/ui/note_screen/notes_screen.dart';
+import 'package:notes_sqflite/ui/todo_screen/todo_done_screen.dart';
+import 'package:notes_sqflite/ui/todo_screen/todo_screen.dart';
 
 class Base extends StatefulWidget {
   const Base({super.key});
@@ -216,7 +215,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DeleteScreen(),
+                      builder: (context) => DeleteNoteScreen(),
                     ),
                   );
                 },

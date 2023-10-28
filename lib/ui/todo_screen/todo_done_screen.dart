@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notes_sqflite/animations/list_animation.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/db/list_data.dart';
 import 'package:notes_sqflite/main.dart';
@@ -38,7 +39,7 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
     return WillPopScope(
       onWillPop: () async {
         setState(() {
-          isUpdateTodo = true;
+          isUpdateTodoScreen = true;
         });
         return true;
       },
@@ -49,7 +50,7 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
           leading: IconButton(
               onPressed: () {
                 setState(() {
-                  isUpdateTodo = true;
+                  isUpdateTodoScreen = true;
                 });
                 Navigator.pop(context);
               },
@@ -74,38 +75,59 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
                     vertical: 10,
                   ),
                   itemCount: snapshot.data!.length,
-                  reverse: true,
+                  // reverse: true,
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     return snapshot.data![index].finished == 1
-                        ? TodoWidget(
-                            description: snapshot.data![index].todo,
-                            categoryName: snapshot.data![index].category,
-                            dueDate: snapshot.data![index].dueDate,
-                            dueTime: snapshot.data![index].dueTime,
-                            finished: snapshot.data![index].finished,
-                            onDelete: () {
-                              setState(() {
-                                dbHelper!.deleteTodo(snapshot.data![index].id!);
-                                todoList = dbHelper!.getTodosList();
-                              });
-                            },
-                            onDone: (todo, date, time, status, category) {
-                              dbHelper!
-                                  .updateTodo(TodoModel(
-                                id: snapshot.data![index].id,
-                                todo: todo,
-                                finished: status,
-                                dueDate: date,
-                                dueTime: time,
-                                category: category,
-                              ))
-                                  .then((value) {
+                        ? VerticalAnimation(
+                            index: index,
+                            child: TodoWidget(
+                              todo: snapshot.data![index].todo,
+                              categoryName: snapshot.data![index].category,
+                              dueDate: snapshot.data![index].dueDate,
+                              dueTime: snapshot.data![index].dueTime,
+                              finished: snapshot.data![index].finished,
+                              onDelete: () {
                                 setState(() {
+                                  dbHelper!
+                                      .deleteTodo(snapshot.data![index].id!);
                                   todoList = dbHelper!.getTodosList();
                                 });
-                              });
-                            },
+                              },
+                              onUpdate: (todo, time, date, status, category) {
+                                dbHelper!
+                                    .updateTodo(TodoModel(
+                                  id: snapshot.data![index].id,
+                                  todo: todo,
+                                  finished: status,
+                                  dueDate: date,
+                                  dueTime: time,
+                                  category: category,
+                                ))
+                                    .then((value) {
+                                  Navigator.pop(context,);
+                                  setState(() {
+                                    todoList = dbHelper!.getTodosList();
+                                  });
+                                });
+                              },
+                              onFinish: (todo, date, time, status, category) {
+                                dbHelper!
+                                    .updateTodo(TodoModel(
+                                  id: snapshot.data![index].id,
+                                  todo: todo,
+                                  finished: status,
+                                  dueDate: date,
+                                  dueTime: time,
+                                  category: category,
+                                ))
+                                    .then((value) {
+                                  setState(() {
+                                    todoList = dbHelper!.getTodosList();
+                                  });
+                                });
+                              },
+                            ),
                           )
                         : Container();
                   },
