@@ -3,6 +3,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/note_model.dart';
+import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:notes_sqflite/widget/note_widget.dart';
 
 class ArchiveNoteScreen extends StatefulWidget {
@@ -37,9 +38,9 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
         return true;
       },
       child: Scaffold(
-        backgroundColor: Colors.black,
+        // backgroundColor: AppColors.whiteColor,
         appBar: AppBar(
-          backgroundColor: Colors.black,
+          // backgroundColor: AppColors.whiteColor,
           leading: IconButton(
               onPressed: () {
                 setState(() {
@@ -49,11 +50,13 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
               },
               icon: Icon(
                 Icons.arrow_back,
-                color: Colors.white,
+                color: Theme.of(context).iconTheme.color
               )),
           title: Text(
             "Archive",
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(
+              // color: Colors.black,
+            ),
           ),
           centerTitle: false,
         ),
@@ -67,7 +70,7 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
             //   child: Text(
             //     "Archive",
             //     style: TextStyle(
-            //         color: Colors.white,
+            //         color: AppColors.whiteColor
             //         fontWeight: FontWeight.w500,
             //         fontSize: 14),
             //   ),
@@ -86,36 +89,37 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
                       return snapshot.data![index].archive == 1
-                          ? snapshot.data![index].deleted==0?
-                          NoteWidget(
-                              dbHelper: dbHelper!,
-                              keyvalue:
-                                  ValueKey<int>(snapshot.data![index].id!),
-                              id: snapshot.data![index].id!,
-                              title: snapshot.data![index].title.toString(),
-                              note: snapshot.data![index].note.toString(),
-                              pin: snapshot.data![index].pin!,
-                              archive: snapshot.data![index].archive!,
-                              email: snapshot.data![index].email.toString(),
-                              deleted: snapshot.data![index].deleted!,
-                              createDate:
-                                  snapshot.data![index].create_date.toString(),
-                              editedDate:
-                                  snapshot.data![index].edited_date.toString(),
-                              onUpdateComplete: () {
-                                setState(() {
-                                  noteList = dbHelper!.getNotesList();
-                                });
-                              },
-                              onDismissed: () {
-                                setState(() {
-                                  // dbHelper!.delete(snapshot.data![index].id!);
-                                  noteList = dbHelper!.getNotesList();
-                                  snapshot.data!.remove(snapshot.data![index]);
-                                });
-                              },
-                            )
-                          :Container()
+                          ? snapshot.data![index].deleted == 0
+                              ? NoteWidget(
+                                  dbHelper: dbHelper!,
+                                  keyvalue:
+                                      ValueKey<int>(snapshot.data![index].id!),
+                                  id: snapshot.data![index].id!,
+                                  title: snapshot.data![index].title.toString(),
+                                  note: snapshot.data![index].note.toString(),
+                                  pin: snapshot.data![index].pin!,
+                                  archive: snapshot.data![index].archive!,
+                                  email: snapshot.data![index].email.toString(),
+                                  deleted: snapshot.data![index].deleted!,
+                                  createDate: snapshot.data![index].create_date
+                                      .toString(),
+                                  editedDate: snapshot.data![index].edited_date
+                                      .toString(),
+                                  onUpdateComplete: () {
+                                    setState(() {
+                                      noteList = dbHelper!.getNotesList();
+                                    });
+                                  },
+                                  onDismissed: () {
+                                    setState(() {
+                                      // dbHelper!.delete(snapshot.data![index].id!);
+                                      noteList = dbHelper!.getNotesList();
+                                      snapshot.data!
+                                          .remove(snapshot.data![index]);
+                                    });
+                                  },
+                                )
+                              : Container()
                           : Container();
                     },
                   );

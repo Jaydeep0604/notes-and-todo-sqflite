@@ -4,6 +4,7 @@ import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/note_model.dart';
 import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
+import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:notes_sqflite/widget/note_widget.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -69,7 +70,7 @@ class _NotesScreenState extends State<NotesScreen> {
         SafeArea(
           child: SingleChildScrollView(
             child: Container(
-              color: Colors.black,
+              // color: AppColors.whiteColor,
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               child: FutureBuilder(
                 future: noteList,
@@ -90,7 +91,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                   child: Center(
                                     child: Text(
                                       "No Data",
-                                      style: TextStyle(color: Colors.white),
+                                      style: TextStyle(color: AppColors.whiteColor),
                                     ),
                                   ),
                                 );
@@ -222,7 +223,7 @@ class _NotesScreenState extends State<NotesScreen> {
           child: Padding(
             padding: const EdgeInsets.only(bottom: 10, right: 10),
             child: InkWell(
-              splashColor: Colors.blueGrey,
+              splashColor: AppColors.blueGrayColor,
               borderRadius: BorderRadius.circular(50),
               radius: 10,
               onTap: () {
@@ -249,14 +250,14 @@ class _NotesScreenState extends State<NotesScreen> {
                     color: Colors.yellow,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.4),
+                      color: AppColors.whiteColor.withOpacity(0.4),
                     ),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Icon(
                       Icons.add,
-                      color: Colors.black,
+                      color: AppColors.blackColor,
                       size: 30,
                     ),
                   )),
@@ -274,7 +275,7 @@ class _NotesScreenState extends State<NotesScreen> {
   //     pageBuilder: (context, animation, secondaryAnimation) {
   //       return Material(
   //         type: MaterialType.card,
-  //         color: Colors.black,
+  //         color: AppColors.blackColor,
   //         child: StatefulBuilder(builder: (context, setState) {
   //           void isPinedChange() {
   //             setState(() {
@@ -308,7 +309,7 @@ class _NotesScreenState extends State<NotesScreen> {
   //                           },
   //                           icon: Icon(
   //                             Icons.arrow_back,
-  //                             color: Colors.white,
+  //                             color: AppColors.whiteColor
   //                           ),
   //                         ),
   //                         Spacer(),
@@ -323,11 +324,11 @@ class _NotesScreenState extends State<NotesScreen> {
   //                             child: isPined
   //                                 ? Icon(
   //                                     Icons.push_pin,
-  //                                     color: Colors.white,
+  //                                     color: AppColors.whiteColor
   //                                   )
   //                                 : Icon(
   //                                     Icons.push_pin_outlined,
-  //                                     color: Colors.white,
+  //                                     color: AppColors.whiteColor
   //                                   ),
   //                           ),
   //                         ),
@@ -342,11 +343,11 @@ class _NotesScreenState extends State<NotesScreen> {
   //                             child: isArchived
   //                                 ? Icon(
   //                                     Icons.archive,
-  //                                     color: Colors.white,
+  //                                     color: AppColors.whiteColor
   //                                   )
   //                                 : Icon(
   //                                     Icons.archive_outlined,
-  //                                     color: Colors.white,
+  //                                     color: AppColors.whiteColor
   //                                   ),
   //                           ),
   //                         ),
@@ -369,7 +370,7 @@ class _NotesScreenState extends State<NotesScreen> {
   //                       style: TextStyle(
   //                         fontWeight: FontWeight.w400,
   //                         fontSize: 20,
-  //                         color: Colors.white,
+  //                         color: AppColors.whiteColor
   //                       ),
   //                       decoration: InputDecoration(
   //                           hintText: "Title",
@@ -431,7 +432,7 @@ class _NotesScreenState extends State<NotesScreen> {
   //                         padding: const EdgeInsets.all(8.0),
   //                         child: Icon(
   //                           Icons.check,
-  //                           color: Colors.black,
+  //                           color: AppColors.blackColor,
   //                           size: 30,
   //                         ),
   //                       ),

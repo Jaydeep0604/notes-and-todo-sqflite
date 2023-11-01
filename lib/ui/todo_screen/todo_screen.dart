@@ -5,6 +5,7 @@ import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_detail_screen.dart';
+import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:notes_sqflite/widget/todo_widget.dart';
 
 class TodoScreen extends StatefulWidget {
@@ -57,7 +58,7 @@ class _TodoScreenState extends State<TodoScreen> {
             child: Stack(
               children: [
                 RefreshIndicator(
-                  color: Colors.blue,
+                  color: AppColors.blueColor,
                   // backgroundColor: Colors.trransparent,
                   onRefresh: () =>
                       Future.delayed(Duration(seconds: 1), loadData),
@@ -82,6 +83,7 @@ class _TodoScreenState extends State<TodoScreen> {
                                 children: [
                                   if (snapshot.data![index].finished == 0)
                                     TodoWidget(
+                                      id: snapshot.data![index].id!,
                                       todo: snapshot.data![index].todo,
                                       categoryName:
                                           snapshot.data![index].category,
@@ -95,22 +97,9 @@ class _TodoScreenState extends State<TodoScreen> {
                                           todoList = dbHelper!.getTodosList();
                                         });
                                       },
-                                      onUpdate:
-                                          (todo, time, date, status, category) {
-                                        dbHelper!
-                                            .updateTodo(TodoModel(
-                                          id: snapshot.data![index].id,
-                                          todo: todo,
-                                          finished: status,
-                                          dueDate: date,
-                                          dueTime: time,
-                                          category: category,
-                                        ))
-                                            .then((value) {
-                                          Navigator.pop(context, true);
-                                          setState(() {
-                                            todoList = dbHelper!.getTodosList();
-                                          });
+                                      onUpdate: () {
+                                        setState(() {
+                                          todoList = dbHelper!.getTodosList();
                                         });
                                       },
                                       onFinish:
@@ -124,11 +113,16 @@ class _TodoScreenState extends State<TodoScreen> {
                                           dueTime: time,
                                           category: category,
                                         ))
-                                            .then((value) {
-                                          setState(() {
-                                            todoList = dbHelper!.getTodosList();
-                                          });
-                                        });
+                                            .then(
+                                          (value) {
+                                            setState(
+                                              () {
+                                                todoList =
+                                                    dbHelper!.getTodosList();
+                                              },
+                                            );
+                                          },
+                                        );
                                       },
                                     ),
                                 ],
@@ -145,7 +139,7 @@ class _TodoScreenState extends State<TodoScreen> {
                       } else {
                         return Center(
                             child: CircularProgressIndicator(
-                          color: Colors.white,
+                          color: AppColors.whiteColor,
                         ));
                       }
                     },
@@ -156,7 +150,7 @@ class _TodoScreenState extends State<TodoScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 10, right: 10),
                     child: InkWell(
-                      splashColor: Colors.blueGrey,
+                      splashColor: AppColors.blueGrayColor,
                       borderRadius: BorderRadius.circular(50),
                       radius: 10,
                       onTap: () {
@@ -201,7 +195,7 @@ class _TodoScreenState extends State<TodoScreen> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                            color: Colors.yellow,
+                            color: AppColors.yellowColor,
                             shape: BoxShape.circle,
                             border: Border.all(
                                 color: Colors.white.withOpacity(0.4))),
@@ -209,7 +203,7 @@ class _TodoScreenState extends State<TodoScreen> {
                           padding: const EdgeInsets.all(8.0),
                           child: Icon(
                             Icons.add,
-                            color: Colors.black,
+                            color: AppColors.blackColor,
                             size: 30,
                           ),
                         ),
@@ -231,7 +225,7 @@ class _TodoScreenState extends State<TodoScreen> {
   //     builder: (context) {
   //       return StatefulBuilder(builder: (context, setState) {
   //         return Material(
-  //           color: Colors.black,
+  //           color: AppColors.blackColor,
   //           child: Form(
   //             key: formKey,
   //             child: Column(
@@ -239,7 +233,7 @@ class _TodoScreenState extends State<TodoScreen> {
   //               crossAxisAlignment: CrossAxisAlignment.start,
   //               children: <Widget>[
   //                 AppBar(
-  //                   backgroundColor: Colors.black,
+  //                   backgroundColor: AppColors.blackColor,
   //                   leading: IconButton(
   //                     tooltip: "Navigate up",
   //                     onPressed: () {
@@ -247,7 +241,7 @@ class _TodoScreenState extends State<TodoScreen> {
   //                     },
   //                     icon: Icon(
   //                       Icons.arrow_back,
-  //                       color: Colors.white,
+  //                       color: AppColors.whiteColor
   //                     ),
   //                   ),
   //                 ),
@@ -281,9 +275,9 @@ class _TodoScreenState extends State<TodoScreen> {
   //                               },
   //                               decoration: InputDecoration(
   //                                 hintText: "Enter schedule here",
-  //                                 errorStyle: TextStyle(color: Colors.red[400]),
+  //                                 errorStyle: TextStyle(color: AppColors.redColor),
   //                                 hintStyle: TextStyle(
-  //                                     color: Colors.white, fontSize: 16),
+  //                                     color: AppColors.whiteColor fontSize: 16),
   //                                 errorBorder: UnderlineInputBorder(
   //                                   borderSide: BorderSide(
   //                                     color: Colors.red.shade400,
@@ -298,7 +292,7 @@ class _TodoScreenState extends State<TodoScreen> {
   //                               children: [
   //                                 Checkbox(
   //                                     value: isFinished,
-  //                                     checkColor: Colors.white,
+  //                                     checkColor: AppColors.whiteColor
   //                                     shape: RoundedRectangleBorder(
   //                                       borderRadius: BorderRadius.circular(3),
   //                                     ),
@@ -313,7 +307,7 @@ class _TodoScreenState extends State<TodoScreen> {
   //                                 Text(
   //                                   "Schedule complated?",
   //                                   style: TextStyle(
-  //                                       color: Colors.white,
+  //                                       color: AppColors.whiteColor
   //                                       // fontWeight: FontWeight.w500,
   //                                       fontSize: 14),
   //                                 ),
@@ -335,7 +329,7 @@ class _TodoScreenState extends State<TodoScreen> {
   //                             TextFormField(
   //                               controller: dateCtr,
   //                               readOnly: true,
-  //                               style: TextStyle(color: Colors.red[400]),
+  //                               style: TextStyle(color: AppColors.redColor),
   //                               onTap: () {
   //                                 _selectDate(context);
   //                               },
@@ -344,7 +338,7 @@ class _TodoScreenState extends State<TodoScreen> {
   //                               decoration: InputDecoration(
   //                                   hintText: "Date not set",
   //                                   hintStyle:
-  //                                       TextStyle(color: Colors.red[400])),
+  //                                       TextStyle(color: AppColors.redColor)),
   //                             ),
   //                             SizedBox(
   //                               height: 10,
@@ -357,17 +351,17 @@ class _TodoScreenState extends State<TodoScreen> {
   //                               readOnly: true,
   //                               minLines: 1,
   //                               maxLines: 1,
-  //                               style: TextStyle(color: Colors.red[400]),
+  //                               style: TextStyle(color: AppColors.redColor),
   //                               decoration: InputDecoration(
   //                                   hintText: "Set time",
   //                                   hintStyle:
-  //                                       TextStyle(color: Colors.red[400])),
+  //                                       TextStyle(color: AppColors.redColor)),
   //                             ),
   //                             SizedBox(
   //                               height: 20,
   //                             ),
   //                             PopupMenuButton(
-  //                               color: Colors.white,
+  //                               color: AppColors.whiteColor
   //                               child: Container(
   //                                 padding: const EdgeInsets.symmetric(
   //                                   horizontal: 10,
@@ -461,7 +455,7 @@ class _TodoScreenState extends State<TodoScreen> {
   //                               padding: const EdgeInsets.all(8.0),
   //                               child: Icon(
   //                                 Icons.check,
-  //                                 color: Colors.black,
+  //                                 color: AppColors.blackColor,
   //                                 size: 30,
   //                               ),
   //                             ),

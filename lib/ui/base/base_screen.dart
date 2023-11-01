@@ -5,8 +5,10 @@ import 'package:notes_sqflite/model/note_model.dart';
 import 'package:notes_sqflite/ui/archive_screen/archive_note_screen.dart';
 import 'package:notes_sqflite/ui/delete_note_screen/delete_screen.dart';
 import 'package:notes_sqflite/ui/note_screen/notes_screen.dart';
+import 'package:notes_sqflite/ui/setting_screen/setting_screen.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_done_screen.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_screen.dart';
+import 'package:notes_sqflite/utils/app_colors.dart';
 
 class Base extends StatefulWidget {
   const Base({super.key});
@@ -61,14 +63,14 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      // backgroundColor: AppColors.whiteColor,
       key: globalScaffoldKey,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        // backgroundColor: AppColors.whiteColor,
         leading: isNotes
             ? Icon(
                 CupertinoIcons.pencil_outline,
-                color: Colors.white,
+                color: Theme.of(context).iconTheme.color,
               )
             : IconButton(
                 onPressed: () {
@@ -77,14 +79,14 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                     isTodos = false;
                   });
                 },
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: Colors.white,
-                ),
+                icon: Icon(Icons.arrow_back,
+                    color: Theme.of(context).iconTheme.color),
               ),
         title: Text(
-          isNotes ? "Notes" : "schedules",
-          style: TextStyle(color: Colors.white),
+          isNotes ? "Notes" : "Schedules",
+          style: TextStyle(
+              // color: AppColors.blackColor
+              ),
         ),
         actions: [
           SizedBox(
@@ -94,17 +96,15 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
               onPressed: () {
                 openDrawer();
               },
-              icon: Icon(
-                CupertinoIcons.text_alignright,
-                color: Colors.white,
-              ))
+              icon: Icon(CupertinoIcons.text_alignright,
+                  color: Theme.of(context).iconTheme.color))
         ],
         centerTitle: true,
       ),
       endDrawer: Container(
         width: MediaQuery.of(context).size.width * 0.65,
         child: Drawer(
-          backgroundColor: Colors.blueGrey.shade700.withOpacity(0.9),
+          backgroundColor: AppColors.drawerBackgroundColor.withOpacity(0.9),
           child: Column(
             children: [
               SizedBox(
@@ -115,12 +115,12 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 child: Center(
                     child: Icon(
                   CupertinoIcons.pencil_outline,
-                  color: Colors.white,
+                  color: AppColors.whiteColor,
                   size: 35,
                 )),
               ),
               Divider(
-                color: Colors.white,
+                color: AppColors.whiteColor.withOpacity(0.7),
               ),
               // ListTile(
               //   splashColor: Colors.blue[400],
@@ -134,7 +134,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
               //   ),
               //   leading: Icon(
               //     CupertinoIcons.pencil_ellipsis_rectangle,
-              //     color: Colors.white,
+              //     color: AppColors.whiteColor
               //   ),
               // ),
               // Divider(
@@ -143,7 +143,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
               //   color: Colors.white38,
               // ),
               ListTile(
-                splashColor: Colors.green[400],
+                splashColor: AppColors.greenSplashColor,
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -152,12 +152,9 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 },
                 title: Text(
                   "Finished",
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: AppColors.whiteColor),
                 ),
-                leading: Icon(
-                  Icons.done_all,
-                  color: Colors.white,
-                ),
+                leading: Icon(Icons.done_all, color: AppColors.whiteColor),
               ),
               Divider(
                 endIndent: 10,
@@ -175,7 +172,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
               //   ),
               //   leading: Icon(
               //     Icons.archive_outlined,
-              //     color: Colors.white,
+              //     color: AppColors.whiteColor
               //   ),
               // ),
               // Divider(
@@ -184,7 +181,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
               //   color: Colors.white38,
               // ),
               ListTile(
-                splashColor: Colors.deepOrange[400],
+                splashColor: AppColors.orangeSplashColor,
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -196,12 +193,10 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 },
                 title: Text(
                   "Archive",
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: AppColors.whiteColor),
                 ),
-                leading: Icon(
-                  Icons.archive_outlined,
-                  color: Colors.white,
-                ),
+                leading:
+                    Icon(Icons.archive_outlined, color: AppColors.whiteColor),
               ),
               Divider(
                 endIndent: 10,
@@ -209,7 +204,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 color: Colors.white38,
               ),
               ListTile(
-                splashColor: Colors.red[400],
+                splashColor: AppColors.redColor,
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -221,45 +216,44 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 },
                 title: Text(
                   "Deleted",
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: AppColors.whiteColor),
                 ),
-                leading: Icon(
-                  Icons.delete_forever,
-                  color: Colors.white,
-                ),
+                leading:
+                    Icon(Icons.delete_forever, color: AppColors.whiteColor),
               ),
               Divider(
                 endIndent: 10,
                 indent: 10,
                 color: Colors.white38,
               ),
-              // ListTile(
-              //   splashColor: Colors.grey[400],
-              //   onTap: () {
-              //     Navigator.pop(context);
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //         builder: (context) => SettingScreen(),
-              //       ),
-              //     );
-              //   },
-              //   title: Text(
-              //     "Settings",
-              //     style: TextStyle(color: Colors.white),
-              //   ),
-              //   leading: Icon(
-              //     Icons.settings,
-              //     color: Colors.white,
-              //   ),
-              // ),
+              ListTile(
+                splashColor: Colors.grey[400],
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SettingScreen(),
+                    ),
+                  );
+                },
+                title: Text(
+                  "Settings",
+                  style: TextStyle(color: Colors.white),
+                ),
+                leading: Icon(
+                  Icons.settings,
+                  color: AppColors.whiteColor
+                ),
+              ),
             ],
           ),
         ),
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.black87,
+          // color: Colors.black87,
+          // color: AppColors.whiteColor,
           borderRadius: BorderRadius.only(
             topRight: Radius.circular(10),
             topLeft: Radius.circular(10),
@@ -282,14 +276,14 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 57, 149, 199),
+                        color: AppColors.bottomNavigationBarFirstColor,
                         borderRadius: BorderRadius.circular(10),
                         border:
                             Border.all(color: Colors.white.withOpacity(0.4))),
                     child: Center(
                       child: Icon(
                         CupertinoIcons.pencil_ellipsis_rectangle,
-                        color: Colors.white,
+                        color: Theme.of(context).iconTheme.color,
                         size: isNotes ? 25 : 20,
                       ),
                     ),
@@ -315,14 +309,16 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                        color: Colors.blueGrey.shade900.withGreen(180),
-                        borderRadius: BorderRadius.circular(10),
-                        border:
-                            Border.all(color: Colors.white.withOpacity(0.4))),
+                      color: AppColors.bottomNavigationBarSecondColor,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.4),
+                      ),
+                    ),
                     child: Center(
                       child: Icon(
                         CupertinoIcons.list_bullet_indent,
-                        color: Colors.white,
+                        color: Theme.of(context).iconTheme.color,
                         size: isTodos ? 25 : 20,
                       ),
                     ),

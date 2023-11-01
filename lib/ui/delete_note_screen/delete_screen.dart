@@ -3,6 +3,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/note_model.dart';
+import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:notes_sqflite/widget/note_widget.dart';
 
 class DeleteNoteScreen extends StatefulWidget {
@@ -38,9 +39,9 @@ class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
         return true;
       },
       child: Scaffold(
-        backgroundColor: Colors.black,
+        // backgroundColor: AppColors.whiteColor,
         appBar: AppBar(
-          backgroundColor: Colors.black,
+          // backgroundColor: AppColors.whiteColor,
           leading: IconButton(
               onPressed: () {
                 setState(() {
@@ -50,11 +51,13 @@ class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
               },
               icon: Icon(
                 Icons.arrow_back,
-                color: Colors.white,
+                color: Theme.of(context).iconTheme.color
               )),
           title: Text(
             "Deleted",
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(
+              // color: Colors.black
+              ),
           ),
           centerTitle: false,
         ),
@@ -68,7 +71,7 @@ class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
             //   child: Text(
             //     "Deleted",
             //     style: TextStyle(
-            //         color: Colors.white,
+            //         color: AppColors.whiteColor
             //         fontWeight: FontWeight.w500,
             //         fontSize: 14),
             //   ),

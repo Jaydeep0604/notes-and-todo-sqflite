@@ -5,20 +5,22 @@ import 'package:notes_sqflite/db/list_data.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
 import 'package:notes_sqflite/services/notification_services.dart';
+import 'package:notes_sqflite/utils/app_colors.dart';
 
 class TodoDetailscreen extends StatefulWidget {
   bool isUpdateTodo;
+  int? id;
   bool? isDone;
   String? todo;
   String? date;
   String? time;
   String? categoryName;
   void Function()? onDelete;
-  void Function(String description, String time, String date, int status,
-      String category)? onUpdate;
+  void Function()? onUpdate;
   TodoDetailscreen(
       {super.key,
       required this.isUpdateTodo,
+      this.id,
       this.isDone,
       this.todo,
       this.date,
@@ -137,117 +139,115 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
   final formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Form(
-        key: formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            AppBar(
-              backgroundColor: Colors.black,
-              leading: IconButton(
-                tooltip: "Navigate up",
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: Colors.white,
+    return GestureDetector(
+      onTap: (){
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        body: Form(
+          key: formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              AppBar(
+                // backgroundColor: AppColors.whiteColor,
+                leading: IconButton(
+                  tooltip: "Navigate up",
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(Icons.arrow_back,
+                      color: Theme.of(context).iconTheme.color),
                 ),
-              ),
-              actions: [
-                if (widget.isUpdateTodo)
-                  IconButton(
-                    tooltip: "Share schedules",
-                    onPressed: () {
-                      // Navigator.pop(context);
-                    },
-                    icon: Icon(
-                      Icons.share,
-                      color: Colors.white,
+                actions: [
+                  if (widget.isUpdateTodo)
+                    IconButton(
+                      tooltip: "Share schedules",
+                      onPressed: () {},
+                      icon: Icon(Icons.share,
+                          color: Theme.of(context).iconTheme.color),
                     ),
-                  ),
-                if (widget.isUpdateTodo)
-                  IconButton(
-                    tooltip: "Delete",
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          backgroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          alignment: Alignment.center,
-                          titleTextStyle:
-                              TextStyle(fontWeight: FontWeight.w500),
-                          title: Text(
-                            "Are you sure, you want to delete?",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
+                  if (widget.isUpdateTodo)
+                    IconButton(
+                      tooltip: "Delete",
+                      onPressed: () {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Theme.of(context).canvasColor,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            alignment: Alignment.center,
+                            titleTextStyle:
+                                TextStyle(fontWeight: FontWeight.w500),
+                            title: Text(
+                              "Are you sure, you want to delete?",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                color: Colors.black),
-                          ),
-                          actions: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: MaterialButton(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        side: BorderSide(color: Colors.black)),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text(
-                                      "No",
-                                      style: TextStyle(color: Colors.black),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Expanded(
-                                  child: MaterialButton(
-                                    color: Colors.blue,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      // side: BorderSide(color: Colors.black)
-                                    ),
-                                    onPressed: () {
-                                      if (widget.isUpdateTodo) {
-                                        widget.onDelete!();
-                                      }
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text(
-                                      "Yes",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                )
-                              ],
+                                color: AppColors.blackColor,
+                              ),
                             ),
-                          ],
-                        ),
-                      ).then((value) => Navigator.pop(context));
-                    },
-                    icon: Icon(
-                      Icons.delete_forever,
-                      color: Colors.white,
+                            actions: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: MaterialButton(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                          side: BorderSide(
+                                              color: AppColors.blackColor)),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                        "No",
+                                        style: TextStyle(
+                                            color: AppColors.blackColor),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: MaterialButton(
+                                      color: AppColors.blueColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        // side: BorderSide(color: Colors.black)
+                                      ),
+                                      onPressed: () {
+                                        if (widget.isUpdateTodo) {
+                                          widget.onDelete!();
+                                        }
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                        "Yes",
+                                        style: TextStyle(
+                                            color: AppColors.whiteColor),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.delete_forever,
+                          color: Theme.of(context).iconTheme.color),
                     ),
+                  SizedBox(
+                    width: 10,
                   ),
-                SizedBox(
-                  width: 10,
-                ),
-              ],
-            ),
-            Expanded(
-                child: Stack(
-              children: [
-                SingleChildScrollView(
+                ],
+              ),
+              Expanded(
+                child: SingleChildScrollView(
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 15),
                     child: Column(
@@ -256,16 +256,18 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                       children: [
                         Text(
                           "What is to be done?",
-                          style: TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 18,
+                                    color: AppColors.blueColor,
+                                  ),
                         ),
                         TextFormField(
                           controller: todoCtr,
                           minLines: 1,
                           maxLines: null,
-                          style: TextStyle(color: Colors.white),
+                          style: Theme.of(context).textTheme.titleMedium,
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "Enter schedule";
@@ -274,12 +276,14 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                           },
                           decoration: InputDecoration(
                             hintText: "Enter schedule here",
-                            errorStyle: TextStyle(color: Colors.red[400]),
-                            hintStyle:
-                                TextStyle(color: Colors.white, fontSize: 16),
+                            errorStyle: TextStyle(color: AppColors.redColor),
+                            hintStyle: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontSize: 14),
                             errorBorder: UnderlineInputBorder(
                               borderSide: BorderSide(
-                                color: Colors.red.shade400,
+                                color: AppColors.redColor,
                               ),
                             ),
                           ),
@@ -291,13 +295,13 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                           children: [
                             Checkbox(
                                 value: isFinished,
-                                checkColor: Colors.white,
+                                // checkColor: AppColors.blackColor,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(3),
                                 ),
                                 activeColor:
-                                    Colors.blueGrey.shade900.withGreen(140),
-                                side: BorderSide(color: Colors.white),
+                                    AppColors.bottomNavigationBarSecondColor,
+                                // side: BorderSide(color: AppColors.blackColor),
                                 onChanged: (value) {
                                   setState(() {
                                     isFinished = value!;
@@ -305,38 +309,52 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                                 }),
                             Text(
                               "Schedule complated?",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  // fontWeight: FontWeight.w500,
-                                  fontSize: 14),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
                             ),
                           ],
                         ),
                         SizedBox(
                           height: 30,
                         ),
-                        Text(
-                          "Due date",
-                          style: TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18),
-                        ),
+                        Text("Due date",
+                            style:
+                                Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 18,
+                                      color: AppColors.blueColor,
+                                    )),
                         SizedBox(
                           height: 10,
                         ),
                         TextFormField(
                           controller: dateCtr,
                           readOnly: true,
-                          style: TextStyle(color: Colors.red[400]),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontSize: 14,
+                                    color: Colors.red[400],
+                                  ),
                           onTap: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
                             _selectDate(context);
                           },
                           minLines: 1,
                           maxLines: 1,
                           decoration: InputDecoration(
                               hintText: "Date not set",
-                              hintStyle: TextStyle(color: Colors.red[400])),
+                              hintStyle: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontSize: 14,
+                                    color: Colors.red[400],
+                                  )),
                         ),
                         SizedBox(
                           height: 10,
@@ -344,29 +362,37 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                         TextFormField(
                           controller: timeCtr,
                           onTap: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
                             displayTimePicker(context);
                           },
                           readOnly: true,
                           minLines: 1,
                           maxLines: 1,
-                          style: TextStyle(color: Colors.red[400]),
+                          style: TextStyle(color: AppColors.redColor),
                           decoration: InputDecoration(
                               hintText: "Set time",
-                              hintStyle: TextStyle(color: Colors.red[400])),
+                              hintStyle: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontSize: 14,
+                                    color: Colors.red[400],
+                                  )),
                         ),
                         SizedBox(
                           height: 20,
                         ),
                         PopupMenuButton(
-                          color: Colors.white,
+                          color: Theme.of(context).canvasColor,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10,
                               vertical: 5,
                             ),
                             decoration: BoxDecoration(
-                                border: Border.all(color: Colors.blue),
-                                borderRadius: BorderRadius.circular(10)),
+                              border: Border.all(color: AppColors.blueColor),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -374,15 +400,13 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                               children: [
                                 Text(
                                   "${categoryName}",
-                                  style: TextStyle(color: Colors.white),
+                                  style: Theme.of(context).textTheme.titleMedium,
                                 ),
                                 SizedBox(
                                   width: 10,
                                 ),
-                                Icon(
-                                  Icons.arrow_drop_down_sharp,
-                                  color: Colors.blue,
-                                )
+                                Icon(Icons.arrow_drop_down_sharp,
+                                    color: Theme.of(context).iconTheme.color)
                               ],
                             ),
                           ),
@@ -390,13 +414,14 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                             ListData.category.length,
                             (index) => PopupMenuItem(
                               onTap: () {
+                                FocusManager.instance.primaryFocus?.unfocus();
                                 setState(() {
                                   categoryName = ListData.category[index];
                                 });
                               },
                               child: Text(
                                 ListData.category[index],
-                                style: TextStyle(color: Colors.black),
+                                style: TextStyle(color: AppColors.blackColor),
                               ),
                             ),
                           ),
@@ -405,79 +430,80 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                     ),
                   ),
                 ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 20, right: 20),
-                    child: InkWell(
-                      splashColor: Colors.blueGrey,
-                      borderRadius: BorderRadius.circular(50),
-                      radius: 10,
-                      onTap: () {
-                        if (formKey.currentState!.validate()) {
-                          if (widget.isUpdateTodo) {
-                            widget.onUpdate!(
-                              todoCtr.text,
-                              dateCtr.text,
-                              timeCtr.text,
-                              isFinished == true ? 1 : 0,
-                              categoryName!,
-                            );
-                          } else {
-                            dbHelper!
-                                .insertTodo(
-                              TodoModel(
-                                todo: todoCtr.text,
-                                finished: isFinished == false ? 0 : 1,
-                                dueDate: dateCtr.text,
-                                dueTime: timeCtr.text,
-                                category: categoryName.toString(),
-                              ),
-                            )
-                                .then((value) {
-                              print("data added");
-                              setState(() {
-                                isUpdateTodoScreen = true;
-                              });
-                              if (notificationDateTime != null) {
-                                notificationServices.showNotification(
-                                  notificationDateTime!,
-                                  todoCtr.text,
-                                  timeCtr.text,
-                                );
-                              }
-                              clear();
-                              Navigator.pop(context);
-                            }).onError(
-                              (error, stackTrace) {
-                                print(error.toString());
-                                print(stackTrace.toString());
-                              },
-                            );
-                          }
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+                  child: MaterialButton(
+                    color: AppColors.yellowColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    onPressed: () {
+                      
+                      if (formKey.currentState!.validate()) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        if (widget.isUpdateTodo) {
+                          dbHelper!
+                              .updateTodo(TodoModel(
+                            id: widget.id,
+                            todo: todoCtr.text,
+                            finished: isFinished == true ? 1 : 0,
+                            dueDate: dateCtr.text,
+                            dueTime: timeCtr.text,
+                            category: categoryName!,
+                          ))
+                              .then((value) {
+                            Navigator.pop(context, true);
+                            widget.onUpdate!();
+                          });
+                        } else {
+                          dbHelper!
+                              .insertTodo(
+                            TodoModel(
+                              todo: todoCtr.text,
+                              finished: isFinished == false ? 0 : 1,
+                              dueDate: dateCtr.text,
+                              dueTime: timeCtr.text,
+                              category: categoryName.toString(),
+                            ),
+                          )
+                              .then((value) {
+                            print("data added");
+                            setState(() {
+                              isUpdateTodoScreen = true;
+                            });
+                            if (notificationDateTime != null) {
+                              notificationServices.showNotification(
+                                notificationDateTime!,
+                                todoCtr.text,
+                                timeCtr.text,
+                              );
+                            }
+                            clear();
+                            Navigator.pop(context);
+                          }).onError(
+                            (error, stackTrace) {
+                              print(error.toString());
+                              print(stackTrace.toString());
+                            },
+                          );
                         }
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.yellow,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: Colors.white.withOpacity(0.4))),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.check,
-                            color: Colors.black,
-                            size: 30,
-                          ),
-                        ),
-                      ),
+                      }
+                    },
+                    child: Text(
+                      "Save",
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelMedium
+                          ?.copyWith(fontSize: 14, color: AppColors.blackColor),
                     ),
                   ),
                 ),
-              ],
-            ))
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

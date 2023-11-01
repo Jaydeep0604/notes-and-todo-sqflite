@@ -44,9 +44,9 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
         return true;
       },
       child: Scaffold(
-        backgroundColor: Colors.black,
+        // backgroundColor: AppColors.whiteColor,
         appBar: AppBar(
-          backgroundColor: Colors.black,
+          // backgroundColor: AppColors.whiteColor,
           leading: IconButton(
               onPressed: () {
                 setState(() {
@@ -54,13 +54,13 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
                 });
                 Navigator.pop(context);
               },
-              icon: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-              )),
+              icon: Icon(Icons.arrow_back,
+                  color: Theme.of(context).iconTheme.color)),
           title: Text(
             "Finished",
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(
+                // color: Colors.black,
+                ),
           ),
           centerTitle: false,
         ),
@@ -82,6 +82,7 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
                         ? VerticalAnimation(
                             index: index,
                             child: TodoWidget(
+                              id: snapshot.data![index].id!,
                               todo: snapshot.data![index].todo,
                               categoryName: snapshot.data![index].category,
                               dueDate: snapshot.data![index].dueDate,
@@ -94,22 +95,10 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
                                   todoList = dbHelper!.getTodosList();
                                 });
                               },
-                              onUpdate: (todo, time, date, status, category) {
-                                dbHelper!
-                                    .updateTodo(TodoModel(
-                                  id: snapshot.data![index].id,
-                                  todo: todo,
-                                  finished: status,
-                                  dueDate: date,
-                                  dueTime: time,
-                                  category: category,
-                                ))
-                                    .then((value) {
-                                  Navigator.pop(context,);
-                                  setState(() {
+                              onUpdate: () {
+                               setState(() {
                                     todoList = dbHelper!.getTodosList();
                                   });
-                                });
                               },
                               onFinish: (todo, date, time, status, category) {
                                 dbHelper!
@@ -140,7 +129,7 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
               } else {
                 return Center(
                     child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: Theme.of(context).iconTheme.color,
                 ));
               }
             },

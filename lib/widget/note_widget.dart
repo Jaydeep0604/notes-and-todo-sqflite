@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/model/note_model.dart';
 import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
+import 'package:notes_sqflite/utils/app_colors.dart';
 
 // ignore: must_be_immutable
 class NoteWidget extends StatefulWidget {
@@ -124,13 +125,14 @@ class _NoteWidgetState extends State<NoteWidget> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            color: Colors.white10,
+            color: Theme.of(context).scaffoldBackgroundColor,
+            // color: AppColors.blackColor,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
               width: MediaQuery.of(context).size.width * 0.5,
               // constraints: BoxConstraints(maxHeight: 270, minHeight: 0),
               decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white.withOpacity(0.9)),
+                  border: Border.all(color: Theme.of(context).iconTheme.color!),
                   borderRadius: BorderRadius.circular(10)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -143,7 +145,7 @@ class _NoteWidgetState extends State<NoteWidget> {
                         Icon(
                           Icons.push_pin_sharp,
                           size: 13,
-                          color: Colors.red[400],
+                          color: AppColors.redColor,
                         ),
                         SizedBox(
                           width: 5,
@@ -151,44 +153,42 @@ class _NoteWidgetState extends State<NoteWidget> {
                         Text(
                           "Pined",
                           style:
-                              TextStyle(color: Colors.red[400], fontSize: 12),
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: Colors.red,
+                                    fontSize: 12,
+                                  ),
                         ),
                       ],
                     ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.title,
-                          style: TextStyle(
-                            fontSize: 14,
+                  if (widget.pin == 1)
+                    SizedBox(
+                      height: 5,
+                    ),
+                  if (widget.title != "")
+                    Text(
+                      widget.title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            fontSize: 14,
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  RichText(
-                    maxLines: 14,
-                    overflow: TextOverflow.ellipsis,
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: widget.note,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
                     ),
-                  ),
+                  if (widget.title != "" && widget.note != "")
+                    SizedBox(
+                      height: 10,
+                    ),
+                  if (widget.note != "")
+                    RichText(
+                      maxLines: 14,
+                      overflow: TextOverflow.ellipsis,
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: widget.note,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 13,),
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             )),
@@ -202,7 +202,7 @@ class _NoteWidgetState extends State<NoteWidget> {
   //     transitionDuration: Duration(milliseconds: 300),
   //     pageBuilder: (context, animation, secondaryAnimation) {
   //       return Material(
-  //         color: Colors.black,
+  //         color: AppColors.blackColor,
   //         child: StatefulBuilder(builder: (context, setState) {
   //           void isPinedChange() {
   //             setState(() {
@@ -236,7 +236,7 @@ class _NoteWidgetState extends State<NoteWidget> {
   //                           },
   //                           icon: Icon(
   //                             Icons.arrow_back,
-  //                             color: Colors.white,
+  //                             color: AppColors.whiteColor
   //                           ),
   //                         ),
   //                         Spacer(),
@@ -251,11 +251,11 @@ class _NoteWidgetState extends State<NoteWidget> {
   //                             child: isPined == true
   //                                 ? Icon(
   //                                     Icons.push_pin,
-  //                                     color: Colors.white,
+  //                                     color: AppColors.whiteColor
   //                                   )
   //                                 : Icon(
   //                                     Icons.push_pin_outlined,
-  //                                     color: Colors.white,
+  //                                     color: AppColors.whiteColor
   //                                   ),
   //                           ),
   //                         ),
@@ -271,11 +271,11 @@ class _NoteWidgetState extends State<NoteWidget> {
   //                             child: isArchived!
   //                                 ? Icon(
   //                                     Icons.archive,
-  //                                     color: Colors.white,
+  //                                     color: AppColors.whiteColor
   //                                   )
   //                                 : Icon(
   //                                     Icons.archive_outlined,
-  //                                     color: Colors.white,
+  //                                     color: AppColors.whiteColor
   //                                   ),
   //                           ),
   //                         ),
@@ -287,12 +287,12 @@ class _NoteWidgetState extends State<NoteWidget> {
   //                             },
   //                             icon: Icon(
   //                               Icons.delete_forever,
-  //                               color: Colors.white,
+  //                               color: AppColors.whiteColor
   //                             ),
   //                           ),
   //                         if (isDeleted == true)
   //                           PopupMenuButton(
-  //                             color: Colors.white,
+  //                             color: AppColors.whiteColor
   //                             shape: RoundedRectangleBorder(
   //                                 borderRadius: BorderRadius.circular(10)),
   //                             itemBuilder: (context) {
@@ -350,7 +350,7 @@ class _NoteWidgetState extends State<NoteWidget> {
   //                                     children: [
   //                                       Icon(
   //                                         Icons.delete_forever,
-  //                                         color: Colors.red[400],
+  //                                         color: AppColors.redColor,
   //                                       ),
   //                                       SizedBox(
   //                                         width: 10,
@@ -461,7 +461,7 @@ class _NoteWidgetState extends State<NoteWidget> {
   //                         padding: const EdgeInsets.all(8.0),
   //                         child: Icon(
   //                           Icons.check,
-  //                           color: Colors.black,
+  //                           color: AppColors.blackColor,
   //                           size: 30,
   //                         ),
   //                       ),
@@ -486,7 +486,7 @@ class _NoteWidgetState extends State<NoteWidget> {
   // //   showDialog(
   // //     context: context,
   // //     builder: (context) => AlertDialog(
-  // //       backgroundColor: Colors.white,
+  // //       backgroundColor: AppColors.whiteColor
   // //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
   // //       alignment: Alignment.center,
   // //       titleTextStyle: TextStyle(fontWeight: FontWeight.w500),

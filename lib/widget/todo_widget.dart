@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_detail_screen.dart';
+import 'package:notes_sqflite/utils/app_colors.dart';
 
 class TodoWidget extends StatefulWidget {
   TodoWidget({
     super.key,
+    required this.id,
     required this.todo,
     required this.dueDate,
     required this.dueTime,
@@ -15,11 +17,9 @@ class TodoWidget extends StatefulWidget {
     required this.onUpdate,
   });
   String todo, dueDate, dueTime, categoryName;
-  int finished;
+  int finished, id;
   void Function() onDelete;
-  void Function(
-          String todo, String time, String date, int status, String category)
-      onUpdate;
+  void Function() onUpdate;
   void Function(
           String todo, String time, String date, int status, String category)
       onFinish;
@@ -109,6 +109,7 @@ class _TodoWidgetState extends State<TodoWidget> {
           MaterialPageRoute(
             builder: (context) => TodoDetailscreen(
               isUpdateTodo: true,
+              id: widget.id,
               isDone: isDone,
               todo: widget.todo,
               date: widget.dueDate,
@@ -123,6 +124,7 @@ class _TodoWidgetState extends State<TodoWidget> {
         });
       },
       child: Card(
+        color: Theme.of(context).scaffoldBackgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -130,23 +132,21 @@ class _TodoWidgetState extends State<TodoWidget> {
           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-            color: Colors.black,
+            // color: AppColors.blackColor,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: Colors.white.withOpacity(0.6),
+              color: Theme.of(context).iconTheme.color!,
             ),
-            gradient: LinearGradient(
-              tileMode: TileMode.mirror,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.black,
-                Colors.black,
-                // Colors.blueGrey.shade900,
-                // Colors.blueGrey.shade900,
-                Colors.blueGrey.shade900.withGreen(70),
-              ],
-            ),
+            // gradient: LinearGradient(
+            //   tileMode: TileMode.mirror,
+            //   begin: Alignment.topLeft,
+            //   end: Alignment.bottomRight,
+            //   colors: [
+            //     Colors.transparent,
+            //     Colors.transparent,
+            //     Colors.blueGrey.shade900.withGreen(70).withOpacity(0.5),
+            //   ],
+            // ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,12 +157,12 @@ class _TodoWidgetState extends State<TodoWidget> {
                 width: 19,
                 child: Checkbox(
                   value: isDone,
-                  checkColor: Colors.white,
+                  checkColor: AppColors.whiteColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(3),
                   ),
                   activeColor: Colors.blueGrey.shade900.withGreen(140),
-                  side: BorderSide(color: Colors.white),
+                  side: BorderSide(color: Theme.of(context).iconTheme.color!),
                   onChanged: (newvalue) {
                     setState(() {
                       isDone = newvalue!;
@@ -190,10 +190,11 @@ class _TodoWidgetState extends State<TodoWidget> {
                       softWrap: true,
                       text: TextSpan(
                         text: "${widget.todo}",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color: Colors.white),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
                       ),
                     ),
                     if (widget.dueTime != "" || widget.dueDate != "")
@@ -209,9 +210,11 @@ class _TodoWidgetState extends State<TodoWidget> {
                               TextSpan(text: ", "),
                             TextSpan(text: "${widget.dueTime}"),
                           ],
-                          style: TextStyle(
-                            color: Colors.red[400],
-                          ),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontSize: 14,
+                                    color: Colors.red[400],
+                                  ),
                         ),
                       ),
                   ],
@@ -231,13 +234,13 @@ class _TodoWidgetState extends State<TodoWidget> {
   //     pageBuilder: (context, animation, secondaryAnimation) {
   //       return StatefulBuilder(
   //         builder: (context, setState) => Material(
-  //           color: Colors.black,
+  //           color: AppColors.blackColor,
   //           child: Column(
   //             mainAxisAlignment: MainAxisAlignment.start,
   //             crossAxisAlignment: CrossAxisAlignment.start,
   //             children: <Widget>[
   //               AppBar(
-  //                 backgroundColor: Colors.black,
+  //                 backgroundColor: AppColors.blackColor,
   //                 leading: IconButton(
   //                   tooltip: "Navigate up",
   //                   onPressed: () {
@@ -245,7 +248,7 @@ class _TodoWidgetState extends State<TodoWidget> {
   //                   },
   //                   icon: Icon(
   //                     Icons.arrow_back,
-  //                     color: Colors.white,
+  //                     color: AppColors.whiteColor
   //                   ),
   //                 ),
   //                 actions: [
@@ -256,7 +259,7 @@ class _TodoWidgetState extends State<TodoWidget> {
   //                     },
   //                     icon: Icon(
   //                       Icons.share,
-  //                       color: Colors.white,
+  //                       color: AppColors.whiteColor
   //                     ),
   //                   ),
   //                   IconButton(
@@ -265,7 +268,7 @@ class _TodoWidgetState extends State<TodoWidget> {
   //                       showDialog(
   //                         context: context,
   //                         builder: (context) => AlertDialog(
-  //                           backgroundColor: Colors.white,
+  //                           backgroundColor: AppColors.whiteColor
   //                           shape: RoundedRectangleBorder(
   //                               borderRadius: BorderRadius.circular(10)),
   //                           alignment: Alignment.center,
@@ -341,7 +344,7 @@ class _TodoWidgetState extends State<TodoWidget> {
   //                     },
   //                     icon: Icon(
   //                       Icons.delete_forever,
-  //                       color: Colors.white,
+  //                       color: AppColors.whiteColor
   //                     ),
   //                   ),
   //                   SizedBox(
@@ -381,7 +384,7 @@ class _TodoWidgetState extends State<TodoWidget> {
   //                               hintText: "Enter schedule here",
   //                               errorStyle: TextStyle(color: Colors.red[400]),
   //                               hintStyle: TextStyle(
-  //                                   color: Colors.white, fontSize: 16),
+  //                                   color: AppColors.whiteColor fontSize: 16),
   //                               errorBorder: UnderlineInputBorder(
   //                                 borderSide: BorderSide(
   //                                   color: Colors.red.shade400,
@@ -409,7 +412,7 @@ class _TodoWidgetState extends State<TodoWidget> {
   //                             children: [
   //                               Checkbox(
   //                                   value: isDone,
-  //                                   checkColor: Colors.white,
+  //                                   checkColor: AppColors.whiteColor
   //                                   shape: RoundedRectangleBorder(
   //                                     borderRadius: BorderRadius.circular(3),
   //                                   ),
@@ -430,7 +433,7 @@ class _TodoWidgetState extends State<TodoWidget> {
   //                               Text(
   //                                 "Schedule complated?",
   //                                 style: TextStyle(
-  //                                     color: Colors.white,
+  //                                     color: AppColors.whiteColor
   //                                     // fontWeight: FontWeight.w500,
   //                                     fontSize: 14),
   //                               ),
@@ -482,7 +485,7 @@ class _TodoWidgetState extends State<TodoWidget> {
   //                             height: 20,
   //                           ),
   //                           PopupMenuButton(
-  //                             color: Colors.white,
+  //                             color: AppColors.whiteColor
   //                             child: Container(
   //                               padding: const EdgeInsets.symmetric(
   //                                 horizontal: 10,
@@ -559,7 +562,7 @@ class _TodoWidgetState extends State<TodoWidget> {
   //                             padding: const EdgeInsets.all(8.0),
   //                             child: Icon(
   //                               Icons.check,
-  //                               color: Colors.black,
+  //                               color: AppColors.blackColor,
   //                               size: 30,
   //                             ),
   //                           ),
