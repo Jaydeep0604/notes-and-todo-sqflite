@@ -1,6 +1,4 @@
-// import 'dart:math' as math show Random;
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/model/note_model.dart';
 import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
@@ -12,22 +10,25 @@ class NoteWidget extends StatefulWidget {
   void Function() onUpdateComplete, onDismissed;
   Key keyvalue;
   int id, pin, archive, deleted;
+  List<String> imageList;
   DBHelper dbHelper;
-  NoteWidget(
-      {super.key,
-      required this.id,
-      required this.title,
-      required this.note,
-      required this.pin,
-      required this.archive,
-      required this.email,
-      required this.deleted,
-      required this.createDate,
-      required this.editedDate,
-      required this.onUpdateComplete,
-      required this.onDismissed,
-      required this.keyvalue,
-      required this.dbHelper});
+  NoteWidget({
+    super.key,
+    required this.id,
+    required this.title,
+    required this.note,
+    required this.pin,
+    required this.archive,
+    required this.email,
+    required this.deleted,
+    required this.createDate,
+    required this.editedDate,
+    required this.onUpdateComplete,
+    required this.onDismissed,
+    required this.keyvalue,
+    required this.dbHelper,
+    required this.imageList,
+  });
 
   @override
   State<NoteWidget> createState() => _NoteWidgetState();
@@ -87,6 +88,7 @@ class _NoteWidgetState extends State<NoteWidget> {
                 onUpdateComplete: widget.onUpdateComplete,
                 createDate: widget.createDate,
                 editedDate: widget.editedDate,
+                imageList: widget.imageList,
               );
             },
           ),
@@ -102,16 +104,16 @@ class _NoteWidgetState extends State<NoteWidget> {
         onDismissed: (direction) {
           dbHelper
               ?.update(NotesModel(
-            id: widget.id,
-            title: widget.title,
-            note: widget.note,
-            pin: widget.pin,
-            archive: 1,
-            email: widget.email,
-            deleted: 0,
-            create_date: widget.createDate,
-            edited_date: widget.editedDate,
-          ))
+                  id: widget.id,
+                  title: widget.title,
+                  note: widget.note,
+                  pin: widget.pin,
+                  archive: 1,
+                  email: widget.email,
+                  deleted: 0,
+                  create_date: widget.createDate,
+                  edited_date: widget.editedDate,
+                  image_list: []))
               .then((value) {
             widget.onDismissed();
             // dbHelper!.delete(
@@ -184,7 +186,10 @@ class _NoteWidgetState extends State<NoteWidget> {
                         children: [
                           TextSpan(
                             text: widget.note,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 13,),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      fontSize: 13,
+                                    ),
                           ),
                         ],
                       ),

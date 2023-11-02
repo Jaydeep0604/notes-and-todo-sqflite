@@ -7,6 +7,7 @@ import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:timezone/data/latest_10y.dart';
 import 'package:provider/provider.dart';
 
+
 bool isUpdateNoteScreen = false;
 bool isUpdateTodoScreen = false;
 
@@ -18,6 +19,7 @@ void main() async {
   initializeTimeZones();
   final themeProvider = ThemeProvider();
   await themeProvider.loadTheme();
+
   final AndroidInitializationSettings androidSettings =
       AndroidInitializationSettings("@mipmap/todo_main");
   final DarwinInitializationSettings IosSettings = DarwinInitializationSettings(

@@ -48,15 +48,13 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
                 });
                 Navigator.pop(context);
               },
-              icon: Icon(
-                Icons.arrow_back,
-                color: Theme.of(context).iconTheme.color
-              )),
+              icon: Icon(Icons.arrow_back,
+                  color: Theme.of(context).iconTheme.color)),
           title: Text(
             "Archive",
             style: TextStyle(
-              // color: Colors.black,
-            ),
+                // color: Colors.black,
+                ),
           ),
           centerTitle: false,
         ),
@@ -78,13 +76,18 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
             FutureBuilder(
               future: noteList,
               builder: (context, AsyncSnapshot<List<NotesModel>> snapshot) {
+                int archiveCount = snapshot.data != null &&
+                        snapshot.data!.any(
+                            (item) => item.archive == 1 && item.deleted != 1)
+                    ? snapshot.data!.length
+                    : 0;
                 if (snapshot.hasData) {
                   return MasonryGridView.count(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     crossAxisCount: 2,
                     crossAxisSpacing: 8,
                     mainAxisSpacing: 8,
-                    itemCount: snapshot.data?.length,
+                    itemCount: archiveCount,
                     primary: false,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
@@ -105,6 +108,7 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
                                       .toString(),
                                   editedDate: snapshot.data![index].edited_date
                                       .toString(),
+                                  imageList: snapshot.data![index].image_list,
                                   onUpdateComplete: () {
                                     setState(() {
                                       noteList = dbHelper!.getNotesList();

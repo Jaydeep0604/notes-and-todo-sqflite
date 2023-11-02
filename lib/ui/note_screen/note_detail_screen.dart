@@ -7,28 +7,29 @@ import 'package:flutter/services.dart';
 import 'package:notes_sqflite/ui/image_view_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 
 class NoteDetailScreen extends StatefulWidget {
-  NoteDetailScreen(
-      {super.key,
-      required this.isUpdateNote,
-      this.id,
-      this.title,
-      this.note,
-      this.createDate,
-      this.email,
-      this.editedDate,
-      this.isDeleted = false,
-      this.isPined = false,
-      this.isArchived = false,
-      this.onUpdateComplete,
-      this.onDismissed});
+  NoteDetailScreen({
+    super.key,
+    required this.isUpdateNote,
+    this.id,
+    this.title,
+    this.note,
+    this.createDate,
+    this.email,
+    this.editedDate,
+    this.isDeleted = false,
+    this.isPined = false,
+    this.isArchived = false,
+    this.onUpdateComplete,
+    this.onDismissed,
+    this.imageList,
+  });
   bool isUpdateNote;
   int? id;
   String? title, createDate, email, note, editedDate;
   bool isDeleted, isPined, isArchived;
+  List<String>? imageList;
   void Function()? onUpdateComplete, onDismissed;
   @override
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
@@ -36,11 +37,13 @@ class NoteDetailScreen extends StatefulWidget {
 
 class _NoteDetailScreenState extends State<NoteDetailScreen> {
   bool isEdited = false;
-
   DBHelper? dbHelper;
 
   late TextEditingController titleCtr;
   late TextEditingController noteCtr;
+
+  final ImagePicker imagePicker = ImagePicker();
+  List<XFile>? imageFileList = [];
 
   void initState() {
     super.initState();
@@ -50,6 +53,16 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     if (widget.isUpdateNote) {
       titleCtr = TextEditingController(text: widget.title);
       noteCtr = TextEditingController(text: widget.note);
+      if (widget.imageList != null) {
+        imageFileList = widget.imageList!
+            .where((path) => path.isNotEmpty) // Filter out empty strings
+            .map((path) => XFile(path))
+            .toList();
+      } else {
+        imageFileList = [];
+      }
+
+      // imageFileList = widget.imageList!.map((path) => XFile(path)).toList();
     } else {
       titleCtr = TextEditingController();
       noteCtr = TextEditingController();
@@ -77,9 +90,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       setState;
     });
   }
-
-  final ImagePicker imagePicker = ImagePicker();
-  List<XFile>? imageFileList = [];
 
   void selectImages() async {
     final List<XFile>? selectedImages = await imagePicker.pickMultiImage();
@@ -149,16 +159,18 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                   if (widget.isUpdateNote) {
                     dbHelper
                         ?.update(NotesModel(
-                      id: widget.id,
-                      title: titleCtr.text,
-                      note: noteCtr.text,
-                      pin: widget.isPined == true ? 1 : 0,
-                      archive: widget.isArchived == true ? 1 : 0,
-                      email: widget.email,
-                      deleted: widget.isDeleted == true ? 1 : 0,
-                      create_date: widget.createDate,
-                      edited_date: widget.editedDate,
-                    ))
+                            id: widget.id,
+                            title: titleCtr.text,
+                            note: noteCtr.text,
+                            pin: widget.isPined == true ? 1 : 0,
+                            archive: widget.isArchived == true ? 1 : 0,
+                            email: widget.email,
+                            deleted: widget.isDeleted == true ? 1 : 0,
+                            create_date: widget.createDate,
+                            edited_date: widget.editedDate,
+                            image_list: imageFileList!
+                                .map((image) => image.path)
+                                .toList()))
                         .then((value) {
                       widget.onUpdateComplete!();
                     });
@@ -180,16 +192,18 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                   if (widget.isUpdateNote) {
                     dbHelper
                         ?.update(NotesModel(
-                      id: widget.id,
-                      title: titleCtr.text,
-                      note: noteCtr.text,
-                      pin: widget.isPined == true ? 1 : 0,
-                      archive: widget.isArchived == true ? 1 : 0,
-                      email: widget.email,
-                      deleted: widget.isDeleted == true ? 1 : 0,
-                      create_date: widget.createDate,
-                      edited_date: widget.editedDate,
-                    ))
+                            id: widget.id,
+                            title: titleCtr.text,
+                            note: noteCtr.text,
+                            pin: widget.isPined == true ? 1 : 0,
+                            archive: widget.isArchived == true ? 1 : 0,
+                            email: widget.email,
+                            deleted: widget.isDeleted == true ? 1 : 0,
+                            create_date: widget.createDate,
+                            edited_date: widget.editedDate,
+                            image_list: imageFileList!
+                                .map((image) => image.path)
+                                .toList()))
                         .then((value) {
                       widget.onUpdateComplete!();
                     });
@@ -235,16 +249,18 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           });
                           dbHelper
                               ?.update(NotesModel(
-                            id: widget.id,
-                            title: titleCtr.text,
-                            note: noteCtr.text,
-                            pin: widget.isPined == true ? 1 : 0,
-                            archive: widget.isArchived == true ? 1 : 0,
-                            email: widget.email,
-                            deleted: widget.isDeleted == true ? 1 : 0,
-                            create_date: widget.createDate,
-                            edited_date: widget.editedDate,
-                          ))
+                                  id: widget.id,
+                                  title: titleCtr.text,
+                                  note: noteCtr.text,
+                                  pin: widget.isPined == true ? 1 : 0,
+                                  archive: widget.isArchived == true ? 1 : 0,
+                                  email: widget.email,
+                                  deleted: widget.isDeleted == true ? 1 : 0,
+                                  create_date: widget.createDate,
+                                  edited_date: widget.editedDate,
+                                  image_list: imageFileList!
+                                      .map((image) => image.path)
+                                      .toList()))
                               .then((value) {
                             if (value == 1) {
                               widget.onUpdateComplete!();
@@ -273,7 +289,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       ),
                       PopupMenuItem(
                         onTap: () {
-                          dbHelper?.delete(widget.id!).then(
+                          dbHelper?.deleteNote(widget.id!).then(
                             (value) {
                               Navigator.pop(context);
                               widget.onDismissed!();
@@ -322,6 +338,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                         children: [
                           TextFormField(
                             controller: titleCtr,
+                            autofocus: widget.isUpdateNote ? false : true,
                             maxLines: null,
                             style: Theme.of(context)
                                 .textTheme
@@ -336,9 +353,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                     .textTheme
                                     .titleMedium
                                     ?.copyWith(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 20,
-                                    ),
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 20,
+                                        color: Theme.of(context)
+                                            .highlightColor
+                                            .withOpacity(0.5)),
                                 enabledBorder: InputBorder.none,
                                 border: InputBorder.none,
                                 disabledBorder: InputBorder.none),
@@ -352,7 +371,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                 .textTheme
                                 .titleMedium
                                 ?.copyWith(
-                                  fontWeight: FontWeight.w500,
                                   fontSize: 16,
                                 ),
                             decoration: InputDecoration(
@@ -361,9 +379,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                   .textTheme
                                   .titleMedium
                                   ?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16,
-                                  ),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                      color: Theme.of(context)
+                                          .highlightColor
+                                          .withOpacity(0.5)),
                               enabledBorder: InputBorder.none,
                               border: InputBorder.none,
                             ),
@@ -372,9 +392,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             height: 10,
                           ),
                           Container(
-                            height: 104,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
+                            child: GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent: 100,
+                                      childAspectRatio: 3 / 3,
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 10),
+                              scrollDirection: Axis.vertical,
                               primary: false,
                               shrinkWrap: true,
                               itemCount: imageFileList!.length,
@@ -385,7 +410,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => ImageViewScreen(
-                                            path: imageFileList![index].path.toString()),
+                                            path: imageFileList![index]
+                                                .path
+                                                .toString()),
                                       ),
                                     );
                                   },
@@ -393,11 +420,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                     height: 104,
                                     width: 104,
                                     decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(
-                                            color: Theme.of(context)
-                                                .highlightColor
-                                                .withOpacity(0.5))),
+                                      borderRadius: BorderRadius.circular(11),
+                                      border: Border.all(
+                                        color: Theme.of(context)
+                                            .highlightColor
+                                            .withOpacity(0.5),
+                                      ),
+                                    ),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(10),
                                       child: Image.file(
@@ -406,11 +435,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                       ),
                                     ),
                                   ),
-                                );
-                              },
-                              separatorBuilder: (context, index) {
-                                return SizedBox(
-                                  width: 10,
                                 );
                               },
                             ),
@@ -425,8 +449,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 ),
                 Container(
                   height: 50,
-                  // color: noteColor,
-                  // color: AppColors.whiteColor,
                   child: Row(
                     children: [
                       Expanded(
@@ -541,111 +563,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                       // color: AppColors.blackColor,
                                       ),
                                 ),
-                                // IconButton(
-                                //   onPressed: () {
-                                //     showModalBottomSheet(
-                                //       context: context,
-                                //       builder: (context) {
-                                //         return StatefulBuilder(
-                                //             builder: (context, setState) {
-                                //           void _colorChangeTapped(
-                                //               int indexOfColor) {
-                                //             setState(() {
-                                //               noteColor = colors[indexOfColor];
-                                //               indexOfCurrentColor = indexOfColor;
-                                //               Navigator.pop(context);
-                                //               // widget.callBackColorTapped(
-                                //               //     colors[indexOfColor]);
-                                //             });
-                                //           }
-                                //           return Container(
-                                //             padding: EdgeInsets.symmetric(
-                                //                 vertical: 10),
-                                //             decoration: BoxDecoration(
-                                //               color: noteColor,
-                                //               borderRadius: BorderRadius.only(
-                                //                   topLeft: Radius.circular(20),
-                                //                   topRight: Radius.circular(20)),
-                                //             ),
-                                //             width:
-                                //                 MediaQuery.of(context).size.width,
-                                //             child: Column(
-                                //               mainAxisAlignment:
-                                //                   MainAxisAlignment.start,
-                                //               crossAxisAlignment:
-                                //                   CrossAxisAlignment.start,
-                                //               mainAxisSize: MainAxisSize.min,
-                                //               children: [
-                                //                 Padding(
-                                //                   padding: const EdgeInsets.only(
-                                //                       left: 10),
-                                //                   child: Text(
-                                //                     "Colour",
-                                //                     style: TextStyle(
-                                //                       color: AppColors.whiteColor
-                                //                     ),
-                                //                   ),
-                                //                 ),
-                                //                 SizedBox(
-                                //                   height: 10,
-                                //                 ),
-                                //                 Container(
-                                //                   height: 50,
-                                //                   child: ListView(
-                                //                     scrollDirection:
-                                //                         Axis.horizontal,
-                                //                     children: List.generate(
-                                //                         colors.length, (index) {
-                                //                       return GestureDetector(
-                                //                           onTap: () =>
-                                //                               _colorChangeTapped(
-                                //                                   index),
-                                //                           child: Padding(
-                                //                               padding:
-                                //                                   EdgeInsets.only(
-                                //                                       left: 6,
-                                //                                       right: 6),
-                                //                               child: Container(
-                                //                                   child:
-                                //                                       new CircleAvatar(
-                                //                                     child:
-                                //                                         _checkOrNot(
-                                //                                             index),
-                                //                                     foregroundColor:
-                                //                                         foregroundColor,
-                                //                                     backgroundColor:
-                                //                                         colors[
-                                //                                             index],
-                                //                                   ),
-                                //                                   width: 48.0,
-                                //                                   height: 48.0,
-                                //                                   padding: const EdgeInsets
-                                //                                           .all(
-                                //                                       1.0), // border width
-                                //                                   decoration:
-                                //                                       new BoxDecoration(
-                                //                                     color: Colors
-                                //                                         .yellow, // border color
-                                //                                     shape: BoxShape
-                                //                                         .circle,
-                                //                                   ))));
-                                //                     }),
-                                //                   ),
-                                //                 ),
-                                //               ],
-                                //             ),
-                                //           );
-                                //         });
-                                //       },
-                                //     ).then((value) {
-                                //       setState(() {});
-                                //     });
-                                //   },
-                                //   icon: Icon(
-                                //     Icons.color_lens_outlined,
-                                //     color: AppColors.whiteColor
-                                //   ),
-                                // ),
                               ],
                             ),
                           )),
@@ -694,7 +611,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                           deleted:
                                               widget.isDeleted == true ? 1 : 0,
                                           create_date: widget.createDate,
-                                          edited_date: editedDate.toString()),
+                                          edited_date: editedDate.toString(),
+                                          image_list: imageFileList!
+                                              .map((image) => image.path)
+                                              .toList()),
                                     )
                                         .then((value) {
                                       widget.onUpdateComplete!();
@@ -720,58 +640,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                     ],
                   ),
                 ),
-                // Align(
-                //   alignment: Alignment.bottomRight,
-                //   child: Padding(
-                //     padding: const EdgeInsets.only(bottom: 20, right: 20),
-                //     child: InkWell(
-                //       splashColor: Colors.blueGrey,
-                //       borderRadius: BorderRadius.circular(50),
-                //       radius: 10,
-                //       onTap: () {
-                //         if (widget.isUpdateNote) {
-                //           final editedDate = DateFormat('EEEEEEEEE,d MMM y')
-                //               .format(DateTime.now());
-                //           dbHelper!
-                //               .update(
-                //             NotesModel(
-                //                 id: widget.id,
-                //                 title: titleCtr.text.toString(),
-                //                 note: noteCtr.text.toString(),
-                //                 pin: 0,
-                //                 archive: 0,
-                //                 email: '',
-                //                 deleted: 0,
-                //                 create_date: widget.createDate,
-                //                 edited_date: editedDate.toString()),
-                //           )
-                //               .then((value) {
-                //             widget.onUpdateComplete!();
-                //             clear();
-                //             Navigator.pop(context);
-                //           });
-                //         } else {
-                //           addNote();
-                //         }
-                //       },
-                //       child: Container(
-                //         decoration: BoxDecoration(
-                //             color: Colors.yellow,
-                //             shape: BoxShape.circle,
-                //             border:
-                //                 Border.all(color: Colors.white.withOpacity(0.4))),
-                //         child: Padding(
-                //           padding: const EdgeInsets.all(8.0),
-                //           child: Icon(
-                //             Icons.check,
-                //             color: AppColors.blackColor,
-                //             size: 30,
-                //           ),
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -787,10 +655,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         return dateParts[1]
             .trim(); // Return the second part after trimming any leading/trailing spaces
       } else {
-        return 'Invalid Date'; // Handle invalid format
+        return 'Invalid Date';
       }
     } catch (e) {
-      return 'Invalid Date'; // Handle parsing errors
+      return 'Invalid Date';
     }
   }
 
@@ -806,18 +674,17 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     final time = DateFormat('kk:mm a').format(DateTime.now());
     print("$date, $time");
     dbHelper!
-        .insert(
-      NotesModel(
-        title: titleCtr.text.toString(),
-        note: noteCtr.text.toString(),
-        pin: widget.isPined == true ? 1 : 0,
-        archive: widget.isArchived == true ? 1 : 0,
-        email: '',
-        deleted: 0,
-        create_date: date.toString(),
-        edited_date: date.toString(),
-      ),
-    )
+        .insertNote(NotesModel(
+      title: titleCtr.text.toString(),
+      note: noteCtr.text.toString(),
+      pin: widget.isPined == true ? 1 : 0,
+      archive: widget.isArchived == true ? 1 : 0,
+      email: '',
+      deleted: 0,
+      create_date: date.toString(),
+      edited_date: date.toString(),
+      image_list: imageFileList!.map((image) => image.path).toList(),
+    ))
         .then((value) {
       print("data added");
       clear();
@@ -882,18 +749,19 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       });
                       dbHelper
                           ?.update(NotesModel(
-                        id: widget.id,
-                        title: titleCtr.text,
-                        note: noteCtr.text,
-                        pin: widget.isPined == true ? 1 : 0,
-                        archive: widget.isArchived == true ? 1 : 0,
-                        email: widget.email,
-                        deleted: widget.isDeleted == true ? 1 : 0,
-                        create_date: widget.createDate,
-                        edited_date: widget.editedDate,
-                      ))
+                              id: widget.id,
+                              title: titleCtr.text,
+                              note: noteCtr.text,
+                              pin: widget.isPined == true ? 1 : 0,
+                              archive: widget.isArchived == true ? 1 : 0,
+                              email: widget.email,
+                              deleted: widget.isDeleted == true ? 1 : 0,
+                              create_date: widget.createDate,
+                              edited_date: widget.editedDate,
+                              image_list: imageFileList!
+                                  .map((image) => image.path)
+                                  .toList()))
                           .then((value) {
-                        // Navigator.popUntil(context, (route) => route.isFirst);
                         Navigator.pop(context);
                         Navigator.pop(context);
                       });
@@ -909,10 +777,12 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           ),
         ],
       ),
-    ).then((value) {
-      if (widget.isUpdateNote) {
-        widget.onUpdateComplete!();
-      }
-    });
+    ).then(
+      (value) {
+        if (widget.isUpdateNote) {
+          widget.onUpdateComplete!();
+        }
+      },
+    );
   }
 }

@@ -7,22 +7,16 @@ import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:notes_sqflite/widget/note_widget.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class NotesScreen extends StatefulWidget {
-  NotesScreen({super.key, required this.refreshPage});
-  void Function() refreshPage;
+  NotesScreen({super.key});
 
   @override
-  State<NotesScreen> createState() => _NotesScreenState(
-        refreshPage: refreshPage,
-      );
+  State<NotesScreen> createState() => _NotesScreenState();
 }
 
 class _NotesScreenState extends State<NotesScreen> {
-  _NotesScreenState({required this.refreshPage});
-
-  void Function() refreshPage;
-
   DBHelper? dbHelper;
 
   late Future<List<NotesModel>> noteList;
@@ -65,104 +59,70 @@ class _NotesScreenState extends State<NotesScreen> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
-    return Stack(
-      children: [
-        SafeArea(
-          child: SingleChildScrollView(
-            child: Container(
-              // color: AppColors.whiteColor,
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              child: FutureBuilder(
-                future: noteList,
-                builder: (context, AsyncSnapshot<List<NotesModel>> snapshot) {
-                  if (snapshot.hasData) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        FutureBuilder(
-                          future: noteList,
-                          builder: (context,
-                              AsyncSnapshot<List<NotesModel>> snapshot) {
-                            if (snapshot.hasData) {
-                              if (snapshot.data!.isEmpty) {
-                                return SizedBox(
-                                  height: height * 0.70,
-                                  child: Center(
-                                    child: Text(
-                                      "No Data",
-                                      style: TextStyle(color: AppColors.whiteColor),
+    return AnimationLimiter(
+      child: Stack(
+        children: [
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: FutureBuilder(
+                  future: noteList,
+                  builder: (context, AsyncSnapshot<List<NotesModel>> snapshot) {
+                    int otherCount = snapshot.data != null &&
+                            snapshot.data!.any((item) =>
+                                item.archive != 1 &&
+                                item.deleted != 1 &&
+                                item.pin != 1)
+                        ? snapshot.data!.length
+                        : 0;
+                    if (snapshot.hasData) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          FutureBuilder(
+                            future: noteList,
+                            builder: (context,
+                                AsyncSnapshot<List<NotesModel>> snapshot) {
+                              int pinCount = snapshot.data != null &&
+                                      snapshot.data!
+                                          .any((item) => item.pin == 1)
+                                  ? snapshot.data!.length
+                                  : 0;
+                              if (snapshot.hasData) {
+                                if (snapshot.data!.isEmpty) {
+                                  return SizedBox(
+                                    height: height * 0.70,
+                                    child: Center(
+                                      child: Text(
+                                        "No Data",
+                                        style: TextStyle(
+                                            color: AppColors.whiteColor),
+                                      ),
                                     ),
-                                  ),
-                                );
-                              }
-                              return MasonryGridView.count(
-                                padding: EdgeInsets.zero,
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 8,
-                                mainAxisSpacing: 8,
-                                itemCount: snapshot.data?.length,
-                                primary: false,
-                                shrinkWrap: true,
-                                itemBuilder: (context, index) {
-                                  return Column(
-                                    children: [
-                                      if (snapshot.data![index].pin == 1)
-                                        NoteWidget(
-                                          dbHelper: dbHelper!,
-                                          keyvalue: ValueKey<int>(
-                                              snapshot.data![index].id!),
-                                          id: snapshot.data![index].id!,
-                                          title: snapshot.data![index].title
-                                              .toString(),
-                                          note: snapshot.data![index].note
-                                              .toString(),
-                                          pin: snapshot.data![index].pin!,
-                                          archive: 0,
-                                          email: snapshot.data![index].email
-                                              .toString(),
-                                          deleted: 0,
-                                          createDate: '',
-                                          editedDate: '',
-                                          onUpdateComplete: () {
-                                            setState(() {
-                                              noteList =
-                                                  dbHelper!.getNotesList();
-                                            });
-                                          },
-                                          onDismissed: () {
-                                            setState(() {
-                                              noteList =
-                                                  dbHelper!.getNotesList();
-                                            });
-                                          },
-                                        )
-                                    ],
                                   );
-                                },
-                              );
-                            } else {
-                              return Center(child: CircularProgressIndicator());
-                            }
-                          },
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        MasonryGridView.count(
-                          padding: EdgeInsets.zero,
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                          itemCount: snapshot.data?.length,
-                          primary: false,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            return snapshot.data![index].archive != 1
-                                ? snapshot.data![index].deleted != 1
-                                    ? snapshot.data![index].deleted != 1
-                                        ? snapshot.data![index].pin != 1
-                                            ? NoteWidget(
+                                }
+
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    MasonryGridView.count(
+                                      padding: EdgeInsets.zero,
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 8,
+                                      mainAxisSpacing: 8,
+                                      itemCount: pinCount,
+                                      primary: false,
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        return Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            if (snapshot.data![index].pin == 1)
+                                              NoteWidget(
                                                 dbHelper: dbHelper!,
                                                 keyvalue: ValueKey<int>(
                                                     snapshot.data![index].id!),
@@ -173,19 +133,14 @@ class _NotesScreenState extends State<NotesScreen> {
                                                 note: snapshot.data![index].note
                                                     .toString(),
                                                 pin: snapshot.data![index].pin!,
-                                                archive: snapshot
-                                                    .data![index].deleted!,
+                                                archive: 0,
                                                 email: snapshot
                                                     .data![index].email
                                                     .toString(),
-                                                deleted: snapshot
-                                                    .data![index].deleted!,
-                                                createDate: snapshot
-                                                    .data![index].create_date
-                                                    .toString(),
-                                                editedDate: snapshot
-                                                    .data![index].edited_date
-                                                    .toString(),
+                                                deleted: 0,
+                                                createDate: '',
+                                                editedDate: '',
+                                                imageList: snapshot.data![index].image_list,
                                                 onUpdateComplete: () {
                                                   setState(() {
                                                     noteList = dbHelper!
@@ -194,257 +149,143 @@ class _NotesScreenState extends State<NotesScreen> {
                                                 },
                                                 onDismissed: () {
                                                   setState(() {
-                                                    // dbHelper!.delete(snapshot
-                                                    //     .data![index].id!);
                                                     noteList = dbHelper!
                                                         .getNotesList();
-                                                    snapshot.data!.remove(
-                                                        snapshot.data![index]);
                                                   });
-                                                })
-                                            : SizedBox()
-                                        : SizedBox()
-                                    : SizedBox()
-                                : Container();
-                          },
-                        ),
-                      ],
-                    );
-                  } else {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                },
+                                                },
+                                              ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                    if (pinCount >= 1 && otherCount >= 1)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 10),
+                                        child: Text("Others"),
+                                      ),
+                                  ],
+                                );
+                              } else {
+                                return Center(
+                                    child: CircularProgressIndicator());
+                              }
+                            },
+                          ),
+                          MasonryGridView.count(
+                            padding: EdgeInsets.zero,
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                            itemCount: otherCount,
+                            primary: false,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              return snapshot.data![index].archive != 1
+                                  ? snapshot.data![index].deleted != 1
+                                      ? snapshot.data![index].pin != 1
+                                          ? NoteWidget(
+                                              dbHelper: dbHelper!,
+                                              keyvalue: ValueKey<int>(
+                                                  snapshot.data![index].id!),
+                                              id: snapshot.data![index].id!,
+                                              title: snapshot.data![index].title
+                                                  .toString(),
+                                              note: snapshot.data![index].note
+                                                  .toString(),
+                                              pin: snapshot.data![index].pin!,
+                                              archive: snapshot
+                                                  .data![index].deleted!,
+                                              email: snapshot.data![index].email
+                                                  .toString(),
+                                              deleted: snapshot
+                                                  .data![index].deleted!,
+                                              createDate: snapshot
+                                                  .data![index].create_date
+                                                  .toString(),
+                                              editedDate: snapshot
+                                                  .data![index].edited_date
+                                                  .toString(),
+                                                  imageList: snapshot.data![index].image_list,
+                                              onUpdateComplete: () {
+                                                setState(() {
+                                                  noteList =
+                                                      dbHelper!.getNotesList();
+                                                });
+                                              },
+                                              onDismissed: () {
+                                                setState(() {
+                                                  // dbHelper!.delete(snapshot
+                                                  //     .data![index].id!);
+                                                  noteList =
+                                                      dbHelper!.getNotesList();
+                                                  snapshot.data!.remove(
+                                                      snapshot.data![index]);
+                                                });
+                                              })
+                                          : SizedBox()
+                                      : SizedBox()
+                                  : Container();
+                            },
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
               ),
             ),
           ),
-        ),
-        Align(
-          alignment: Alignment.bottomRight,
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 10, right: 10),
-            child: InkWell(
-              splashColor: AppColors.blueGrayColor,
-              borderRadius: BorderRadius.circular(50),
-              radius: 10,
-              onTap: () {
-                // addNoteDialoge();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return NoteDetailScreen(
-                        isUpdateNote: false,
-                      );
-                    },
-                  ),
-                ).then((value) {
-                  if (value == true) {
-                    setState(() {
-                      noteList = dbHelper!.getNotesList();
-                    });
-                  }
-                });
-              },
-              child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.yellow,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.whiteColor.withOpacity(0.4),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 10, right: 10),
+              child: InkWell(
+                splashColor: AppColors.blueGrayColor,
+                borderRadius: BorderRadius.circular(50),
+                radius: 10,
+                onTap: () {
+                  // addNoteDialoge();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return NoteDetailScreen(
+                          isUpdateNote: false,
+                        );
+                      },
                     ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.add,
-                      color: AppColors.blackColor,
-                      size: 30,
+                  ).then((value) {
+                    if (value == true) {
+                      setState(() {
+                        noteList = dbHelper!.getNotesList();
+                      });
+                    }
+                  });
+                },
+                child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.yellow,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.whiteColor.withOpacity(0.4),
+                      ),
                     ),
-                  )),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        Icons.add,
+                        color: AppColors.blackColor,
+                        size: 30,
+                      ),
+                    )),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
-
-  // void addNoteDialoge() {
-  //   showGeneralDialog(
-  //     context: context,
-  //     transitionDuration: Duration(milliseconds: 300),
-  //     pageBuilder: (context, animation, secondaryAnimation) {
-  //       return Material(
-  //         type: MaterialType.card,
-  //         color: AppColors.blackColor,
-  //         child: StatefulBuilder(builder: (context, setState) {
-  //           void isPinedChange() {
-  //             setState(() {
-  //               isPined = !isPined;
-  //             });
-  //           }
-
-  //           void isArchivedChange() {
-  //             setState(() {
-  //               isArchived = !isArchived;
-  //               setState;
-  //             });
-  //           }
-
-  //           return Stack(
-  //             children: [
-  //               Column(
-  //                 mainAxisAlignment: MainAxisAlignment.start,
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 children: <Widget>[
-  //                   SizedBox(
-  //                     height: 40,
-  //                   ),
-  //                   Container(
-  //                     child: Row(
-  //                       children: [
-  //                         IconButton(
-  //                           tooltip: "Navigate up",
-  //                           onPressed: () {
-  //                             Navigator.pop(context);
-  //                           },
-  //                           icon: Icon(
-  //                             Icons.arrow_back,
-  //                             color: AppColors.whiteColor
-  //                           ),
-  //                         ),
-  //                         Spacer(),
-  //                         IconButton(
-  //                           tooltip: "Pin",
-  //                           onPressed: () {
-  //                             isPinedChange();
-  //                             // Navigator.pop(context);
-  //                           },
-  //                           icon: Transform.scale(
-  //                             scale: 1,
-  //                             child: isPined
-  //                                 ? Icon(
-  //                                     Icons.push_pin,
-  //                                     color: AppColors.whiteColor
-  //                                   )
-  //                                 : Icon(
-  //                                     Icons.push_pin_outlined,
-  //                                     color: AppColors.whiteColor
-  //                                   ),
-  //                           ),
-  //                         ),
-  //                         IconButton(
-  //                           tooltip: "Archive",
-  //                           onPressed: () {
-  //                             isArchivedChange();
-  //                             // Navigator.pop(context);
-  //                           },
-  //                           icon: Transform.scale(
-  //                             scale: 1,
-  //                             child: isArchived
-  //                                 ? Icon(
-  //                                     Icons.archive,
-  //                                     color: AppColors.whiteColor
-  //                                   )
-  //                                 : Icon(
-  //                                     Icons.archive_outlined,
-  //                                     color: AppColors.whiteColor
-  //                                   ),
-  //                           ),
-  //                         ),
-  //                         SizedBox(
-  //                           width: 10,
-  //                         ),
-  //                       ],
-  //                     ),
-  //                   ),
-  //                   SizedBox(
-  //                     height: 10,
-  //                   ),
-  //                   Padding(
-  //                     padding: const EdgeInsets.symmetric(
-  //                       horizontal: 15,
-  //                     ),
-  //                     child: TextFormField(
-  //                       controller: titleCtr,
-  //                       maxLines: null,
-  //                       style: TextStyle(
-  //                         fontWeight: FontWeight.w400,
-  //                         fontSize: 20,
-  //                         color: AppColors.whiteColor
-  //                       ),
-  //                       decoration: InputDecoration(
-  //                           hintText: "Title",
-  //                           hintStyle: TextStyle(
-  //                               color: Colors.white60,
-  //                               fontWeight: FontWeight.w400,
-  //                               fontSize: 20),
-  //                           enabledBorder: InputBorder.none,
-  //                           border: InputBorder.none,
-  //                           disabledBorder: InputBorder.none),
-  //                       inputFormatters: [],
-  //                     ),
-  //                   ),
-  //                   Expanded(
-  //                       child: SingleChildScrollView(
-  //                     child: Container(
-  //                       padding: EdgeInsets.symmetric(horizontal: 15),
-  //                       child: Column(
-  //                         mainAxisAlignment: MainAxisAlignment.start,
-  //                         crossAxisAlignment: CrossAxisAlignment.start,
-  //                         children: [
-  //                           TextFormField(
-  //                             controller: noteCtr,
-  //                             minLines: 1,
-  //                             maxLines: null,
-  //                             style: TextStyle(color: Colors.white),
-  //                             decoration: InputDecoration(
-  //                               hintText: "Note",
-  //                               hintStyle: TextStyle(
-  //                                   color: Colors.white60, fontSize: 16),
-  //                               enabledBorder: InputBorder.none,
-  //                               border: InputBorder.none,
-  //                             ),
-  //                           ),
-  //                         ],
-  //                       ),
-  //                     ),
-  //                   ))
-  //                 ],
-  //               ),
-  //               Align(
-  //                 alignment: Alignment.bottomRight,
-  //                 child: Padding(
-  //                   padding: const EdgeInsets.only(bottom: 20, right: 20),
-  //                   child: InkWell(
-  //                     splashColor: Colors.blueGrey,
-  //                     borderRadius: BorderRadius.circular(50),
-  //                     radius: 10,
-  //                     onTap: () {
-  //                       addNote();
-  //                     },
-  //                     child: Container(
-  //                       decoration: BoxDecoration(
-  //                           color: Colors.yellow,
-  //                           shape: BoxShape.circle,
-  //                           border: Border.all(
-  //                               color: Colors.white.withOpacity(0.4))),
-  //                       child: Padding(
-  //                         padding: const EdgeInsets.all(8.0),
-  //                         child: Icon(
-  //                           Icons.check,
-  //                           color: AppColors.blackColor,
-  //                           size: 30,
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ],
-  //           );
-  //         }),
-  //       );
-  //     },
-  //   );
-  // }
 }

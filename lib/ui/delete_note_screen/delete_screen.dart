@@ -79,13 +79,19 @@ class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
             FutureBuilder(
               future: noteList,
               builder: (context, AsyncSnapshot<List<NotesModel>> snapshot) {
+                 int deletedCount = snapshot.data != null &&
+                            snapshot.data!.any((item) =>
+                               
+                                item.deleted == 1)
+                        ? snapshot.data!.length
+                        : 0;
                 if (snapshot.hasData) {
                   return MasonryGridView.count(
                     padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
                     crossAxisCount: 2,
                     crossAxisSpacing: 8,
                     mainAxisSpacing: 8,
-                    itemCount: snapshot.data?.length,
+                    itemCount: deletedCount,
                     primary: false,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
@@ -105,6 +111,7 @@ class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
                                   snapshot.data![index].create_date.toString(),
                               editedDate:
                                   snapshot.data![index].edited_date.toString(),
+                                  imageList: snapshot.data![index].image_list,
                               onUpdateComplete: () {
                                 setState(() {
                                   noteList = dbHelper!.getNotesList();

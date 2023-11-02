@@ -8,17 +8,21 @@ class NotesModel {
   final int? deleted;
   final String? create_date;
   final String? edited_date;
+  final List<String> image_list;
 
-  NotesModel(
-      {this.id,
-      this.title,
-      this.note,
-      this.pin,
-      this.archive,
-      this.email,
-      this.deleted,
-      this.create_date,
-      this.edited_date});
+
+  NotesModel({
+    this.id,
+    this.title,
+    this.note,
+    this.pin,
+    this.archive,
+    this.email,
+    this.deleted,
+    this.create_date,
+    this.edited_date,
+    required this.image_list,
+  });
 
   NotesModel.fromMap(Map<String, dynamic> data)
       : id = data['id'],
@@ -29,7 +33,8 @@ class NotesModel {
         email = data['email'],
         deleted = data['deleted'],
         create_date = data['create_date'],
-        edited_date = data['edited_date'];
+        edited_date = data['edited_date'],
+        image_list = (data['image_list']as String).split(',');
 
   Map<String, Object?> toMap() {
     return {
@@ -42,6 +47,7 @@ class NotesModel {
       'deleted': deleted,
       'create_date': create_date,
       'edited_date': edited_date,
+      'image_list': image_list.join(',')
     };
   }
 }

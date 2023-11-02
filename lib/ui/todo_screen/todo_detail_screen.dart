@@ -140,7 +140,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
@@ -196,7 +196,8 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                                   Expanded(
                                     child: MaterialButton(
                                       shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                           side: BorderSide(
                                               color: AppColors.blackColor)),
                                       onPressed: () {
@@ -266,6 +267,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                         TextFormField(
                           controller: todoCtr,
                           minLines: 1,
+                          autofocus: widget.isUpdateTodo ? false : true,
                           maxLines: null,
                           style: Theme.of(context).textTheme.titleMedium,
                           validator: (value) {
@@ -323,12 +325,14 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                           height: 30,
                         ),
                         Text("Due date",
-                            style:
-                                Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 18,
-                                      color: AppColors.blueColor,
-                                    )),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 18,
+                                  color: AppColors.blueColor,
+                                )),
                         SizedBox(
                           height: 10,
                         ),
@@ -400,7 +404,8 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                               children: [
                                 Text(
                                   "${categoryName}",
-                                  style: Theme.of(context).textTheme.titleMedium,
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
                                 ),
                                 SizedBox(
                                   width: 10,
@@ -441,7 +446,6 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
                     onPressed: () {
-                      
                       if (formKey.currentState!.validate()) {
                         FocusManager.instance.primaryFocus?.unfocus();
                         if (widget.isUpdateTodo) {

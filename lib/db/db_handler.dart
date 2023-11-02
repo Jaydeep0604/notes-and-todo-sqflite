@@ -25,12 +25,12 @@ class DBHelper {
 
   _onCreate(Database db, int version) async {
     await db.execute(
-        "CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, note TEXT NOT NULL, pin INTEGER NOT NULL, archive INTEGER NOT NULL, email TEXT NOT NULL, deleted INTEGER NOT NULL, create_date TEXT NOT NULL, edited_date Text)");
+        "CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, note TEXT NOT NULL, pin INTEGER NOT NULL, archive INTEGER NOT NULL, email TEXT NOT NULL, deleted INTEGER NOT NULL, create_date TEXT NOT NULL, edited_date Text, image_list TEXT)");
     await db.execute(
         "CREATE TABLE todos (id INTEGER PRIMARY KEY AUTOINCREMENT, todo TEXT NOT NULL, finished INTEGER NOT NULL, due_date TEXT NOT NULL,due_time TEXT NOT NULL, category TEXT NOT NULL)");
   }
 
-  Future<NotesModel> insert(NotesModel notesModel) async {
+  Future<NotesModel> insertNote(NotesModel notesModel) async {
     var dbClient = await db;
     await dbClient!.insert('notes', notesModel.toMap());
     return notesModel;
@@ -56,7 +56,7 @@ class DBHelper {
     return queryResult.map((e) => TodoModel.fromMap(e)).toList();
   }
 
-  Future<int> delete(int id) async {
+  Future<int> deleteNote(int id) async {
     var dbClient = await db;
     return await dbClient!.delete('notes', where: 'id = ?', whereArgs: [id]);
   }
@@ -68,10 +68,27 @@ class DBHelper {
 
   Future<int> update(NotesModel notesModel) async {
     var dbClient = await db;
-    return await dbClient!.update('notes', notesModel.toMap(),
-        where: 'id = ?', whereArgs: [notesModel.id]);
+    return await dbClient!.update(
+      'notes',
+      notesModel.toMap(),
+      where: 'id = ?',
+      whereArgs: [notesModel.id],
+    );
   }
-  
+
+  Future<int> updatetile(NotesModel notesModel) async {
+    var dbClient = await db;
+    final updateFields = <String, dynamic>{};
+    if (notesModel.title != null) {
+      updateFields['title'] = notesModel.title;
+    }
+    return await dbClient!.update(
+      'notes',
+      updateFields,
+      where: 'id = ?',
+      whereArgs: [notesModel.id],
+    );
+  }
 
   Future<int> updateTodo(TodoModel todoModel) async {
     var dbClient = await db;

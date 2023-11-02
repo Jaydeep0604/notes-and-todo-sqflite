@@ -241,10 +241,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                   "Settings",
                   style: TextStyle(color: Colors.white),
                 ),
-                leading: Icon(
-                  Icons.settings,
-                  color: AppColors.whiteColor
-                ),
+                leading: Icon(Icons.settings, color: AppColors.whiteColor),
               ),
             ],
           ),
@@ -291,10 +288,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 ),
               ),
             ),
-            // VerticalDivider(
-            //   endIndent: 5,
-            //   indent: 5,
-            // ),
+          
             Expanded(
               flex: isTodos ? 1 : 2,
               child: Padding(
@@ -329,11 +323,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
           ],
         ),
       ),
-      body: isNotes
-          ? NotesScreen(
-              refreshPage: () {},
-            )
-          : TodoScreen(),
+      body: isNotes ? NotesScreen() : TodoScreen(),
     );
   }
 }
