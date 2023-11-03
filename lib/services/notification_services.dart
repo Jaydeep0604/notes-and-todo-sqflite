@@ -1,12 +1,14 @@
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:timezone/standalone.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationServices {
-  void showNotification(DateTime scheduledTime,String todo, String time) async {
+  void showNotification(
+      DateTime scheduledTime, String todo, String time) async {
     initializeTimeZone();
     print(scheduledTime);
     print(tz.local);
@@ -89,6 +91,8 @@ class NotificationServices {
     }
   }
 
+  
+
   // void showBigPictureNotification() async {
   //   initializeTimeZone();
   //   print(tz.local);
@@ -96,7 +100,6 @@ class NotificationServices {
   //   final BigPictureStyleInformation bigPictureStyleInformation =
   //       BigPictureStyleInformation(FilePathAndroidBitmap('todo_large_icon'),
   //           largeIcon: FilePathAndroidBitmap('todo_large_icon'));
-
   //   final AndroidNotificationDetails androidDetails =
   //       AndroidNotificationDetails(
   //     'notification_todo',
@@ -104,20 +107,16 @@ class NotificationServices {
   //     priority: Priority.max,
   //     importance: Importance.max,
   //     largeIcon: DrawableResourceAndroidBitmap("todo_large_icon"),
-
   //   );
-
   //   final DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
   //     presentAlert: true,
   //     presentBadge: true,
   //     presentSound: true,
   //   );
-
   //   final NotificationDetails notificationDetails = NotificationDetails(
   //     iOS: iosDetails,
   //     android: androidDetails,
   //   );
-
   //   try {
   //     await localNotificationsPlugin.show(
   //       0,

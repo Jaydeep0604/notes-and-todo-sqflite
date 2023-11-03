@@ -19,7 +19,7 @@ class ImageViewScreen extends StatefulWidget {
 class _ImageViewScreenState extends State<ImageViewScreen> {
   void saveImageToGallery() async {
     final result = await PhotoManager.editor
-        .saveImageWithPath(widget.path, title: "demoimage");
+        .saveImageWithPath(widget.path, title: widget.path);
     if (result != null) {
       print('Image added to Photos library.');
       AppMessage.showToast(context, "Image Saved Successfully");
@@ -52,7 +52,7 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
             itemBuilder: (context) {
               return [
                 PopupMenuItem(
-                  height: 30,
+                  height: 40,
                   onTap: () {
                     saveImageToGallery();
                   },
@@ -63,7 +63,7 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
                           color: AppColors.blackColor,
                         ),
                   ),
-                )
+                ),
               ];
             },
           )

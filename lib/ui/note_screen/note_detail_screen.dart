@@ -1,12 +1,17 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
+import 'package:notes_sqflite/db/list_data.dart';
 import 'package:notes_sqflite/model/note_model.dart';
 import 'package:flutter/services.dart';
 import 'package:notes_sqflite/ui/image_view_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_share/flutter_share.dart';
+import 'package:notes_sqflite/utils/app_message.dart';
+import 'package:share_plus/share_plus.dart';
 
 class NoteDetailScreen extends StatefulWidget {
   NoteDetailScreen({
@@ -42,17 +47,23 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   late TextEditingController titleCtr;
   late TextEditingController noteCtr;
 
+  late TextEditingController dateCtr;
+  late TextEditingController timeCtr;
+
   final ImagePicker imagePicker = ImagePicker();
   List<XFile>? imageFileList = [];
 
   void initState() {
     super.initState();
     dbHelper = DBHelper();
-    this.noteColor = Colors.black;
-    indexOfCurrentColor = colors.indexOf(noteColor);
+
+    // this.noteColor = Colors.black;
+    // indexOfCurrentColor = colors.indexOf(noteColor);
     if (widget.isUpdateNote) {
       titleCtr = TextEditingController(text: widget.title);
       noteCtr = TextEditingController(text: widget.note);
+      timeCtr = TextEditingController();
+      dateCtr = TextEditingController();
       if (widget.imageList != null) {
         imageFileList = widget.imageList!
             .where((path) => path.isNotEmpty) // Filter out empty strings
@@ -118,9 +129,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   final Color borderColor = Color(0xffd3d3d3);
   final Color foregroundColor = Color(0xff595959);
 
-  final _check = Icon(Icons.check);
-  late Color noteColor;
-
+  // final _check = Icon(Icons.check);
+  // late Color noteColor;
   late int indexOfCurrentColor;
 
   @override
@@ -138,11 +148,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           FocusManager.instance.primaryFocus?.unfocus();
         },
         child: Scaffold(
-          // backgroundColor: AppColors.whiteColor,
-          // backgroundColor: noteColor,
           appBar: AppBar(
-            // backgroundColor: AppColors.whiteColor,
-            // backgroundColor: noteColor,
             leading: IconButton(
               tooltip: "Navigate up",
               onPressed: () {
@@ -183,6 +189,16 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           color: Theme.of(context).iconTheme.color)
                       : Icon(Icons.push_pin_outlined,
                           color: Theme.of(context).iconTheme.color),
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  showNoteDateTimeMainDialoge();
+                  // showNotificationBottomSheet();
+                },
+                icon: Icon(
+                  Icons.notification_add_outlined,
+                  color: Theme.of(context).iconTheme.color,
                 ),
               ),
               IconButton(
@@ -416,23 +432,60 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                       ),
                                     );
                                   },
-                                  child: Container(
+                                  child: SizedBox(
                                     height: 104,
                                     width: 104,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(11),
-                                      border: Border.all(
-                                        color: Theme.of(context)
-                                            .highlightColor
-                                            .withOpacity(0.5),
-                                      ),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.file(
-                                        File(imageFileList![index].path),
-                                        fit: BoxFit.cover,
-                                      ),
+                                    child: Stack(
+                                      children: [
+                                        Container(
+                                          height: 104,
+                                          width: 104,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(11),
+                                            border: Border.all(
+                                              color: Theme.of(context)
+                                                  .highlightColor
+                                                  .withOpacity(0.5),
+                                            ),
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            child: Image.file(
+                                              File(imageFileList![index].path),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(11),
+                                              color: Colors.black12),
+                                          child: Align(
+                                              alignment: Alignment.topRight,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      imageFileList!.removeWhere(
+                                                          (element) =>
+                                                              element ==
+                                                              imageFileList![
+                                                                  index]);
+                                                    });
+                                                  },
+                                                  child: Icon(
+                                                    Icons.delete_forever,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              )),
+                                        )
+                                      ],
                                     ),
                                   ),
                                 );
@@ -499,12 +552,20 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                                     ),
                                                   ),
                                                 ListTile(
-                                                  onTap: () {},
+                                                  onTap: () {
+                                                    Navigator.pop(context);
+                                                    Clipboard.setData(
+                                                        ClipboardData(
+                                                            text: noteCtr.text
+                                                                .toString()));
+                                                    AppMessage.showToast(
+                                                        context, "Note Copied");
+                                                  },
                                                   leading: Icon(Icons.copy,
                                                       color:
                                                           AppColors.blackColor),
                                                   title: Text(
-                                                    "Make a Copy",
+                                                    "Copy Note",
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .titleMedium
@@ -515,7 +576,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                                   ),
                                                 ),
                                                 ListTile(
-                                                  onTap: () {},
+                                                  onTap: () {
+                                                    Navigator.pop(context);
+                                                    onshareTodo(
+                                                        context,
+                                                        noteCtr.text
+                                                            .toString());
+                                                  },
                                                   leading: Icon(Icons.share,
                                                       color:
                                                           AppColors.blackColor),
@@ -567,22 +634,23 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             ),
                           )),
                       Expanded(
-                          flex: 1,
-                          child: widget.isUpdateNote
-                              ? Container(
-                                  child: Center(
-                                    child: Text(
-                                      "Edited ${_extractDate(widget.editedDate)}",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            fontSize: 12,
-                                          ),
-                                    ),
+                        flex: 1,
+                        child: widget.isUpdateNote
+                            ? Container(
+                                child: Center(
+                                  child: Text(
+                                    "Edited ${_extractDate(widget.editedDate)}",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          fontSize: 12,
+                                        ),
                                   ),
-                                )
-                              : Container()),
+                                ),
+                              )
+                            : Container(),
+                      ),
                       Expanded(
                         flex: 1,
                         child: Container(
@@ -662,11 +730,19 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     }
   }
 
-  Widget? _checkOrNot(int index) {
-    if (indexOfCurrentColor == index) {
-      return _check;
-    }
-    return null;
+  // Widget? checkOrNot(int index) {
+  //   if (indexOfCurrentColor == index) {
+  //     return _check;
+  //   }
+  //   return null;
+  // }
+
+  void onshareTodo(BuildContext context, String note) async {
+    await Share.shareXFiles(
+      imageFileList!,
+      text: note,
+      subject: "note",
+    );
   }
 
   void addNote() {
@@ -783,6 +859,198 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           widget.onUpdateComplete!();
         }
       },
+    );
+  }
+
+  showNotificationBottomSheet() {
+    return showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.all(10),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).canvasColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(
+                  Icons.access_time,
+                  color: AppColors.blackColor,
+                ),
+                title: Row(
+                  children: [
+                    Text(
+                      "Later Today",
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontSize: 14, color: AppColors.blackColor),
+                    ),
+                    Spacer(),
+                    Text(
+                      "6:00 pm",
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontSize: 14, color: AppColors.blackColor),
+                    ),
+                  ],
+                ),
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.access_time,
+                  color: AppColors.blackColor,
+                ),
+                title: Row(
+                  children: [
+                    Text(
+                      "Tomorrow Morning",
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontSize: 14, color: AppColors.blackColor),
+                    ),
+                    Spacer(),
+                    Text(
+                      "8:00 am",
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontSize: 14, color: AppColors.blackColor),
+                    ),
+                  ],
+                ),
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.access_time,
+                  color: AppColors.blackColor,
+                ),
+                title: Text(
+                  "Chose a date & time",
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontSize: 14, color: AppColors.blackColor),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  showNoteDateTimeMainDialoge() {
+    return showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(builder: (context, setState) {
+        DateTime currentDate = DateTime.now();
+        DateTime? notificationDateTime;
+        TimeOfDay timeOfDay = TimeOfDay.now();
+
+        Future<void> selectDate(BuildContext context) async {
+          final DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate: currentDate,
+            firstDate: DateTime(2015),
+            lastDate: DateTime(2050),
+          );
+          if (pickedDate != null && pickedDate != currentDate) {
+            setState(() {
+              currentDate = pickedDate;
+              final dateFormat =
+                  DateFormat('EEEEEEEEE, d MMM y').format(currentDate);
+              dateCtr.text = dateFormat;
+              // Combine date and time when the date is selected.
+              notificationDateTime = currentDate.add(
+                Duration(hours: timeOfDay.hour, minutes: timeOfDay.minute),
+              );
+            });
+          }
+        }
+
+        Future<void> displayTimePicker(BuildContext context) async {
+          var time = await showTimePicker(
+            context: context,
+            initialTime: timeOfDay,
+          );
+          if (time != null) {
+            setState(
+              () {
+                timeOfDay = time;
+                // Combine date and time when the time is selected.
+                notificationDateTime = currentDate.add(
+                  Duration(hours: time.hour, minutes: time.minute),
+                );
+                timeCtr.text = "${time.format(context).toLowerCase()}";
+              },
+            );
+          }
+        }
+
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          backgroundColor: Theme.of(context).iconTheme.color,
+          title: Text("Add your reminder",
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  fontSize: 18)),
+          actions: [
+            // PopupMenuButton(
+            //   child: ListTile(
+            //     contentPadding: EdgeInsets.zero,
+            //     title: Text("3 November"),
+            //     trailing: Icon(Icons.arrow_drop_down),
+            //   ),
+            //   itemBuilder: (context) => [
+            //     PopupMenuItem(child: ListTile(title: Text("Today"),)),
+            //     PopupMenuItem(child: ListTile(title: Text("Tomorrow"),)),
+            //     PopupMenuItem(child: ListTile(title: Text("Select a date.."),))
+            //   ],
+            // ),
+            ListTile(
+              onTap: () {
+                selectDate(context);
+              },
+              splashColor: Colors.transparent,
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                "${dateCtr.text ?? 'ssdsds'}",
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).scaffoldBackgroundColor),
+              ),
+              trailing: Icon(
+                Icons.touch_app_outlined,
+                color: Theme.of(context).scaffoldBackgroundColor,
+              ),
+            ),
+            ListTile(
+              splashColor: Colors.transparent,
+              onTap: () {
+                displayTimePicker(context);
+              },
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                "${timeCtr.text ?? 'ssdsds'}",
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).scaffoldBackgroundColor),
+              ),
+              trailing: Icon(
+                Icons.touch_app_outlined,
+                color: Theme.of(context).scaffoldBackgroundColor,
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 }

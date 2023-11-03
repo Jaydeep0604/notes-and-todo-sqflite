@@ -6,6 +6,7 @@ import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
 import 'package:notes_sqflite/services/notification_services.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
+import 'package:flutter_share/flutter_share.dart';
 
 class TodoDetailscreen extends StatefulWidget {
   bool isUpdateTodo;
@@ -164,7 +165,13 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                   if (widget.isUpdateTodo)
                     IconButton(
                       tooltip: "Share schedules",
-                      onPressed: () {},
+                      onPressed: () {
+                        shareTodo(
+                          todoCtr.text.toString(),
+                          dateCtr.text.toString(),
+                          timeCtr.text.toString(),
+                        );
+                      },
                       icon: Icon(Icons.share,
                           color: Theme.of(context).iconTheme.color),
                     ),
@@ -173,71 +180,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                       tooltip: "Delete",
                       onPressed: () {
                         FocusManager.instance.primaryFocus?.unfocus();
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            backgroundColor: Theme.of(context).canvasColor,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            alignment: Alignment.center,
-                            titleTextStyle:
-                                TextStyle(fontWeight: FontWeight.w500),
-                            title: Text(
-                              "Are you sure, you want to delete?",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.blackColor,
-                              ),
-                            ),
-                            actions: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: MaterialButton(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          side: BorderSide(
-                                              color: AppColors.blackColor)),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text(
-                                        "No",
-                                        style: TextStyle(
-                                            color: AppColors.blackColor),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
-                                    child: MaterialButton(
-                                      color: AppColors.blueColor,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        // side: BorderSide(color: Colors.black)
-                                      ),
-                                      onPressed: () {
-                                        if (widget.isUpdateTodo) {
-                                          widget.onDelete!();
-                                        }
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text(
-                                        "Yes",
-                                        style: TextStyle(
-                                            color: AppColors.whiteColor),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
+                        showDeleteDialoge();
                       },
                       icon: Icon(Icons.delete_forever,
                           color: Theme.of(context).iconTheme.color),
@@ -510,6 +453,75 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
           ),
         ),
       ),
+    );
+  }
+
+  showDeleteDialoge() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).canvasColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        alignment: Alignment.center,
+        titleTextStyle: TextStyle(fontWeight: FontWeight.w500),
+        title: Text(
+          "Are you sure, you want to delete?",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: AppColors.blackColor,
+          ),
+        ),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: MaterialButton(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(color: AppColors.blackColor)),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "No",
+                    style: TextStyle(color: AppColors.blackColor),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: MaterialButton(
+                  color: AppColors.blueColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    // side: BorderSide(color: Colors.black)
+                  ),
+                  onPressed: () {
+                    if (widget.isUpdateTodo) {
+                      widget.onDelete!();
+                    }
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Yes",
+                    style: TextStyle(color: AppColors.whiteColor),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void shareTodo(String todo, String date, String time) async {
+    await FlutterShare.share(
+      title: "todo",
+      text: "$todo ($date, $time)",
     );
   }
 }
