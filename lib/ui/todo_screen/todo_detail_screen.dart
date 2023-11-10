@@ -75,9 +75,9 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
     dateCtr.clear();
   }
 
-  void dispose() {
-    super.dispose();
-  }
+  // void dispose() {
+  //   super.dispose();
+  // }
 
   DateTime currentDate = DateTime.now();
   DateTime? notificationDateTime;
@@ -502,8 +502,10 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                   onPressed: () {
                     if (widget.isUpdateTodo) {
                       widget.onDelete!();
+                      Navigator.pop(context);
                     }
                     Navigator.pop(context);
+                    
                   },
                   child: Text(
                     "Yes",

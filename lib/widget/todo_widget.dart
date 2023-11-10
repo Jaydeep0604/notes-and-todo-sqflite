@@ -53,9 +53,9 @@ class _TodoWidgetState extends State<TodoWidget> {
     });
   }
 
-  void dispose() {
-    super.dispose();
-  }
+  // void dispose() {
+  //   super.dispose();
+  // }
 
   void setStatus() {
     setState(
@@ -153,8 +153,8 @@ class _TodoWidgetState extends State<TodoWidget> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(
-                height: 19,
-                width: 19,
+                height: 24,
+                width: 24,
                 child: Checkbox(
                   value: isDone,
                   checkColor: AppColors.whiteColor,

@@ -1,16 +1,13 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
-import 'package:notes_sqflite/db/list_data.dart';
 import 'package:notes_sqflite/model/note_model.dart';
 import 'package:flutter/services.dart';
 import 'package:notes_sqflite/ui/image_view_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_share/flutter_share.dart';
-import 'package:notes_sqflite/utils/app_message.dart';
+import 'package:notes_sqflite/utils/functions.dart';
 import 'package:share_plus/share_plus.dart';
 
 class NoteDetailScreen extends StatefulWidget {
@@ -35,7 +32,18 @@ class NoteDetailScreen extends StatefulWidget {
   String? title, createDate, email, note, editedDate;
   bool isDeleted, isPined, isArchived;
   List<String>? imageList;
-  void Function()? onUpdateComplete, onDismissed;
+  void Function()? onUpdateComplete;
+  void Function(
+    int id,
+    String title,
+    String note,
+    String email,
+    String createDate,
+    String editedDate,
+    int pin,
+    int archive,
+    int deleted,
+  )? onDismissed;
   @override
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
 }
@@ -43,6 +51,10 @@ class NoteDetailScreen extends StatefulWidget {
 class _NoteDetailScreenState extends State<NoteDetailScreen> {
   bool isEdited = false;
   DBHelper? dbHelper;
+  bool isEvening = false;
+  bool isNextMorning = false;
+  bool isCustom = true;
+  bool isDefault = false;
 
   late TextEditingController titleCtr;
   late TextEditingController noteCtr;
@@ -56,14 +68,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   void initState() {
     super.initState();
     dbHelper = DBHelper();
-
+    timeCtr = TextEditingController();
+    dateCtr = TextEditingController();
     // this.noteColor = Colors.black;
     // indexOfCurrentColor = colors.indexOf(noteColor);
     if (widget.isUpdateNote) {
       titleCtr = TextEditingController(text: widget.title);
       noteCtr = TextEditingController(text: widget.note);
-      timeCtr = TextEditingController();
-      dateCtr = TextEditingController();
+
       if (widget.imageList != null) {
         imageFileList = widget.imageList!
             .where((path) => path.isNotEmpty) // Filter out empty strings
@@ -108,6 +120,12 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       imageFileList!.addAll(selectedImages);
     }
     print("Image List Length:" + imageFileList!.length.toString());
+    await dbHelper?.updateImageList(
+      NotesModel(
+        id: widget.id,
+        image_list: imageFileList!.map((image) => image.path).toList(),
+      ),
+    );
     setState(() {});
   }
 
@@ -147,568 +165,582 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
         },
-        child: Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              tooltip: "Navigate up",
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.arrow_back,
-                  color: Theme.of(context).iconTheme.color),
-            ),
-            actions: [
-              IconButton(
-                tooltip: "Pin",
+        child: WillPopScope(
+          onWillPop: () async {
+            Navigator.pop(context, true);
+            return true;
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                tooltip: "Navigate up",
                 onPressed: () {
-                  isPinedChange();
-                  if (widget.isUpdateNote) {
-                    dbHelper
-                        ?.update(NotesModel(
-                            id: widget.id,
-                            title: titleCtr.text,
-                            note: noteCtr.text,
-                            pin: widget.isPined == true ? 1 : 0,
-                            archive: widget.isArchived == true ? 1 : 0,
-                            email: widget.email,
-                            deleted: widget.isDeleted == true ? 1 : 0,
-                            create_date: widget.createDate,
-                            edited_date: widget.editedDate,
-                            image_list: imageFileList!
-                                .map((image) => image.path)
-                                .toList()))
-                        .then((value) {
-                      widget.onUpdateComplete!();
-                    });
-                  }
+                  Navigator.pop(context, true);
                 },
-                icon: Transform.scale(
-                  scale: 1,
-                  child: widget.isPined
-                      ? Icon(Icons.push_pin,
-                          color: Theme.of(context).iconTheme.color)
-                      : Icon(Icons.push_pin_outlined,
-                          color: Theme.of(context).iconTheme.color),
-                ),
+                icon: Icon(Icons.arrow_back,
+                    color: Theme.of(context).iconTheme.color),
               ),
-              IconButton(
-                onPressed: () {
-                  showNoteDateTimeMainDialoge();
-                  // showNotificationBottomSheet();
-                },
-                icon: Icon(
-                  Icons.notification_add_outlined,
-                  color: Theme.of(context).iconTheme.color,
-                ),
-              ),
-              IconButton(
-                tooltip: "Archive",
-                onPressed: () {
-                  isArchivedChange();
-                  if (widget.isUpdateNote) {
-                    dbHelper
-                        ?.update(NotesModel(
-                            id: widget.id,
-                            title: titleCtr.text,
-                            note: noteCtr.text,
-                            pin: widget.isPined == true ? 1 : 0,
-                            archive: widget.isArchived == true ? 1 : 0,
-                            email: widget.email,
-                            deleted: widget.isDeleted == true ? 1 : 0,
-                            create_date: widget.createDate,
-                            edited_date: widget.editedDate,
-                            image_list: imageFileList!
-                                .map((image) => image.path)
-                                .toList()))
-                        .then((value) {
-                      widget.onUpdateComplete!();
-                    });
-                  }
-                },
-                icon: Transform.scale(
-                  scale: 1,
-                  child: widget.isArchived
-                      ? Icon(Icons.archive,
-                          color: Theme.of(context).iconTheme.color)
-                      : Icon(Icons.archive_outlined,
-                          color: Theme.of(context).iconTheme.color),
-                ),
-              ),
-              // if (widget.isDeleted == false && widget.isUpdateNote == true)
-              //   IconButton(
-              //     tooltip: "Delete",
-              //     onPressed: () {
-              //       showDeleteDialoge();
-              //     },
-              //     icon: Icon(
-              //       Icons.delete_forever,
-              //       color: AppColors.whiteColor
-              //     ),
-              //   ),
-              if (widget.isDeleted == true)
-                PopupMenuButton(
-                  color: Theme.of(context).canvasColor,
-                  icon: Icon(
-                    Icons.more_vert,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                  itemBuilder: (context) {
-                    return [
-                      PopupMenuItem(
-                        onTap: () async {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          setState(() {
-                            widget.isDeleted = false;
-                            isEdited = true;
-                          });
-                          dbHelper
-                              ?.update(NotesModel(
-                                  id: widget.id,
-                                  title: titleCtr.text,
-                                  note: noteCtr.text,
-                                  pin: widget.isPined == true ? 1 : 0,
-                                  archive: widget.isArchived == true ? 1 : 0,
-                                  email: widget.email,
-                                  deleted: widget.isDeleted == true ? 1 : 0,
-                                  create_date: widget.createDate,
-                                  edited_date: widget.editedDate,
-                                  image_list: imageFileList!
-                                      .map((image) => image.path)
-                                      .toList()))
-                              .then((value) {
-                            if (value == 1) {
-                              widget.onUpdateComplete!();
-                            }
-                          });
-                          Navigator.pop(context);
-                        },
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.restore,
-                              color: Theme.of(context).cardColor,
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text(
-                              "Restore",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelMedium
-                                  ?.copyWith(fontSize: 14),
-                            )
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        onTap: () {
-                          dbHelper?.deleteNote(widget.id!).then(
-                            (value) {
-                              Navigator.pop(context);
-                              widget.onDismissed!();
-                            },
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.delete_forever,
-                              color: AppColors.redColor,
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text(
-                              "Delete forever",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelMedium
-                                  ?.copyWith(fontSize: 14),
-                            )
-                          ],
+              actions: [
+                IconButton(
+                  tooltip: "Pin",
+                  onPressed: () {
+                    isPinedChange();
+                    if (widget.isUpdateNote) {
+                      dbHelper
+                          ?.updatePin(
+                        NotesModel(
+                          id: widget.id,
+                          pin: widget.isPined == true ? 1 : 0,
+                          image_list: [],
                         ),
                       )
-                    ];
+                          .then((value) {
+                        widget.onUpdateComplete!();
+                      });
+                    }
                   },
+                  icon: Transform.scale(
+                    scale: 1,
+                    child: widget.isPined
+                        ? Icon(Icons.push_pin,
+                            color: Theme.of(context).iconTheme.color)
+                        : Icon(Icons.push_pin_outlined,
+                            color: Theme.of(context).iconTheme.color),
+                  ),
                 ),
-              SizedBox(
-                width: 10,
-              ),
-            ],
-          ),
-          body: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextFormField(
-                            controller: titleCtr,
-                            autofocus: widget.isUpdateNote ? false : true,
-                            maxLines: null,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 20,
-                                ),
-                            decoration: InputDecoration(
+                IconButton(
+                  tooltip: "Archive",
+                  onPressed: () {
+                    isArchivedChange();
+                    if (widget.isUpdateNote) {
+                      dbHelper
+                          ?.updateArchive(
+                        NotesModel(
+                          id: widget.id,
+                          archive: widget.isArchived == true ? 1 : 0,
+                          image_list: [],
+                        ),
+                      )
+                          .then((value) {
+                        widget.onUpdateComplete!();
+                      });
+                    }
+                  },
+                  icon: Transform.scale(
+                    scale: 1,
+                    child: widget.isArchived
+                        ? Icon(Icons.archive,
+                            color: Theme.of(context).iconTheme.color)
+                        : Icon(Icons.archive_outlined,
+                            color: Theme.of(context).iconTheme.color),
+                  ),
+                ),
+                if (widget.isDeleted == true)
+                  PopupMenuButton(
+                    color: Theme.of(context).canvasColor,
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem(
+                          onTap: () async {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            setState(() {
+                              widget.isDeleted = false;
+                              isEdited = true;
+                            });
+                            dbHelper
+                                ?.deleteNote(
+                              NotesModel(
+                                id: widget.id,
+                                deleted: 0,
+                                image_list: [],
+                              ),
+                            )
+                                .then((value) {
+                              if (value == 1) {
+                                widget.onUpdateComplete!();
+                              }
+                            });
+                            Navigator.pop(context);
+                          },
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.restore,
+                                color: Theme.of(context).cardColor,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                "Restore",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium
+                                    ?.copyWith(fontSize: 14),
+                              )
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem(
+                          onTap: () {
+                            dbHelper?.deleteForeverNote(widget.id!).then(
+                              (value) {
+                                Navigator.pop(context);
+                                widget.onDismissed!(
+                                    widget.id!,
+                                    titleCtr.text,
+                                    noteCtr.text,
+                                    widget.email!,
+                                    widget.createDate!,
+                                    widget.editedDate!,
+                                    widget.isPined == true ? 1 : 0,
+                                    widget.isArchived == true ? 1 : 0,
+                                    widget.isDeleted == true ? 1 : 0);
+                              },
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.delete_forever,
+                                color: AppColors.redColor,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                "Delete forever",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium
+                                    ?.copyWith(fontSize: 14),
+                              )
+                            ],
+                          ),
+                        )
+                      ];
+                    },
+                  ),
+                SizedBox(
+                  width: 10,
+                ),
+              ],
+            ),
+            body: SafeArea(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 15),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextFormField(
+                              controller: titleCtr,
+                              autofocus: widget.isUpdateNote ? false : true,
+                              maxLines: null,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 20,
+                                  ),
+                              decoration: InputDecoration(
                                 hintText: "Title",
                                 hintStyle: Theme.of(context)
                                     .textTheme
                                     .titleMedium
                                     ?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 20,
+                                      color: Theme.of(context)
+                                          .highlightColor
+                                          .withOpacity(0.5),
+                                    ),
+                                enabledBorder: InputBorder.none,
+                                border: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                              ),
+                              inputFormatters: [],
+                              onChanged: (value) {
+                                final editedDate =
+                                    DateFormat('EEEEEEEEE,d MMM y').format(
+                                  DateTime.now(),
+                                );
+
+                                dbHelper!
+                                    .updatetile(NotesModel(
+                                  id: widget.id,
+                                  title: value,
+                                  edited_date: editedDate.toString(),
+                                  image_list: [],
+                                ))
+                                    .then((result) {
+                                  if (result == 1) {
+                                    print("Auto-saved");
+                                  }
+                                });
+                              },
+                            ),
+                            TextFormField(
+                              controller: noteCtr,
+                              minLines: 1,
+                              maxLines: null,
+                              style: Theme.of(context).textTheme.titleMedium,
+                              decoration: InputDecoration(
+                                hintText: "Note",
+                                hintStyle: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 20,
                                         color: Theme.of(context)
                                             .highlightColor
                                             .withOpacity(0.5)),
                                 enabledBorder: InputBorder.none,
                                 border: InputBorder.none,
-                                disabledBorder: InputBorder.none),
-                            inputFormatters: [],
-                          ),
-                          TextFormField(
-                            controller: noteCtr,
-                            minLines: 1,
-                            maxLines: null,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                  fontSize: 16,
-                                ),
-                            decoration: InputDecoration(
-                              hintText: "Note",
-                              hintStyle: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
-                                      color: Theme.of(context)
-                                          .highlightColor
-                                          .withOpacity(0.5)),
-                              enabledBorder: InputBorder.none,
-                              border: InputBorder.none,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            child: GridView.builder(
-                              gridDelegate:
-                                  const SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent: 100,
-                                      childAspectRatio: 3 / 3,
-                                      crossAxisSpacing: 10,
-                                      mainAxisSpacing: 10),
-                              scrollDirection: Axis.vertical,
-                              primary: false,
-                              shrinkWrap: true,
-                              itemCount: imageFileList!.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ImageViewScreen(
-                                            path: imageFileList![index]
-                                                .path
-                                                .toString()),
-                                      ),
-                                    );
-                                  },
-                                  child: SizedBox(
-                                    height: 104,
-                                    width: 104,
-                                    child: Stack(
-                                      children: [
-                                        Container(
-                                          height: 104,
-                                          width: 104,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(11),
-                                            border: Border.all(
-                                              color: Theme.of(context)
-                                                  .highlightColor
-                                                  .withOpacity(0.5),
-                                            ),
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.file(
-                                              File(imageFileList![index].path),
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(11),
-                                              color: Colors.black12),
-                                          child: Align(
-                                              alignment: Alignment.topRight,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      imageFileList!.removeWhere(
-                                                          (element) =>
-                                                              element ==
-                                                              imageFileList![
-                                                                  index]);
-                                                    });
-                                                  },
-                                                  child: Icon(
-                                                    Icons.delete_forever,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              )),
-                                        )
-                                      ],
-                                    ),
-                                  ),
+                                disabledBorder: InputBorder.none,
+                              ),
+                              onChanged: (value) {
+                                final editedDate =
+                                    DateFormat('EEEEEEEEE,d MMM y').format(
+                                  DateTime.now(),
                                 );
+                                dbHelper!
+                                    .updateNoteText(NotesModel(
+                                  id: widget.id,
+                                  note: value,
+                                  edited_date: editedDate.toString(),
+                                  image_list: [],
+                                ))
+                                    .then((result) {
+                                  if (result == 1) {
+                                    print("Auto-saved");
+                                  }
+                                });
                               },
                             ),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                        ],
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              child: GridView.builder(
+                                gridDelegate:
+                                    const SliverGridDelegateWithMaxCrossAxisExtent(
+                                        maxCrossAxisExtent: 100,
+                                        childAspectRatio: 3 / 3,
+                                        crossAxisSpacing: 10,
+                                        mainAxisSpacing: 10),
+                                scrollDirection: Axis.vertical,
+                                primary: false,
+                                shrinkWrap: true,
+                                itemCount: imageFileList!.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ImageViewScreen(
+                                              path: imageFileList![index]
+                                                  .path
+                                                  .toString()),
+                                        ),
+                                      );
+                                    },
+                                    child: SizedBox(
+                                      height: 104,
+                                      width: 104,
+                                      child: Stack(
+                                        children: [
+                                          Container(
+                                            height: 104,
+                                            width: 104,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(11),
+                                              border: Border.all(
+                                                color: Theme.of(context)
+                                                    .highlightColor
+                                                    .withOpacity(0.5),
+                                              ),
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: Image.file(
+                                                File(
+                                                    imageFileList![index].path),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(11),
+                                                color: Colors.black12),
+                                            child: Align(
+                                                alignment: Alignment.topRight,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        imageFileList!.removeWhere(
+                                                            (element) =>
+                                                                element ==
+                                                                imageFileList![
+                                                                    index]);
+                                                      });
+                                                    },
+                                                    child: Icon(
+                                                      Icons.delete_forever,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                )),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Container(
-                  height: 50,
-                  child: Row(
-                    children: [
-                      Expanded(
-                          flex: 1,
-                          child: Container(
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    FocusManager.instance.primaryFocus
-                                        ?.unfocus();
-                                    showModalBottomSheet(
-                                      backgroundColor: Colors.transparent,
-                                      context: context,
-                                      builder: (context) {
-                                        return Padding(
-                                          padding: const EdgeInsets.all(10),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  Theme.of(context).canvasColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                if (widget.isDeleted == false &&
-                                                    widget.isUpdateNote == true)
-                                                  ListTile(
-                                                    onTap: () {
-                                                      Navigator.pop(context);
-                                                      showDeleteDialoge();
-                                                    },
-                                                    leading: Icon(
-                                                        Icons.delete_forever,
-                                                        color: AppColors
-                                                            .blackColor),
-                                                    title: Text(
-                                                      "Delete",
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .titleMedium
-                                                          ?.copyWith(
-                                                              fontSize: 14,
-                                                              color: AppColors
-                                                                  .blackColor),
-                                                    ),
-                                                  ),
-                                                ListTile(
-                                                  onTap: () {
-                                                    Navigator.pop(context);
-                                                    Clipboard.setData(
-                                                        ClipboardData(
-                                                            text: noteCtr.text
-                                                                .toString()));
-                                                    AppMessage.showToast(
-                                                        context, "Note Copied");
-                                                  },
-                                                  leading: Icon(Icons.copy,
-                                                      color:
-                                                          AppColors.blackColor),
-                                                  title: Text(
-                                                    "Copy Note",
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleMedium
-                                                        ?.copyWith(
-                                                            fontSize: 14,
-                                                            color: AppColors
-                                                                .blackColor),
-                                                  ),
-                                                ),
-                                                ListTile(
-                                                  onTap: () {
-                                                    Navigator.pop(context);
-                                                    onshareTodo(
-                                                        context,
-                                                        noteCtr.text
-                                                            .toString());
-                                                  },
-                                                  leading: Icon(Icons.share,
-                                                      color:
-                                                          AppColors.blackColor),
-                                                  title: Text(
-                                                    "Send",
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleMedium
-                                                        ?.copyWith(
-                                                            fontSize: 14,
-                                                            color: AppColors
-                                                                .blackColor),
-                                                  ),
-                                                ),
-                                                ListTile(
-                                                  onTap: () {
-                                                    Navigator.pop(context);
-                                                    selectImages();
-                                                  },
-                                                  leading: Icon(
-                                                      Icons
-                                                          .add_photo_alternate_outlined,
-                                                      color:
-                                                          AppColors.blackColor),
-                                                  title: Text(
-                                                    "Add Image",
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleMedium
-                                                        ?.copyWith(
-                                                            fontSize: 14,
-                                                            color: AppColors
-                                                                .blackColor),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                  icon: Icon(Icons.more_vert,
-                                      color: Theme.of(context).iconTheme.color
-                                      // color: AppColors.blackColor,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          )),
-                      Expanded(
-                        flex: 1,
-                        child: widget.isUpdateNote
-                            ? Container(
-                                child: Center(
-                                  child: Text(
-                                    "Edited ${_extractDate(widget.editedDate)}",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(
-                                          fontSize: 12,
+                  Container(
+                    height: 50,
+                    child: Row(
+                      children: [
+                        Expanded(
+                            flex: 1,
+                            child: Container(
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
+                                      showNoteDateTimeMainDialoge(
+                                          isCustom: isCustom,
+                                          isDefault: isDefault);
+                                      // showModalBottomSheet(
+                                      //   backgroundColor: Colors.transparent,
+                                      //   context: context,
+                                      //   elevation: 0,
+                                      //   builder: (context) {
+                                      //     return Padding(
+                                      //       padding: const EdgeInsets.all(10),
+                                      //       child: Container(
+                                      //         decoration: BoxDecoration(
+                                      //           color: Theme.of(context)
+                                      //               .canvasColor,
+                                      //           borderRadius:
+                                      //               BorderRadius.circular(20),
+                                      //         ),
+                                      //         child: Column(
+                                      //           mainAxisSize: MainAxisSize.min,
+                                      //           children: [
+                                      //             if (widget.isDeleted ==
+                                      //                     false &&
+                                      //                 widget.isUpdateNote ==
+                                      //                     true)
+                                      //               ListTile(
+                                      //                 onTap: () {
+                                      //                   Navigator.pop(context);
+                                      //                   showDeleteDialoge();
+                                      //                 },
+                                      //                 leading: Icon(
+                                      //                     Icons.delete_forever,
+                                      //                     color: AppColors
+                                      //                         .blackColor),
+                                      //                 title: Text(
+                                      //                   "Delete",
+                                      //                   style: Theme.of(context)
+                                      //                       .textTheme
+                                      //                       .titleMedium
+                                      //                       ?.copyWith(
+                                      //                           fontSize: 14,
+                                      //                           color: AppColors
+                                      //                               .blackColor),
+                                      //                 ),
+                                      //               ),
+                                      //             ListTile(
+                                      //               onTap: () {
+                                      //                 Navigator.pop(context);
+                                      //                 Clipboard.setData(
+                                      //                     ClipboardData(
+                                      //                         text: noteCtr.text
+                                      //                             .toString()));
+                                      //                 AppMessage.showToast(
+                                      //                     context,
+                                      //                     "Note Copied");
+                                      //               },
+                                      //               leading: Icon(Icons.copy,
+                                      //                   color: AppColors
+                                      //                       .blackColor),
+                                      //               title: Text(
+                                      //                 "Copy Note",
+                                      //                 style: Theme.of(context)
+                                      //                     .textTheme
+                                      //                     .titleMedium
+                                      //                     ?.copyWith(
+                                      //                         fontSize: 14,
+                                      //                         color: AppColors
+                                      //                             .blackColor),
+                                      //               ),
+                                      //             ),
+                                      //             ListTile(
+                                      //               onTap: () {
+                                      //                 Navigator.pop(context);
+                                      //                 onshareTodo(
+                                      //                     context,
+                                      //                     noteCtr.text
+                                      //                         .toString());
+                                      //               },
+                                      //               leading: Icon(Icons.share,
+                                      //                   color: AppColors
+                                      //                       .blackColor),
+                                      //               title: Text(
+                                      //                 "Share Note",
+                                      //                 style: Theme.of(context)
+                                      //                     .textTheme
+                                      //                     .titleMedium
+                                      //                     ?.copyWith(
+                                      //                         fontSize: 14,
+                                      //                         color: AppColors
+                                      //                             .blackColor),
+                                      //               ),
+                                      //             ),
+                                      //             ListTile(
+                                      //               onTap: () {
+                                      //                 Navigator.pop(context);
+                                      //                 showNoteDateTimeMainDialoge();
+                                      //               },
+                                      //               leading: Icon(
+                                      //                   Icons
+                                      //                       .notification_add_outlined,
+                                      //                   color: AppColors
+                                      //                       .blackColor),
+                                      //               title: Text(
+                                      //                 "Add Remider",
+                                      //                 style: Theme.of(context)
+                                      //                     .textTheme
+                                      //                     .titleMedium
+                                      //                     ?.copyWith(
+                                      //                         fontSize: 14,
+                                      //                         color: AppColors
+                                      //                             .blackColor),
+                                      //               ),
+                                      //             ),
+                                      //             ListTile(
+                                      //               onTap: () {
+                                      //                 Navigator.pop(context);
+                                      //                 selectImages();
+                                      //               },
+                                      //               leading: Icon(
+                                      //                   Icons
+                                      //                       .add_photo_alternate_outlined,
+                                      //                   color: AppColors
+                                      //                       .blackColor),
+                                      //               title: Text(
+                                      //                 "Add Image",
+                                      //                 style: Theme.of(context)
+                                      //                     .textTheme
+                                      //                     .titleMedium
+                                      //                     ?.copyWith(
+                                      //                         fontSize: 14,
+                                      //                         color: AppColors
+                                      //                             .blackColor),
+                                      //               ),
+                                      //             )
+                                      //           ],
+                                      //         ),
+                                      //       ),
+                                      //     );
+                                      //   },
+                                      // );
+                                    },
+                                    icon: Icon(Icons.more_vert,
+                                        color: Theme.of(context).iconTheme.color
+                                        // color: AppColors.blackColor,
                                         ),
                                   ),
-                                ),
-                              )
-                            : Container(),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 3),
-                            child: Center(
-                              child: MaterialButton(
-                                color: AppColors.yellowColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                onPressed: () {
-                                  FocusManager.instance.primaryFocus?.unfocus();
-                                  if (widget.isUpdateNote) {
-                                    final editedDate =
-                                        DateFormat('EEEEEEEEE,d MMM y').format(
-                                      DateTime.now(),
-                                    );
-                                    dbHelper!
-                                        .update(
-                                      NotesModel(
-                                          id: widget.id,
-                                          title: titleCtr.text.toString(),
-                                          note: noteCtr.text.toString(),
-                                          pin: 0,
-                                          archive: 0,
-                                          email: '',
-                                          deleted:
-                                              widget.isDeleted == true ? 1 : 0,
-                                          create_date: widget.createDate,
-                                          edited_date: editedDate.toString(),
-                                          image_list: imageFileList!
-                                              .map((image) => image.path)
-                                              .toList()),
-                                    )
-                                        .then((value) {
-                                      widget.onUpdateComplete!();
-                                      clear();
-                                      Navigator.pop(context);
-                                    });
-                                  } else {
-                                    addNote();
-                                  }
-                                },
-                                child: Text(
-                                  "Save",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelMedium
-                                      ?.copyWith(
-                                          fontSize: 14,
-                                          color: AppColors.blackColor),
-                                ),
+                                ],
                               ),
                             )),
-                      )
-                    ],
+                        Expanded(
+                          flex: 1,
+                          child: widget.isUpdateNote
+                              ? Container(
+                                  child: Center(
+                                    child: Text(
+                                      "Edited ${_extractDate(widget.editedDate)}",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            fontSize: 12,
+                                          ),
+                                    ),
+                                  ),
+                                )
+                              : Container(),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: widget.isUpdateNote
+                              ? Container()
+                              : Container(
+                                  padding: EdgeInsets.symmetric(vertical: 3),
+                                  child: Center(
+                                    child: MaterialButton(
+                                      color: AppColors.yellowColor,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      onPressed: () {
+                                        FocusManager.instance.primaryFocus
+                                            ?.unfocus();
+                                        addNote();
+                                      },
+                                      child: Text(
+                                        "Save",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium
+                                            ?.copyWith(
+                                                fontSize: 14,
+                                                color: AppColors.blackColor),
+                                      ),
+                                    ),
+                                  )),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -751,8 +783,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     print("$date, $time");
     dbHelper!
         .insertNote(NotesModel(
-      title: titleCtr.text.toString(),
-      note: noteCtr.text.toString(),
+      title: titleCtr.text.toString() ?? '',
+      note: noteCtr.text.toString() ?? '',
       pin: widget.isPined == true ? 1 : 0,
       archive: widget.isArchived == true ? 1 : 0,
       email: '',
@@ -824,19 +856,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                         isEdited = true;
                       });
                       dbHelper
-                          ?.update(NotesModel(
-                              id: widget.id,
-                              title: titleCtr.text,
-                              note: noteCtr.text,
-                              pin: widget.isPined == true ? 1 : 0,
-                              archive: widget.isArchived == true ? 1 : 0,
-                              email: widget.email,
-                              deleted: widget.isDeleted == true ? 1 : 0,
-                              create_date: widget.createDate,
-                              edited_date: widget.editedDate,
-                              image_list: imageFileList!
-                                  .map((image) => image.path)
-                                  .toList()))
+                          ?.deleteNote(
+                        NotesModel(
+                          id: widget.id,
+                          deleted: 1,
+                          image_list: [],
+                        ),
+                      )
                           .then((value) {
                         Navigator.pop(context);
                         Navigator.pop(context);
@@ -946,111 +972,425 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     );
   }
 
-  showNoteDateTimeMainDialoge() {
+  showNoteDateTimeMainDialoge({
+    bool? isCustom,
+    bool? isDefault,
+  }) {
     return showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(builder: (context, setState) {
-        DateTime currentDate = DateTime.now();
-        DateTime? notificationDateTime;
-        TimeOfDay timeOfDay = TimeOfDay.now();
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          DateTime currentDate = DateTime.now();
+          DateTime? notificationDateTime;
+          TimeOfDay timeOfDay = TimeOfDay.now();
 
-        Future<void> selectDate(BuildContext context) async {
-          final DateTime? pickedDate = await showDatePicker(
-            context: context,
-            initialDate: currentDate,
-            firstDate: DateTime(2015),
-            lastDate: DateTime(2050),
-          );
-          if (pickedDate != null && pickedDate != currentDate) {
-            setState(() {
-              currentDate = pickedDate;
-              final dateFormat =
-                  DateFormat('EEEEEEEEE, d MMM y').format(currentDate);
-              dateCtr.text = dateFormat;
-              // Combine date and time when the date is selected.
-              notificationDateTime = currentDate.add(
-                Duration(hours: timeOfDay.hour, minutes: timeOfDay.minute),
-              );
-            });
-          }
-        }
-
-        Future<void> displayTimePicker(BuildContext context) async {
-          var time = await showTimePicker(
-            context: context,
-            initialTime: timeOfDay,
-          );
-          if (time != null) {
-            setState(
-              () {
-                timeOfDay = time;
-                // Combine date and time when the time is selected.
-                notificationDateTime = currentDate.add(
-                  Duration(hours: time.hour, minutes: time.minute),
-                );
-                timeCtr.text = "${time.format(context).toLowerCase()}";
-              },
+          Future<void> selectDate(BuildContext context) async {
+            final DateTime? pickedDate = await showDatePicker(
+              context: context,
+              initialDate: currentDate,
+              firstDate: DateTime(2015),
+              lastDate: DateTime(2050),
             );
+            if (pickedDate != null && pickedDate != currentDate) {
+              setState(() {
+                currentDate = pickedDate;
+                final dateFormat =
+                    DateFormat('EEEEEEEEE, d MMM y').format(currentDate);
+                dateCtr.text = dateFormat;
+                // Combine date and time when the date is selected.
+                notificationDateTime = currentDate.add(
+                  Duration(hours: timeOfDay.hour, minutes: timeOfDay.minute),
+                );
+              });
+            }
           }
-        }
 
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          backgroundColor: Theme.of(context).iconTheme.color,
-          title: Text("Add your reminder",
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  fontSize: 18)),
-          actions: [
-            // PopupMenuButton(
-            //   child: ListTile(
-            //     contentPadding: EdgeInsets.zero,
-            //     title: Text("3 November"),
-            //     trailing: Icon(Icons.arrow_drop_down),
-            //   ),
-            //   itemBuilder: (context) => [
-            //     PopupMenuItem(child: ListTile(title: Text("Today"),)),
-            //     PopupMenuItem(child: ListTile(title: Text("Tomorrow"),)),
-            //     PopupMenuItem(child: ListTile(title: Text("Select a date.."),))
-            //   ],
-            // ),
-            ListTile(
-              onTap: () {
-                selectDate(context);
-              },
-              splashColor: Colors.transparent,
-              contentPadding: EdgeInsets.zero,
-              title: Text(
-                "${dateCtr.text ?? 'ssdsds'}",
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).scaffoldBackgroundColor),
-              ),
-              trailing: Icon(
-                Icons.touch_app_outlined,
-                color: Theme.of(context).scaffoldBackgroundColor,
-              ),
+          Future<void> displayTimePicker(BuildContext context) async {
+            var time = await showTimePicker(
+              context: context,
+              initialTime: timeOfDay,
+            );
+            if (time != null) {
+              setState(
+                () {
+                  timeOfDay = time;
+                  notificationDateTime = currentDate.add(
+                    Duration(hours: time.hour, minutes: time.minute),
+                  );
+                  timeCtr.text = "${time.format(context).toLowerCase()}";
+                },
+              );
+            }
+          }
+
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-            ListTile(
-              splashColor: Colors.transparent,
-              onTap: () {
-                displayTimePicker(context);
-              },
-              contentPadding: EdgeInsets.zero,
-              title: Text(
-                "${timeCtr.text ?? 'ssdsds'}",
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).scaffoldBackgroundColor),
-              ),
-              trailing: Icon(
-                Icons.touch_app_outlined,
-                color: Theme.of(context).scaffoldBackgroundColor,
-              ),
+            backgroundColor: Theme.of(context).iconTheme.color,
+            title: Row(
+              children: [
+                Text("Add your reminder",
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        fontSize: 18)),
+                Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      dateCtr.clear();
+                      timeCtr.clear();
+                      isEvening = false;
+                      isNextMorning = false;
+                    });
+                  },
+                  child: Text(
+                    "Clear",
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(color: Colors.blue),
+                  ),
+                ),
+              ],
             ),
-          ],
-        );
-      }),
-    );
+            actions: [
+              Row(
+                children: [
+                  GestureDetector(
+                    // borderRadius: BorderRadius.circular(8),
+                    onTap: () {
+                      setState(() {
+                        isCustom = true;
+                        isDefault = false;
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isCustom == true
+                            ? AppColors.blueColor.withOpacity(0.2)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isCustom == true
+                              ? AppColors.blueColor.withOpacity(0.6)
+                              : Colors.transparent,
+                        ),
+                      ),
+                      child: Text(
+                        "Custom",
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Theme.of(context).cardColor,
+                                ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  GestureDetector(
+                    // borderRadius: BorderRadius.circular(8),
+                    onTap: () => setState(() {
+                      isDefault = true;
+                      isCustom = false;
+                    }),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isDefault == true
+                            ? AppColors.blueColor.withOpacity(0.2)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isDefault == true
+                              ? AppColors.blueColor.withOpacity(0.6)
+                              : Colors.transparent,
+                        ),
+                      ),
+                      child: Text(
+                        "Default",
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Theme.of(context).cardColor,
+                                ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              isCustom!
+                  ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          onTap: () {
+                            selectDate(context);
+                          },
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(
+                              color: Colors.transparent,
+                            ),
+                          ),
+                          splashColor: Colors.transparent,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                          title: dateCtr.text == ""
+                              ? Text(
+                                  "Select date",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor),
+                                )
+                              : Text(
+                                  "${dateCtr.text}",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor),
+                                ),
+                          trailing: Icon(
+                            Icons.date_range_outlined,
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                          ),
+                        ),
+                        ListTile(
+                          splashColor: Colors.transparent,
+                          onTap: () {
+                            displayTimePicker(context);
+                          },
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(
+                              color: Colors.transparent,
+                            ),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                          title: timeCtr.text == ""
+                              ? Text(
+                                  'Select time',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor),
+                                )
+                              : Text(
+                                  "${timeCtr.text}",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor),
+                                ),
+                          trailing: Icon(
+                            Icons.watch_later_outlined,
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: MaterialButton(
+                                color: Colors.blue[400],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                onPressed: () {},
+                                child: Text(
+                                  "Cancel",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                          fontSize: 12,
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Expanded(
+                              child: MaterialButton(
+                                color: Colors.green[400],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                onPressed: () {},
+                                child: Text(
+                                  "Add",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                          fontSize: 12,
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor),
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                      ],
+                    )
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          onTap: () {
+                            setState(() {
+                              isEvening = !isEvening;
+                              isNextMorning = false;
+                            });
+                          },
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(
+                              color: isEvening
+                                  ? AppColors.blueColor.withOpacity(0.4)
+                                  : Colors.transparent,
+                            ),
+                          ),
+                          selectedTileColor:
+                              AppColors.blueColor.withOpacity(0.2),
+                          selected: isEvening,
+                          splashColor: Colors.transparent,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                          title: Row(
+                            children: [
+                              Text(
+                                "Today evening",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor),
+                              ),
+                              Spacer(),
+                              Text(
+                                "6:00 pm",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor),
+                              ),
+                            ],
+                          ),
+                          trailing: Icon(
+                            Icons.date_range_outlined,
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () {
+                            setState(() {
+                              isNextMorning = !isNextMorning;
+                              isEvening = false;
+                            });
+                          },
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(
+                              color: isNextMorning
+                                  ? AppColors.blueColor.withOpacity(0.4)
+                                  : Colors.transparent,
+                            ),
+                          ),
+                          selectedTileColor:
+                              AppColors.blueColor.withOpacity(0.2),
+                          selected: isNextMorning,
+                          splashColor: Colors.transparent,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                          title: Row(
+                            children: [
+                              Text(
+                                "Next morning",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor),
+                              ),
+                              Spacer(),
+                              Text(
+                                "7:00 am",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor),
+                              ),
+                            ],
+                          ),
+                          trailing: Icon(
+                            Icons.date_range_outlined,
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        MaterialButton(
+                          minWidth: double.infinity,
+                          color: Colors.green[400],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          onPressed: () {
+                            if (widget.title != "") {
+                              AppFunctions.setNextMorningNotification(
+                                  widget.title!);
+                            }else{
+                              AppFunctions.setNextMorningNotification(
+                                widget.note!);
+                            }
+
+                            
+                          },
+                          child: Text(
+                            "Add",
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  fontSize: 12,
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                ),
+                          ),
+                        )
+                      ],
+                    ),
+            ],
+          );
+        },
+      ),
+    ).then((value) {
+      setState(() {
+        isEvening = false;
+        isNextMorning = false;
+      });
+    });
   }
 }

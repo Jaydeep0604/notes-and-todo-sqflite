@@ -1,12 +1,12 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:notes_sqflite/config/shared_store.dart';
 import 'package:notes_sqflite/provider/theme_provider.dart';
 import 'package:notes_sqflite/ui/base/base_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:timezone/data/latest_10y.dart';
 import 'package:provider/provider.dart';
-
 
 bool isUpdateNoteScreen = false;
 bool isUpdateTodoScreen = false;
@@ -17,9 +17,13 @@ FlutterLocalNotificationsPlugin localNotificationsPlugin =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initializeTimeZones();
+
   final themeProvider = ThemeProvider();
   await themeProvider.loadTheme();
-
+  final themeModeString = await sharedStore.getThememode();
+  if (themeModeString == "" || themeModeString == null) {
+    sharedStore.setThemeMode("system");
+  }
   final AndroidInitializationSettings androidSettings =
       AndroidInitializationSettings("@mipmap/todo_main");
   final DarwinInitializationSettings IosSettings = DarwinInitializationSettings(

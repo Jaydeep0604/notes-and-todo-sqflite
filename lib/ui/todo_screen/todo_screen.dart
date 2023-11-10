@@ -51,167 +51,165 @@ class _TodoScreenState extends State<TodoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
     return SafeArea(
-      child: Column(
+      child: Stack(
         children: [
-          Expanded(
-            child: Stack(
-              children: [
-                RefreshIndicator(
-                  color: AppColors.blueColor,
-                  // backgroundColor: Colors.trransparent,
-                  onRefresh: () =>
-                      Future.delayed(Duration(seconds: 1), loadData),
-                  child: FutureBuilder(
-                    future: todoList,
-                    builder:
-                        (context, AsyncSnapshot<List<TodoModel>> snapshot) {
-                      if (snapshot.hasData) {
-                        return ListView.separated(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 10,
-                          ),
-                          itemCount: snapshot.data!.length,
-                          // reverse: true,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            return VerticalAnimation(
-                              index: index,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (snapshot.data![index].finished == 0)
-                                    TodoWidget(
-                                      id: snapshot.data![index].id!,
-                                      todo: snapshot.data![index].todo,
-                                      categoryName:
-                                          snapshot.data![index].category,
-                                      dueDate: snapshot.data![index].dueDate,
-                                      dueTime: snapshot.data![index].dueTime,
-                                      finished: snapshot.data![index].finished,
-                                      onDelete: () {
-                                        setState(() {
-                                          dbHelper!.deleteTodo(
-                                              snapshot.data![index].id!);
-                                          todoList = dbHelper!.getTodosList();
-                                        });
-                                      },
-                                      onUpdate: () {
-                                        setState(() {
-                                          todoList = dbHelper!.getTodosList();
-                                        });
-                                      },
-                                      onFinish:
-                                          (todo, date, time, status, category) {
-                                        dbHelper!
-                                            .updateTodo(TodoModel(
-                                          id: snapshot.data![index].id,
-                                          todo: todo,
-                                          finished: status,
-                                          dueDate: date,
-                                          dueTime: time,
-                                          category: category,
-                                        ))
-                                            .then(
-                                          (value) {
-                                            setState(
-                                              () {
-                                                todoList =
-                                                    dbHelper!.getTodosList();
-                                              },
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                ],
-                              ),
-                            );
-                          },
-                          separatorBuilder: (context, index) {
-                            return SizedBox(
-                              height:
-                                  snapshot.data![index].finished == 0 ? 10 : 0,
-                            );
-                          },
-                        );
-                      } else {
-                        return Center(
-                            child: CircularProgressIndicator(
-                          color: AppColors.whiteColor,
-                        ));
-                      }
-                    },
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 10, right: 10),
-                    child: InkWell(
-                      splashColor: AppColors.blueGrayColor,
-                      borderRadius: BorderRadius.circular(50),
-                      radius: 10,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TodoDetailscreen(
-                              isUpdateTodo: false,
-                            ),
-                          ),
-                        ).then((value) => () {
-                              if (value == true) {
-                                setState(() {});
-                              }
-                            });
-                        // Navigator.push(
-                        //   context,
-                        //   PageRouteBuilder(
-                        //     pageBuilder:
-                        //         (context, animation, secondaryAnimation) =>
-                        //             TodoDetailscreen(),
-                        //     transitionDuration: Duration(milliseconds: 300),
-                        //     transitionsBuilder: (context, animation,
-                        //             secondaryAnimation, child) =>
-                        //         ScaleTransition(
-                        //       scale: Tween<double>(
-                        //         begin: 0.0,
-                        //         end: 1.0,
-                        //       ).animate(
-                        //         CurvedAnimation(
-                        //           parent: animation,
-                        //           curve: Curves.fastOutSlowIn,
-                        //         ),
-                        //       ),
-                        //       child: child,
-                        //     ),
-                        //   ),
-                        // );
-                        // notificationServices.showNotificationNow(
-                        //     "Done this todo", "3:19 pm");
-                        // addTodoDialoge();
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: AppColors.yellowColor,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: Colors.white.withOpacity(0.4))),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.add,
-                            color: AppColors.blackColor,
-                            size: 30,
-                          ),
-                        ),
+          FutureBuilder(
+            future: todoList,
+            builder: (context, AsyncSnapshot<List<TodoModel>> snapshot) {
+              int homeTodoCount = snapshot.data != null &&
+                      snapshot.data!.any((item) => item.finished == 0)
+                  ? snapshot.data!.length
+                  : 0;
+              if (snapshot.hasData) {
+                if (snapshot.data!.isEmpty|| homeTodoCount==0) {
+                  return Container(
+                    child: Center(
+                      child: Text(
+                        "No Data Found",
+                        style:
+                            TextStyle(color: Theme.of(context).highlightColor),
                       ),
+                    ),
+                  );
+                }
+                return ListView.separated(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 10,
+                  ),
+                  itemCount: homeTodoCount,
+                  // reverse: true,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return VerticalAnimation(
+                      index: index,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (snapshot.data![index].finished == 0)
+                            TodoWidget(
+                              id: snapshot.data![index].id!,
+                              todo: snapshot.data![index].todo,
+                              categoryName: snapshot.data![index].category,
+                              dueDate: snapshot.data![index].dueDate,
+                              dueTime: snapshot.data![index].dueTime,
+                              finished: snapshot.data![index].finished,
+                              onDelete: () {
+                                setState(() {
+                                  dbHelper!
+                                      .deleteTodo(snapshot.data![index].id!);
+                                  todoList = dbHelper!.getTodosList();
+                                });
+                              },
+                              onUpdate: () {
+                                setState(() {
+                                  todoList = dbHelper!.getTodosList();
+                                });
+                              },
+                              onFinish: (todo, date, time, status, category) {
+                                dbHelper!
+                                    .updateTodo(TodoModel(
+                                  id: snapshot.data![index].id,
+                                  todo: todo,
+                                  finished: status,
+                                  dueDate: date,
+                                  dueTime: time,
+                                  category: category,
+                                ))
+                                    .then(
+                                  (value) {
+                                    setState(
+                                      () {
+                                        todoList = dbHelper!.getTodosList();
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return SizedBox(
+                      height: snapshot.data![index].finished == 0 ? 10 : 0,
+                    );
+                  },
+                );
+              } else {
+                return Center(
+                    child: CircularProgressIndicator(
+                  color: AppColors.whiteColor,
+                ));
+              }
+            },
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 10, right: 10),
+              child: InkWell(
+                splashColor: AppColors.blueGrayColor,
+                borderRadius: BorderRadius.circular(50),
+                radius: 10,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TodoDetailscreen(
+                        isUpdateTodo: false,
+                      ),
+                    ),
+                  ).then((value) => () {
+                        if (value == true) {
+                          setState(() {});
+                        }
+                      });
+                  // Navigator.push(
+                  //   context,
+                  //   PageRouteBuilder(
+                  //     pageBuilder:
+                  //         (context, animation, secondaryAnimation) =>
+                  //             TodoDetailscreen(),
+                  //     transitionDuration: Duration(milliseconds: 300),
+                  //     transitionsBuilder: (context, animation,
+                  //             secondaryAnimation, child) =>
+                  //         ScaleTransition(
+                  //       scale: Tween<double>(
+                  //         begin: 0.0,
+                  //         end: 1.0,
+                  //       ).animate(
+                  //         CurvedAnimation(
+                  //           parent: animation,
+                  //           curve: Curves.fastOutSlowIn,
+                  //         ),
+                  //       ),
+                  //       child: child,
+                  //     ),
+                  //   ),
+                  // );
+                  // notificationServices.showNotificationNow(
+                  //     "Done this todo", "3:19 pm");
+                  // addTodoDialoge();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: AppColors.yellowColor,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white.withOpacity(0.4))),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.add,
+                      color: AppColors.blackColor,
+                      size: 30,
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ],

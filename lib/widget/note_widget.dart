@@ -7,7 +7,18 @@ import 'package:notes_sqflite/utils/app_colors.dart';
 // ignore: must_be_immutable
 class NoteWidget extends StatefulWidget {
   String title, note, email, createDate, editedDate;
-  void Function() onUpdateComplete, onDismissed;
+  void Function() onUpdateComplete;
+  void Function(
+    int id,
+    String title,
+    String note,
+    String email,
+    String createDate,
+    String editedDate,
+    int pin,
+    int archive,
+    int deleted,
+  ) onDismissed;
   Key keyvalue;
   int id, pin, archive, deleted;
   List<String> imageList;
@@ -92,7 +103,11 @@ class _NoteWidgetState extends State<NoteWidget> {
               );
             },
           ),
-        );
+        ).then((value) {
+          if(value==true){
+            widget.onUpdateComplete();
+          }
+        });
       },
       child: Dismissible(
         key: widget.keyvalue,
@@ -102,25 +117,16 @@ class _NoteWidgetState extends State<NoteWidget> {
                 ? DismissDirection.none
                 : DismissDirection.endToStart,
         onDismissed: (direction) {
-          dbHelper
-              ?.update(NotesModel(
-                  id: widget.id,
-                  title: widget.title,
-                  note: widget.note,
-                  pin: widget.pin,
-                  archive: 1,
-                  email: widget.email,
-                  deleted: 0,
-                  create_date: widget.createDate,
-                  edited_date: widget.editedDate,
-                  image_list: []))
-              .then((value) {
-            widget.onDismissed();
-            // dbHelper!.delete(
-            //     snapshot.data![index].id!);
-            // snapshot.data!.remove(
-            //     snapshot.data![index]);
-          });
+          widget.onDismissed(
+              widget.id,
+              titleCtr.text,
+              noteCtr.text,
+              widget.email,
+              widget.createDate,
+              widget.editedDate,
+              widget.pin == true ? 1 : 0,
+              widget.archive == true ? 1 : 0,
+              widget.deleted == true ? 1 : 0);
         },
         background: Container(),
         child: Card(

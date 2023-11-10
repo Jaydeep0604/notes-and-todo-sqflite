@@ -30,6 +30,7 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
     return WillPopScope(
       onWillPop: () async {
         setState(() {
@@ -82,11 +83,22 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
                     ? snapshot.data!.length
                     : 0;
                 if (snapshot.hasData) {
+                  if (snapshot.data!.isEmpty) {
+                    return Expanded(
+                      child: Center(
+                        child: Text(
+                          "No Data Found",
+                          style: TextStyle(
+                              color: Theme.of(context).highlightColor),
+                        ),
+                      ),
+                    );
+                  }
                   return MasonryGridView.count(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     crossAxisCount: 2,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 0,
+                    mainAxisSpacing: 0,
                     itemCount: archiveCount,
                     primary: false,
                     shrinkWrap: true,
@@ -114,7 +126,15 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
                                       noteList = dbHelper!.getNotesList();
                                     });
                                   },
-                                  onDismissed: () {
+                                  onDismissed: (id,
+                                      title,
+                                      note,
+                                      email,
+                                      createDate,
+                                      editedDate,
+                                      pin,
+                                      archive,
+                                      deleted) {
                                     setState(() {
                                       // dbHelper!.delete(snapshot.data![index].id!);
                                       noteList = dbHelper!.getNotesList();

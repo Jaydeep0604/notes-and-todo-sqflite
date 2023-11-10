@@ -30,6 +30,7 @@ class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
     return WillPopScope(
       onWillPop: () async {
         setState(() {
@@ -39,9 +40,7 @@ class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
         return true;
       },
       child: Scaffold(
-        // backgroundColor: AppColors.whiteColor,
         appBar: AppBar(
-          // backgroundColor: AppColors.whiteColor,
           leading: IconButton(
               onPressed: () {
                 setState(() {
@@ -49,15 +48,13 @@ class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
                 });
                 Navigator.pop(context);
               },
-              icon: Icon(
-                Icons.arrow_back,
-                color: Theme.of(context).iconTheme.color
-              )),
+              icon: Icon(Icons.arrow_back,
+                  color: Theme.of(context).iconTheme.color)),
           title: Text(
             "Deleted",
             style: TextStyle(
-              // color: Colors.black
-              ),
+                // color: Colors.black
+                ),
           ),
           centerTitle: false,
         ),
@@ -66,31 +63,30 @@ class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Padding(
-            //   padding: const EdgeInsets.only(left: 15),
-            //   child: Text(
-            //     "Deleted",
-            //     style: TextStyle(
-            //         color: AppColors.whiteColor
-            //         fontWeight: FontWeight.w500,
-            //         fontSize: 14),
-            //   ),
-            // ),
             FutureBuilder(
               future: noteList,
               builder: (context, AsyncSnapshot<List<NotesModel>> snapshot) {
-                 int deletedCount = snapshot.data != null &&
-                            snapshot.data!.any((item) =>
-                               
-                                item.deleted == 1)
-                        ? snapshot.data!.length
-                        : 0;
+                int deletedCount = snapshot.data != null &&
+                        snapshot.data!.any((item) => item.deleted == 1)
+                    ? snapshot.data!.length
+                    : 0;
                 if (snapshot.hasData) {
+                  if (snapshot.data!.isEmpty) {
+                    return Expanded(
+                      child: Center(
+                        child: Text(
+                          "No Data Found",
+                          style: TextStyle(
+                              color: Theme.of(context).highlightColor),
+                        ),
+                      ),
+                    );
+                  }
                   return MasonryGridView.count(
-                    padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     crossAxisCount: 2,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 0,
+                    mainAxisSpacing: 0,
                     itemCount: deletedCount,
                     primary: false,
                     shrinkWrap: true,
@@ -111,13 +107,14 @@ class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
                                   snapshot.data![index].create_date.toString(),
                               editedDate:
                                   snapshot.data![index].edited_date.toString(),
-                                  imageList: snapshot.data![index].image_list,
+                              imageList: snapshot.data![index].image_list,
                               onUpdateComplete: () {
                                 setState(() {
                                   noteList = dbHelper!.getNotesList();
                                 });
                               },
-                              onDismissed: () {
+                              onDismissed: (id, title, note, email, createDate,
+                                  editedDate, pin, archive, deleted) {
                                 setState(() {
                                   // dbHelper!.delete(snapshot.data![index].id!);
                                   noteList = dbHelper!.getNotesList();

@@ -56,31 +56,11 @@ class DBHelper {
     return queryResult.map((e) => TodoModel.fromMap(e)).toList();
   }
 
-  Future<int> deleteNote(int id) async {
-    var dbClient = await db;
-    return await dbClient!.delete('notes', where: 'id = ?', whereArgs: [id]);
-  }
-
-  Future<int> deleteTodo(int id) async {
-    var dbClient = await db;
-    return await dbClient!.delete('todos', where: 'id = ?', whereArgs: [id]);
-  }
-
-  Future<int> update(NotesModel notesModel) async {
-    var dbClient = await db;
-    return await dbClient!.update(
-      'notes',
-      notesModel.toMap(),
-      where: 'id = ?',
-      whereArgs: [notesModel.id],
-    );
-  }
-
-  Future<int> updatetile(NotesModel notesModel) async {
+  Future<int> deleteNote(NotesModel notesModel) async {
     var dbClient = await db;
     final updateFields = <String, dynamic>{};
-    if (notesModel.title != null) {
-      updateFields['title'] = notesModel.title;
+    if (notesModel.deleted != null) {
+      updateFields['deleted'] = notesModel.deleted;
     }
     return await dbClient!.update(
       'notes',
@@ -90,9 +70,99 @@ class DBHelper {
     );
   }
 
+  Future<int> deleteForeverNote(int id) async {
+    var dbClient = await db;
+    return await dbClient!.delete('notes', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteTodo(int id) async {
+    var dbClient = await db;
+    return await dbClient!.delete('todos', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateNote(NotesModel notesModel) async {
+    var dbClient = await db;
+    return await dbClient!.update(
+      'notes',
+      notesModel.toMap(),
+      where: 'id = ?',
+      whereArgs: [notesModel.id],
+    );
+  }
+
   Future<int> updateTodo(TodoModel todoModel) async {
     var dbClient = await db;
     return await dbClient!.update('todos', todoModel.toMap(),
         where: 'id = ?', whereArgs: [todoModel.id]);
+  }
+
+  Future<int> updatetile(NotesModel notesModel) async {
+    var dbClient = await db;
+    final updateFields = <String, dynamic>{};
+    if (notesModel.title != null) {
+      updateFields['title'] = notesModel.title;
+      updateFields['edited_date']=notesModel.edited_date;
+    }
+    return await dbClient!.update(
+      'notes',
+      updateFields,
+      where: 'id = ?',
+      whereArgs: [notesModel.id],
+    );
+  }
+
+  Future<int> updateNoteText(NotesModel notesModel) async {
+    var dbClient = await db;
+    final updateFields = <String, dynamic>{};
+    if (notesModel.note != null) {
+      updateFields['note'] = notesModel.note;
+      updateFields['edited_date']=notesModel.edited_date;
+    }
+    return await dbClient!.update(
+      'notes',
+      updateFields,
+      where: 'id = ?',
+      whereArgs: [notesModel.id],
+    );
+  }
+
+  Future<int> updatePin(NotesModel notesModel) async {
+    var dbClient = await db;
+    final updateFields = <String, dynamic>{};
+    if (notesModel.pin != null) {
+      updateFields['pin'] = notesModel.pin;
+    }
+    return await dbClient!.update(
+      'notes',
+      updateFields,
+      where: 'id = ?',
+      whereArgs: [notesModel.id],
+    );
+  }
+
+  Future<int> updateArchive(NotesModel notesModel) async {
+    var dbClient = await db;
+    final updateFields = <String, dynamic>{};
+    if (notesModel.archive != null) {
+      updateFields['archive'] = notesModel.archive;
+    }
+    return await dbClient!.update(
+      'notes',
+      updateFields,
+      where: 'id = ?',
+      whereArgs: [notesModel.id],
+    );
+  }
+
+  Future<int> updateImageList(NotesModel notesModel) async {
+    var dbClient = await db;
+    final updateFields = <String, dynamic>{};
+      updateFields['image_list'] = notesModel.image_list;
+    return await dbClient!.update(
+      'notes',
+      updateFields,
+      where: 'id = ?',
+      whereArgs: [notesModel.id],
+    );
   }
 }

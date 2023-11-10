@@ -30,12 +30,13 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
     });
   }
 
-  void dispose() {
-    super.dispose();
-  }
+  // void dispose() {
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
     return WillPopScope(
       onWillPop: () async {
         setState(() {
@@ -68,13 +69,28 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
           child: FutureBuilder(
             future: todoList,
             builder: (context, AsyncSnapshot<List<TodoModel>> snapshot) {
+              final todoDoneCount = snapshot.data != null &&
+                      snapshot.data!.any((item) => item.finished == 1)
+                  ? snapshot.data!.length
+                  : 0;
               if (snapshot.hasData) {
+                if (snapshot.data!.isEmpty || todoDoneCount == 0) {
+                  return Expanded(
+                    child: Center(
+                      child: Text(
+                        "No Data Found",
+                        style:
+                            TextStyle(color: Theme.of(context).highlightColor),
+                      ),
+                    ),
+                  );
+                }
                 return ListView.separated(
                   padding: EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 10,
                   ),
-                  itemCount: snapshot.data!.length,
+                  itemCount: todoDoneCount,
                   // reverse: true,
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
@@ -96,9 +112,9 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
                                 });
                               },
                               onUpdate: () {
-                               setState(() {
-                                    todoList = dbHelper!.getTodosList();
-                                  });
+                                setState(() {
+                                  todoList = dbHelper!.getTodosList();
+                                });
                               },
                               onFinish: (todo, date, time, status, category) {
                                 dbHelper!

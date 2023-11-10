@@ -15,11 +15,12 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       appBar: AppBar(
         // backgroundColor: AppColors.whiteColor,
         leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back,
-                color: Theme.of(context).iconTheme.color)),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon:
+              Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
+        ),
         title: Text(
           "Privacy Policy",
           style: TextStyle(
@@ -32,11 +33,12 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
           child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
           decoration: BoxDecoration(
             color: AppColors.canvasColor.withOpacity(0.3),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Theme.of(context).highlightColor.withOpacity(0.7)),
+            border: Border.all(
+                color: Theme.of(context).highlightColor.withOpacity(0.7)),
           ),
           child: RichText(
             text: TextSpan(

@@ -1,6 +1,4 @@
 import 'dart:developer';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:timezone/standalone.dart';
@@ -85,9 +83,52 @@ class NotificationServices {
         notificationDetails,
       );
     } catch (e) {
-      log("Error at zonedScheduleNotification----------------------------$e");
+      log("Error at zonedScheduleNotification $e");
       if (e ==
           "Invalid argument (): Must be a date in the future: Instance of 'TZDateTime'") {}
+    }
+  }
+
+  void showNextMorningNotification(
+      DateTime scheduledTime, String todo) async {
+    initializeTimeZone();
+    print(scheduledTime);
+    print(tz.local);
+    final AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'notification_todo',
+      "todo notification",
+      priority: Priority.max,
+      importance: Importance.max,
+      largeIcon: DrawableResourceAndroidBitmap("todo_large_icon"),
+    );
+
+    final DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    final NotificationDetails notificationDetails = NotificationDetails(
+      iOS: iosDetails,
+      android: androidDetails,
+    );
+
+    try {
+      await localNotificationsPlugin.zonedSchedule(
+        0,
+        '$todo',
+        '7:00 AM',
+        tz.TZDateTime.from(scheduledTime, tz.local),
+        notificationDetails,
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+    } catch (e) {
+      log("Error at zonedScheduleNotification----------------------------$e");
+      if (e ==
+          "Invalid argument ($scheduledTime): Must be a date in the future: Instance of 'TZDateTime'") {}
     }
   }
 

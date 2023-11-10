@@ -56,6 +56,9 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
       case AppLifecycleState.detached:
         print("app in detached");
         break;
+      case AppLifecycleState.hidden:
+       print("app in hidden");
+        break;
     }
     super.didChangeAppLifecycleState(state);
   }

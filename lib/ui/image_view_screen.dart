@@ -1,31 +1,26 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:notes_sqflite/utils/app_colors.dart';
-import 'package:notes_sqflite/utils/app_message.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:photo_manager/photo_manager.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 class ImageViewScreen extends StatefulWidget {
   ImageViewScreen({
-    super.key,
+    Key? key,
     required this.path,
   });
-  String path;
+
+  final String path;
 
   @override
-  State<ImageViewScreen> createState() => _ImageViewScreenState();
+  _ImageViewScreenState createState() => _ImageViewScreenState();
 }
 
 class _ImageViewScreenState extends State<ImageViewScreen> {
   void saveImageToGallery() async {
-    final result = await PhotoManager.editor
-        .saveImageWithPath(widget.path, title: widget.path);
-    if (result != null) {
+    final result = await ImageGallerySaver.saveFile(widget.path);
+    if (result['isSuccess']) {
       print('Image added to Photos library.');
-      AppMessage.showToast(context, "Image Saved Successfully");
     } else {
       print('Failed to add image to Photos library.');
-      AppMessage.showToast(context, "Failed to Save Image");
     }
   }
 
@@ -44,10 +39,10 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
         ),
         actions: [
           PopupMenuButton(
-            color: AppColors.whiteColor,
+            color: Colors.white,
             icon: Icon(
               Icons.more_vert,
-              color: AppColors.whiteColor,
+              color: Colors.white,
             ),
             itemBuilder: (context) {
               return [
@@ -58,10 +53,10 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
                   },
                   child: Text(
                     "Save image",
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          fontSize: 14,
-                          color: AppColors.blackColor,
-                        ),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
               ];
@@ -70,14 +65,13 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
         ],
       ),
       body: SafeArea(
-          child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-        child: PhotoView(
-          imageProvider: FileImage(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+          child: Image.file(
             File(widget.path),
           ),
         ),
-      )),
+      ),
     );
   }
 }
