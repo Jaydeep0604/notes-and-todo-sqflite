@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/db/list_data.dart';
+import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
 import 'package:notes_sqflite/services/notification_services.dart';
@@ -114,7 +115,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
           timeOfDay = time;
           // Combine date and time when the time is selected.
           notificationDateTime = currentDate.add(
-            Duration(hours: time.hour, minutes: time.minute),
+            Duration(hours: time.hour, minutes: time.minute,seconds: 00),
           );
           timeCtr.text = "${time.format(context).toLowerCase()}";
         },
@@ -154,7 +155,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
               AppBar(
                 // backgroundColor: AppColors.whiteColor,
                 leading: IconButton(
-                  tooltip: "Navigate up",
+                  tooltip: "${AppLocalization.of(context)?.getTranslatedValue('navigate_up')}",
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -164,7 +165,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                 actions: [
                   if (widget.isUpdateTodo)
                     IconButton(
-                      tooltip: "Share schedules",
+                      tooltip: "${AppLocalization.of(context)?.getTranslatedValue('share_schedule')}",
                       onPressed: () {
                         shareTodo(
                           todoCtr.text.toString(),
@@ -177,7 +178,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                     ),
                   if (widget.isUpdateTodo)
                     IconButton(
-                      tooltip: "Delete",
+                      tooltip: "${AppLocalization.of(context)?.getTranslatedValue('delete')}",
                       onPressed: () {
                         FocusManager.instance.primaryFocus?.unfocus();
                         showDeleteDialoge();
@@ -199,7 +200,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "What is to be done?",
+                          "${AppLocalization.of(context)?.getTranslatedValue('what_is_to_be_done')}?",
                           style:
                               Theme.of(context).textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.w500,
@@ -215,12 +216,12 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                           style: Theme.of(context).textTheme.titleMedium,
                           validator: (value) {
                             if (value!.isEmpty) {
-                              return "Enter schedule";
+                              return "${AppLocalization.of(context)?.getTranslatedValue('enter_schedule')}";
                             }
                             return null;
                           },
                           decoration: InputDecoration(
-                            hintText: "Enter schedule here",
+                            hintText: "${AppLocalization.of(context)?.getTranslatedValue('enter_schedule_here')}",
                             errorStyle: TextStyle(color: AppColors.redColor),
                             hintStyle: Theme.of(context)
                                 .textTheme
@@ -253,7 +254,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                                   });
                                 }),
                             Text(
-                              "Schedule complated?",
+                              "${AppLocalization.of(context)?.getTranslatedValue('schedule_complated')}?",
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium
@@ -267,7 +268,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                         SizedBox(
                           height: 30,
                         ),
-                        Text("Due date",
+                        Text("${AppLocalization.of(context)?.getTranslatedValue('due_date')}",
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium
@@ -294,7 +295,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                           minLines: 1,
                           maxLines: 1,
                           decoration: InputDecoration(
-                              hintText: "Date not set",
+                              hintText: "${AppLocalization.of(context)?.getTranslatedValue('set_date')}",
                               hintStyle: Theme.of(context)
                                   .textTheme
                                   .titleMedium
@@ -317,7 +318,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                           maxLines: 1,
                           style: TextStyle(color: AppColors.redColor),
                           decoration: InputDecoration(
-                              hintText: "Set time",
+                              hintText: "${AppLocalization.of(context)?.getTranslatedValue('set_time')}",
                               hintStyle: Theme.of(context)
                                   .textTheme
                                   .titleMedium
@@ -440,7 +441,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                       }
                     },
                     child: Text(
-                      "Save",
+                      "${AppLocalization.of(context)?.getTranslatedValue('save')}",
                       style: Theme.of(context)
                           .textTheme
                           .labelMedium
@@ -465,7 +466,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
         alignment: Alignment.center,
         titleTextStyle: TextStyle(fontWeight: FontWeight.w500),
         title: Text(
-          "Are you sure, you want to delete?",
+          "${AppLocalization.of(context)?.getTranslatedValue('are_you_sure_you_want_to_delete')}?",
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.w700,
@@ -484,7 +485,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                     Navigator.pop(context);
                   },
                   child: Text(
-                    "No",
+                    "${AppLocalization.of(context)?.getTranslatedValue('no')}",
                     style: TextStyle(color: AppColors.blackColor),
                   ),
                 ),
@@ -508,7 +509,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                     
                   },
                   child: Text(
-                    "Yes",
+                    "${AppLocalization.of(context)?.getTranslatedValue('yes')}",
                     style: TextStyle(color: AppColors.whiteColor),
                   ),
                 ),

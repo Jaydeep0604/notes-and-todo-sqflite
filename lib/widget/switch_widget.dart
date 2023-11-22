@@ -35,8 +35,8 @@ class _SwitchWidgetState extends State<SwitchWidget> {
             if (widget.value) Spacer(),
             if (!widget.value)
               Container(
-                height: 22,
-                width: 22,
+                height: 24,
+                width: 24,
                 decoration: BoxDecoration(
                   color: Theme.of(context).iconTheme.color!,
                   shape: BoxShape.circle,
@@ -53,8 +53,8 @@ class _SwitchWidgetState extends State<SwitchWidget> {
               ),
             if (widget.value)
               Container(
-                height: 22,
-                width: 22,
+                height: 24,
+                width: 24,
                 decoration: BoxDecoration(
                   color: AppColors.greenSplashColor,
                   shape: BoxShape.circle,

@@ -2,14 +2,17 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:notes_sqflite/config/shared_store.dart';
+import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/provider/theme_provider.dart';
 import 'package:notes_sqflite/ui/base/base_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:timezone/data/latest_10y.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 bool isUpdateNoteScreen = false;
 bool isUpdateTodoScreen = false;
+bool isBioMetricLock = false;
 
 FlutterLocalNotificationsPlugin localNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -17,7 +20,6 @@ FlutterLocalNotificationsPlugin localNotificationsPlugin =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initializeTimeZones();
-
   final themeProvider = ThemeProvider();
   await themeProvider.loadTheme();
   final themeModeString = await sharedStore.getThememode();
@@ -45,13 +47,24 @@ void main() async {
       providers: [
         ChangeNotifierProvider.value(value: themeProvider),
       ],
-      child: const MyApp(),
+      child: MyApp(),
     ),
   );
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+
+  static void setLocale(BuildContext context, Locale newLocale) {
+    sharedStore.setLanguage(newLocale.languageCode);
+    _MyAppState? state = context.findRootAncestorStateOfType<_MyAppState>();
+    state?.setLocale(newLocale);
+  }
+
+  static Locale? getLocale(BuildContext context) {
+    _MyAppState? state = context.findRootAncestorStateOfType<_MyAppState>();
+    return state?._locale;
+  }
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -59,6 +72,27 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   ThemeMode themeMode = ThemeMode.light;
+  Locale? _locale;
+
+  @override
+  void didChangeDependencies() {
+    sharedStore.getLanguage().then((locale) {
+      if (locale != null) {
+        setState(() {
+          _locale = Locale(locale);
+        });
+      } else {
+        _locale = Locale("en");
+      }
+    });
+    super.didChangeDependencies();
+  }
+
+  void setLocale(Locale locale) async {
+    setState(() {
+      _locale = locale;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,6 +171,18 @@ class _MyAppState extends State<MyApp> {
           ),
           useMaterial3: true,
         ),
+        localizationsDelegates: [
+          AppLocalization.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate
+        ],
+        supportedLocales: [
+          Locale("hi", 'IN'),
+          Locale("en", 'US'),
+          Locale("gu", 'IN'),
+        ],
+        locale: _locale,
         home: Base(),
       );
     });

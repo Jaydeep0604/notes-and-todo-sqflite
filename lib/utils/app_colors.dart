@@ -15,3 +15,4 @@ class AppColors {
   static Color bottomNavigationBarSecondColor = Colors.blueGrey.shade900.withGreen(180);
 }
 enum SystemThemeMode { light, dark, system }
+enum SystemLanguageMode { hi, en, gu}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
+import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/note_model.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
@@ -51,7 +52,7 @@ class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
               icon: Icon(Icons.arrow_back,
                   color: Theme.of(context).iconTheme.color)),
           title: Text(
-            "Deleted",
+            "${AppLocalization.of(context)?.getTranslatedValue('deleted')}",
             style: TextStyle(
                 // color: Colors.black
                 ),
@@ -71,11 +72,11 @@ class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
                     ? snapshot.data!.length
                     : 0;
                 if (snapshot.hasData) {
-                  if (snapshot.data!.isEmpty) {
+                  if (deletedCount == 0) {
                     return Expanded(
                       child: Center(
                         child: Text(
-                          "No Data Found",
+                          "${AppLocalization.of(context)?.getTranslatedValue('no_data_found')}",
                           style: TextStyle(
                               color: Theme.of(context).highlightColor),
                         ),
@@ -113,14 +114,14 @@ class _DeleteNoteScreenState extends State<DeleteNoteScreen> {
                                   noteList = dbHelper!.getNotesList();
                                 });
                               },
-                              onDismissed: (id, title, note, email, createDate,
-                                  editedDate, pin, archive, deleted) {
-                                setState(() {
-                                  // dbHelper!.delete(snapshot.data![index].id!);
-                                  noteList = dbHelper!.getNotesList();
-                                  snapshot.data!.remove(snapshot.data![index]);
-                                });
-                              })
+                              // onDismissed: (id, archive) {
+                              //   setState(() {
+                              //     // dbHelper!.delete(snapshot.data![index].id!);
+                              //     noteList = dbHelper!.getNotesList();
+                              //     snapshot.data!.remove(snapshot.data![index]);
+                              //   });
+                              // },
+                            )
                           : Container();
                     },
                   );

@@ -1,10 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_sqflite/config/shared_store.dart';
+import 'package:notes_sqflite/language/localisation.dart';
+import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/provider/theme_provider.dart';
+import 'package:notes_sqflite/ui/app_lock/app_lock_screen.dart';
+import 'package:notes_sqflite/ui/export_data/export_pdf_view_screen.dart';
 import 'package:notes_sqflite/ui/privacy_policy_screen/privacy_policy_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
-import 'package:notes_sqflite/widget/switch_widget.dart';
 import 'package:provider/provider.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -16,15 +19,24 @@ class SettingScreen extends StatefulWidget {
 
 class _SettingScreenState extends State<SettingScreen> {
   SystemThemeMode? theme;
+  // SystemLanguageMode? lang;
 
   bool isNotification = false;
   bool isAppMode = false;
-  bool isOn = false;
+  bool islangOpen = false;
+  bool isExportDataOpen = false;
 
   @override
   void initState() {
     super.initState();
     _loadTheme();
+  }
+
+  Locale? _locale;
+
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _locale = MyApp.getLocale(context) ?? Locale('en');
   }
 
   Future<void> _loadTheme() async {
@@ -94,6 +106,51 @@ class _SettingScreenState extends State<SettingScreen> {
       );
     }
 
+    // Row _buildLanguageOption(SystemLanguageMode languageOption, String label) {
+    //   return Row(
+    //     children: [
+    //       SizedBox(width: 10),
+    //       Radio<Locale>(
+    //         activeColor: AppColors.bottomNavigationBarSecondColor,
+    //         value: Locale('${languageOption.name}'),
+    //         groupValue: _locale,
+    //         onChanged: (language) {
+    //           setState(() {
+    //             _locale = language;
+    //           });
+    //           if (language == SystemLanguageMode.en) {
+    //             if (language != null) {
+    //               MyApp.setLocale(context, _locale as Locale);
+    //             }
+    //             setState(() {
+    //               _locale = language as Locale;
+    //             });
+    //           } else if (language == SystemLanguageMode.hi) {
+    //             setState(() {
+    //               _locale = language as Locale;
+    //             });
+    //             if (language != null) {
+    //               MyApp.setLocale(context, _locale as Locale);
+    //             }
+    //           } else if (language == SystemLanguageMode.gu) {
+    //             setState(() {
+    //               _locale = language as Locale;
+    //             });
+    //             if (language != null) {
+    //               MyApp.setLocale(context, _locale as Locale);
+    //             }
+    //           }
+    //         },
+    //       ),
+    //       SizedBox(width: 10),
+    //       Text(
+    //         label,
+    //         style: Theme.of(context).textTheme.titleMedium,
+    //       ),
+    //     ],
+    //   );
+    // }
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -104,7 +161,7 @@ class _SettingScreenState extends State<SettingScreen> {
               Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
         ),
         title: Text(
-          "Settings",
+          "${AppLocalization.of(context)?.getTranslatedValue('settings')}",
           style: TextStyle(
               // color: AppColors.whiteColor
               ),
@@ -188,8 +245,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       Icons.light_mode_sharp,
                     ),
                     title: Text(
-                      "App Mode",
-                      // style: Theme.of(context).textTheme.titleMedium,
+                      "${AppLocalization.of(context)?.getTranslatedValue('app_mode')}",
                     ),
                     onTap: () {
                       setState(() {
@@ -232,11 +288,275 @@ class _SettingScreenState extends State<SettingScreen> {
               Container(
                 color: Theme.of(context).cardColor,
                 child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      Icons.translate,
+                    ),
+                    title: Text(
+                      "${AppLocalization.of(context)?.getTranslatedValue('app_language')}",
+                      // style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    onTap: () {
+                      setState(() {
+                        islangOpen = !islangOpen;
+                      });
+                    },
+                    trailing: Transform.scale(
+                      scale: 1,
+                      child: islangOpen
+                          ? Icon(
+                              Icons.keyboard_arrow_down,
+                            )
+                          : Icon(
+                              Icons.keyboard_arrow_up,
+                            ),
+                    )),
+              ),
+              Visibility(
+                visible: islangOpen,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).canvasColor.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Theme.of(context).canvasColor,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        SizedBox(width: 10),
+                        Radio<Locale>(
+                          activeColor: AppColors.bottomNavigationBarSecondColor,
+                          value: Locale("hi"),
+                          groupValue: _locale,
+                          onChanged: (language) {
+                            setState(() {
+                              _locale = language as Locale;
+                            });
+                            if (language != null) {
+                              MyApp.setLocale(context, _locale as Locale);
+                            }
+                          },
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          "Hindi",
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ]),
+                      Row(children: [
+                        SizedBox(width: 10),
+                        Radio<Locale>(
+                          activeColor: AppColors.bottomNavigationBarSecondColor,
+                          value: Locale("gu"),
+                          groupValue: _locale,
+                          onChanged: (language) {
+                            setState(() {
+                              _locale = language as Locale;
+                            });
+                            if (language != null) {
+                              MyApp.setLocale(context, _locale as Locale);
+                            }
+                          },
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          "Gujarati",
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ]),
+                      Row(children: [
+                        SizedBox(width: 10),
+                        Radio<Locale>(
+                          activeColor: AppColors.bottomNavigationBarSecondColor,
+                          value: Locale("en"),
+                          groupValue: _locale,
+                          onChanged: (language) {
+                            setState(() {
+                              _locale = language as Locale;
+                            });
+                            if (language != null) {
+                              MyApp.setLocale(context, _locale as Locale);
+                            }
+                          },
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          "English",
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ]),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                color: Theme.of(context).cardColor,
+                child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      Icons.downloading_rounded,
+                    ),
+                    title: Text(
+                        "${AppLocalization.of(context)?.getTranslatedValue('export_data')}"),
+                    onTap: () {
+                      setState(() {
+                        isExportDataOpen = !isExportDataOpen;
+                      });
+                    },
+                    trailing: Transform.scale(
+                      scale: 1,
+                      child: isExportDataOpen
+                          ? Icon(
+                              Icons.keyboard_arrow_down,
+                            )
+                          : Icon(
+                              Icons.keyboard_arrow_up,
+                            ),
+                    )),
+              ),
+              Visibility(
+                visible: isExportDataOpen,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Theme.of(context).canvasColor,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ExportPdfViewScreen(
+                                  isNoteView: true, title: "note's preview"),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10)),
+                            color:
+                                Theme.of(context).canvasColor.withOpacity(0.2),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.cloud_download_outlined,
+                              ),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Text(
+                                "${AppLocalization.of(context)?.getTranslatedValue('export_notes')}",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium!
+                                    .copyWith(fontWeight: FontWeight.normal),
+                              ),
+                              Expanded(child: SizedBox()),
+                              Icon(
+                                Icons.touch_app_outlined,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ExportPdfViewScreen(
+                                  isNoteView: false, title: "to-do's preview"),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(10),
+                                bottomRight: Radius.circular(10)),
+                            color:
+                                Theme.of(context).canvasColor.withOpacity(0.2),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.cloud_download_outlined,
+                              ),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Text(
+                                "${AppLocalization.of(context)?.getTranslatedValue("export_to-do's")}",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium!
+                                    .copyWith(fontWeight: FontWeight.normal),
+                              ),
+                              Spacer(),
+                              Icon(
+                                Icons.touch_app_outlined,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                color: Theme.of(context).cardColor,
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(
+                Icons.lock_person_rounded,
+                  ),
+                  title: Text(
+                      "${AppLocalization.of(context)?.getTranslatedValue('app_lock')}"),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AppLockScreen(),
+                      ),
+                    );
+                  },
+                  trailing: Icon(
+                    Icons.keyboard_arrow_right,
+                  ),
+                ),
+              ),
+              Container(
+                color: Theme.of(context).cardColor,
+                child: ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: Icon(
                     CupertinoIcons.doc_append,
                   ),
-                  title: Text("Privacy Policy"),
+                  title: Text(
+                      "${AppLocalization.of(context)?.getTranslatedValue('privacy_policy')}"),
                   onTap: () {
                     Navigator.push(
                       context,

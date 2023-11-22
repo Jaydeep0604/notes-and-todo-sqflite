@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
+import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/note_model.dart';
-import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:notes_sqflite/widget/note_widget.dart';
 
 class ArchiveNoteScreen extends StatefulWidget {
@@ -52,7 +52,7 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
               icon: Icon(Icons.arrow_back,
                   color: Theme.of(context).iconTheme.color)),
           title: Text(
-            "Archive",
+            "${AppLocalization.of(context)?.getTranslatedValue('archive')}",
             style: TextStyle(
                 // color: Colors.black,
                 ),
@@ -83,11 +83,11 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
                     ? snapshot.data!.length
                     : 0;
                 if (snapshot.hasData) {
-                  if (snapshot.data!.isEmpty) {
+                  if (archiveCount == 0) {
                     return Expanded(
                       child: Center(
                         child: Text(
-                          "No Data Found",
+                          "${AppLocalization.of(context)?.getTranslatedValue('no_data_found')}",
                           style: TextStyle(
                               color: Theme.of(context).highlightColor),
                         ),
@@ -126,22 +126,17 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
                                       noteList = dbHelper!.getNotesList();
                                     });
                                   },
-                                  onDismissed: (id,
-                                      title,
-                                      note,
-                                      email,
-                                      createDate,
-                                      editedDate,
-                                      pin,
-                                      archive,
-                                      deleted) {
-                                    setState(() {
-                                      // dbHelper!.delete(snapshot.data![index].id!);
-                                      noteList = dbHelper!.getNotesList();
-                                      snapshot.data!
-                                          .remove(snapshot.data![index]);
-                                    });
-                                  },
+                                  // onDismissed: (
+                                  //   id,
+                                  //   archive,
+                                  // ) {
+                                  //   setState(() {
+                                  //     // dbHelper!.delete(snapshot.data![index].id!);
+                                  //     noteList = dbHelper!.getNotesList();
+                                  //     snapshot.data!
+                                  //         .remove(snapshot.data![index]);
+                                  //   });
+                                  // },
                                 )
                               : Container()
                           : Container();

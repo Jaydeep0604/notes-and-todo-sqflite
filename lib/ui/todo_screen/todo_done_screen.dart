@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:notes_sqflite/animations/list_animation.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/db/list_data.dart';
+import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
 import 'package:notes_sqflite/widget/todo_widget.dart';
@@ -58,7 +59,7 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
               icon: Icon(Icons.arrow_back,
                   color: Theme.of(context).iconTheme.color)),
           title: Text(
-            "Finished",
+            "${AppLocalization.of(context)?.getTranslatedValue('finished')}",
             style: TextStyle(
                 // color: Colors.black,
                 ),
@@ -78,7 +79,7 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
                   return Expanded(
                     child: Center(
                       child: Text(
-                        "No Data Found",
+                        "${AppLocalization.of(context)?.getTranslatedValue('no_data_found')}",
                         style:
                             TextStyle(color: Theme.of(context).highlightColor),
                       ),

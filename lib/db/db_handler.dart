@@ -131,6 +131,7 @@ class DBHelper {
     final updateFields = <String, dynamic>{};
     if (notesModel.pin != null) {
       updateFields['pin'] = notesModel.pin;
+      updateFields['archive'] = notesModel.archive;
     }
     return await dbClient!.update(
       'notes',
@@ -145,6 +146,7 @@ class DBHelper {
     final updateFields = <String, dynamic>{};
     if (notesModel.archive != null) {
       updateFields['archive'] = notesModel.archive;
+      updateFields['pin'] = notesModel.pin;
     }
     return await dbClient!.update(
       'notes',

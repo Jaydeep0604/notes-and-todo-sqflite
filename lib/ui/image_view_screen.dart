@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:notes_sqflite/language/localisation.dart';
 
 class ImageViewScreen extends StatefulWidget {
   ImageViewScreen({
@@ -52,7 +53,7 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
                     saveImageToGallery();
                   },
                   child: Text(
-                    "Save image",
+                    "${AppLocalization.of(context)?.getTranslatedValue('save_image')}",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.black,

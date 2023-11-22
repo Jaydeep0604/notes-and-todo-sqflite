@@ -2,11 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
+import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/model/note_model.dart';
 import 'package:flutter/services.dart';
+import 'package:notes_sqflite/services/notification_services.dart';
 import 'package:notes_sqflite/ui/image_view_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:notes_sqflite/utils/app_message.dart';
 import 'package:notes_sqflite/utils/functions.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -35,14 +38,8 @@ class NoteDetailScreen extends StatefulWidget {
   void Function()? onUpdateComplete;
   void Function(
     int id,
-    String title,
-    String note,
-    String email,
-    String createDate,
-    String editedDate,
-    int pin,
     int archive,
-    int deleted,
+    int pin,
   )? onDismissed;
   @override
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
@@ -51,7 +48,7 @@ class NoteDetailScreen extends StatefulWidget {
 class _NoteDetailScreenState extends State<NoteDetailScreen> {
   bool isEdited = false;
   DBHelper? dbHelper;
-  bool isEvening = false;
+  bool isEvening = false, isNextEvening = false, isCheckNextEvening = false;
   bool isNextMorning = false;
   bool isCustom = true;
   bool isDefault = false;
@@ -62,6 +59,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   late TextEditingController dateCtr;
   late TextEditingController timeCtr;
 
+  DateTime? notificationDateTime;
+  DateTime currentDate = DateTime.now();
+
+  TimeOfDay timeOfDay = TimeOfDay.now();
+
   final ImagePicker imagePicker = ImagePicker();
   List<XFile>? imageFileList = [];
 
@@ -70,6 +72,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     dbHelper = DBHelper();
     timeCtr = TextEditingController();
     dateCtr = TextEditingController();
+    checkEvening();
     // this.noteColor = Colors.black;
     // indexOfCurrentColor = colors.indexOf(noteColor);
     if (widget.isUpdateNote) {
@@ -114,19 +117,12 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     });
   }
 
-  void selectImages() async {
-    final List<XFile>? selectedImages = await imagePicker.pickMultiImage();
-    if (selectedImages!.isNotEmpty) {
-      imageFileList!.addAll(selectedImages);
+  void checkEvening() {
+    if (currentDate.hour >= 18) {
+      setState(() {
+        isCheckNextEvening = true;
+      });
     }
-    print("Image List Length:" + imageFileList!.length.toString());
-    await dbHelper?.updateImageList(
-      NotesModel(
-        id: widget.id,
-        image_list: imageFileList!.map((image) => image.path).toList(),
-      ),
-    );
-    setState(() {});
   }
 
   final colors = [
@@ -173,7 +169,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           child: Scaffold(
             appBar: AppBar(
               leading: IconButton(
-                tooltip: "Navigate up",
+                tooltip:
+                    "${AppLocalization.of(context)?.getTranslatedValue('navigate_up')}",
                 onPressed: () {
                   Navigator.pop(context, true);
                 },
@@ -182,7 +179,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               ),
               actions: [
                 IconButton(
-                  tooltip: "Pin",
+                  tooltip:
+                      "${AppLocalization.of(context)?.getTranslatedValue('pin')}",
                   onPressed: () {
                     isPinedChange();
                     if (widget.isUpdateNote) {
@@ -191,6 +189,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                         NotesModel(
                           id: widget.id,
                           pin: widget.isPined == true ? 1 : 0,
+                          archive: 0,
                           image_list: [],
                         ),
                       )
@@ -209,7 +208,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                   ),
                 ),
                 IconButton(
-                  tooltip: "Archive",
+                  tooltip:
+                      "${AppLocalization.of(context)?.getTranslatedValue('archive')}",
                   onPressed: () {
                     isArchivedChange();
                     if (widget.isUpdateNote) {
@@ -218,6 +218,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                         NotesModel(
                           id: widget.id,
                           archive: widget.isArchived == true ? 1 : 0,
+                          pin: 0,
                           image_list: [],
                         ),
                       )
@@ -278,7 +279,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                 width: 10,
                               ),
                               Text(
-                                "Restore",
+                                "${AppLocalization.of(context)?.getTranslatedValue('restore')}",
                                 style: Theme.of(context)
                                     .textTheme
                                     .labelMedium
@@ -292,16 +293,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             dbHelper?.deleteForeverNote(widget.id!).then(
                               (value) {
                                 Navigator.pop(context);
-                                widget.onDismissed!(
-                                    widget.id!,
-                                    titleCtr.text,
-                                    noteCtr.text,
-                                    widget.email!,
-                                    widget.createDate!,
-                                    widget.editedDate!,
-                                    widget.isPined == true ? 1 : 0,
-                                    widget.isArchived == true ? 1 : 0,
-                                    widget.isDeleted == true ? 1 : 0);
+                                widget.onUpdateComplete!();
                               },
                             );
                           },
@@ -315,7 +307,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                 width: 10,
                               ),
                               Text(
-                                "Delete forever",
+                                "${AppLocalization.of(context)?.getTranslatedValue('delete_forever')}",
                                 style: Theme.of(context)
                                     .textTheme
                                     .labelMedium
@@ -357,7 +349,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                     fontSize: 20,
                                   ),
                               decoration: InputDecoration(
-                                hintText: "Title",
+                                hintText:
+                                    "${AppLocalization.of(context)?.getTranslatedValue('title')}",
                                 hintStyle: Theme.of(context)
                                     .textTheme
                                     .titleMedium
@@ -399,7 +392,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                               maxLines: null,
                               style: Theme.of(context).textTheme.titleMedium,
                               decoration: InputDecoration(
-                                hintText: "Note",
+                                hintText:
+                                    "${AppLocalization.of(context)?.getTranslatedValue('note')}",
                                 hintStyle: Theme.of(context)
                                     .textTheme
                                     .titleMedium
@@ -541,145 +535,151 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                     onPressed: () {
                                       FocusManager.instance.primaryFocus
                                           ?.unfocus();
-                                      showNoteDateTimeMainDialoge(
-                                          isCustom: isCustom,
-                                          isDefault: isDefault);
-                                      // showModalBottomSheet(
-                                      //   backgroundColor: Colors.transparent,
-                                      //   context: context,
-                                      //   elevation: 0,
-                                      //   builder: (context) {
-                                      //     return Padding(
-                                      //       padding: const EdgeInsets.all(10),
-                                      //       child: Container(
-                                      //         decoration: BoxDecoration(
-                                      //           color: Theme.of(context)
-                                      //               .canvasColor,
-                                      //           borderRadius:
-                                      //               BorderRadius.circular(20),
-                                      //         ),
-                                      //         child: Column(
-                                      //           mainAxisSize: MainAxisSize.min,
-                                      //           children: [
-                                      //             if (widget.isDeleted ==
-                                      //                     false &&
-                                      //                 widget.isUpdateNote ==
-                                      //                     true)
-                                      //               ListTile(
-                                      //                 onTap: () {
-                                      //                   Navigator.pop(context);
-                                      //                   showDeleteDialoge();
-                                      //                 },
-                                      //                 leading: Icon(
-                                      //                     Icons.delete_forever,
-                                      //                     color: AppColors
-                                      //                         .blackColor),
-                                      //                 title: Text(
-                                      //                   "Delete",
-                                      //                   style: Theme.of(context)
-                                      //                       .textTheme
-                                      //                       .titleMedium
-                                      //                       ?.copyWith(
-                                      //                           fontSize: 14,
-                                      //                           color: AppColors
-                                      //                               .blackColor),
-                                      //                 ),
-                                      //               ),
-                                      //             ListTile(
-                                      //               onTap: () {
-                                      //                 Navigator.pop(context);
-                                      //                 Clipboard.setData(
-                                      //                     ClipboardData(
-                                      //                         text: noteCtr.text
-                                      //                             .toString()));
-                                      //                 AppMessage.showToast(
-                                      //                     context,
-                                      //                     "Note Copied");
-                                      //               },
-                                      //               leading: Icon(Icons.copy,
-                                      //                   color: AppColors
-                                      //                       .blackColor),
-                                      //               title: Text(
-                                      //                 "Copy Note",
-                                      //                 style: Theme.of(context)
-                                      //                     .textTheme
-                                      //                     .titleMedium
-                                      //                     ?.copyWith(
-                                      //                         fontSize: 14,
-                                      //                         color: AppColors
-                                      //                             .blackColor),
-                                      //               ),
-                                      //             ),
-                                      //             ListTile(
-                                      //               onTap: () {
-                                      //                 Navigator.pop(context);
-                                      //                 onshareTodo(
-                                      //                     context,
-                                      //                     noteCtr.text
-                                      //                         .toString());
-                                      //               },
-                                      //               leading: Icon(Icons.share,
-                                      //                   color: AppColors
-                                      //                       .blackColor),
-                                      //               title: Text(
-                                      //                 "Share Note",
-                                      //                 style: Theme.of(context)
-                                      //                     .textTheme
-                                      //                     .titleMedium
-                                      //                     ?.copyWith(
-                                      //                         fontSize: 14,
-                                      //                         color: AppColors
-                                      //                             .blackColor),
-                                      //               ),
-                                      //             ),
-                                      //             ListTile(
-                                      //               onTap: () {
-                                      //                 Navigator.pop(context);
-                                      //                 showNoteDateTimeMainDialoge();
-                                      //               },
-                                      //               leading: Icon(
-                                      //                   Icons
-                                      //                       .notification_add_outlined,
-                                      //                   color: AppColors
-                                      //                       .blackColor),
-                                      //               title: Text(
-                                      //                 "Add Remider",
-                                      //                 style: Theme.of(context)
-                                      //                     .textTheme
-                                      //                     .titleMedium
-                                      //                     ?.copyWith(
-                                      //                         fontSize: 14,
-                                      //                         color: AppColors
-                                      //                             .blackColor),
-                                      //               ),
-                                      //             ),
-                                      //             ListTile(
-                                      //               onTap: () {
-                                      //                 Navigator.pop(context);
-                                      //                 selectImages();
-                                      //               },
-                                      //               leading: Icon(
-                                      //                   Icons
-                                      //                       .add_photo_alternate_outlined,
-                                      //                   color: AppColors
-                                      //                       .blackColor),
-                                      //               title: Text(
-                                      //                 "Add Image",
-                                      //                 style: Theme.of(context)
-                                      //                     .textTheme
-                                      //                     .titleMedium
-                                      //                     ?.copyWith(
-                                      //                         fontSize: 14,
-                                      //                         color: AppColors
-                                      //                             .blackColor),
-                                      //               ),
-                                      //             )
-                                      //           ],
-                                      //         ),
-                                      //       ),
-                                      //     );
-                                      //   },
-                                      // );
+
+                                      showModalBottomSheet(
+                                        backgroundColor: Colors.transparent,
+                                        context: context,
+                                        elevation: 0,
+                                        builder: (context) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(10),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context)
+                                                    .canvasColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  if (widget.isDeleted ==
+                                                          false &&
+                                                      widget.isUpdateNote ==
+                                                          true)
+                                                    ListTile(
+                                                      onTap: () {
+                                                        Navigator.pop(context);
+                                                        showDeleteDialoge();
+                                                      },
+                                                      leading: Icon(
+                                                          Icons.delete_forever,
+                                                          color: AppColors
+                                                              .blackColor),
+                                                      title: Text(
+                                                        "${AppLocalization.of(context)?.getTranslatedValue('delete')}",
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .titleMedium
+                                                            ?.copyWith(
+                                                                fontSize: 14,
+                                                                color: AppColors
+                                                                    .blackColor),
+                                                      ),
+                                                    ),
+                                                  ListTile(
+                                                    onTap: () {
+                                                      Navigator.pop(context);
+                                                      Clipboard.setData(
+                                                          ClipboardData(
+                                                              text: noteCtr.text
+                                                                  .toString()));
+                                                      AppMessage.showToast(
+                                                          context,
+                                                          "${AppLocalization.of(context)?.getTranslatedValue('note_copied')}");
+                                                    },
+                                                    leading: Icon(Icons.copy,
+                                                        color: AppColors
+                                                            .blackColor),
+                                                    title: Text(
+                                                      "${AppLocalization.of(context)?.getTranslatedValue('copy_note')}",
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleMedium
+                                                          ?.copyWith(
+                                                              fontSize: 14,
+                                                              color: AppColors
+                                                                  .blackColor),
+                                                    ),
+                                                  ),
+                                                  ListTile(
+                                                    onTap: () {
+                                                      Navigator.pop(context);
+                                                      onshareTodo(
+                                                          context,
+                                                          noteCtr.text
+                                                              .toString());
+                                                    },
+                                                    leading: Icon(Icons.share,
+                                                        color: AppColors
+                                                            .blackColor),
+                                                    title: Text(
+                                                      "${AppLocalization.of(context)?.getTranslatedValue('share_note')}",
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleMedium
+                                                          ?.copyWith(
+                                                              fontSize: 14,
+                                                              color: AppColors
+                                                                  .blackColor),
+                                                    ),
+                                                  ),
+                                                  ListTile(
+                                                    onTap: () {
+                                                      Navigator.pop(context);
+                                                      showNoteDateTimeMainDialoge(
+                                                        isCustom: isCustom,
+                                                        isDefault: isDefault,
+                                                        notificationDateTime:
+                                                            notificationDateTime,
+                                                        currentDate:
+                                                            currentDate,
+                                                        timeOfDay: timeOfDay,
+                                                      );
+                                                    },
+                                                    leading: Icon(
+                                                        Icons
+                                                            .notification_add_outlined,
+                                                        color: AppColors
+                                                            .blackColor),
+                                                    title: Text(
+                                                      "${AppLocalization.of(context)?.getTranslatedValue('add_remider')}",
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleMedium
+                                                          ?.copyWith(
+                                                              fontSize: 14,
+                                                              color: AppColors
+                                                                  .blackColor),
+                                                    ),
+                                                  ),
+                                                  ListTile(
+                                                    onTap: () {
+                                                      Navigator.pop(context);
+                                                      selectImages();
+                                                    },
+                                                    leading: Icon(
+                                                        Icons
+                                                            .add_photo_alternate_outlined,
+                                                        color: AppColors
+                                                            .blackColor),
+                                                    title: Text(
+                                                      "${AppLocalization.of(context)?.getTranslatedValue('add_image')}",
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleMedium
+                                                          ?.copyWith(
+                                                              fontSize: 14,
+                                                              color: AppColors
+                                                                  .blackColor),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
                                     },
                                     icon: Icon(Icons.more_vert,
                                         color: Theme.of(context).iconTheme.color
@@ -695,7 +695,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                               ? Container(
                                   child: Center(
                                     child: Text(
-                                      "Edited ${_extractDate(widget.editedDate)}",
+                                      "${AppLocalization.of(context)?.getTranslatedValue('edited')} ${_extractDate(widget.editedDate)}",
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodySmall
@@ -725,7 +725,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                         addNote();
                                       },
                                       child: Text(
-                                        "Save",
+                                        "${AppLocalization.of(context)?.getTranslatedValue('save')}",
                                         style: Theme.of(context)
                                             .textTheme
                                             .labelMedium
@@ -746,6 +746,21 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         ),
       ),
     );
+  }
+
+  void selectImages() async {
+    final List<XFile>? selectedImages = await imagePicker.pickMultiImage();
+    if (selectedImages!.isNotEmpty) {
+      imageFileList!.addAll(selectedImages);
+    }
+    print("Image List Length:" + imageFileList!.length.toString());
+    await dbHelper?.updateImageList(
+      NotesModel(
+        id: widget.id,
+        image_list: imageFileList!.map((image) => image.path).toList(),
+      ),
+    );
+    setState(() {});
   }
 
   String _extractDate(String? dateString) {
@@ -815,7 +830,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         alignment: Alignment.center,
         titleTextStyle: TextStyle(fontWeight: FontWeight.w500),
         title: Text(
-          "Are you sure, you want to delete?",
+          "${AppLocalization.of(context)?.getTranslatedValue('are_you_sure_you_want_to_delete')}",
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.w700,
@@ -834,7 +849,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                     Navigator.pop(context);
                   },
                   child: Text(
-                    "No",
+                    "${AppLocalization.of(context)?.getTranslatedValue('no')}",
                     style: TextStyle(color: AppColors.blackColor),
                   ),
                 ),
@@ -870,7 +885,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                     }
                   },
                   child: Text(
-                    "Yes",
+                    "${AppLocalization.of(context)?.getTranslatedValue('yes')}",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -910,7 +925,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 title: Row(
                   children: [
                     Text(
-                      "Later Today",
+                      "${AppLocalization.of(context)?.getTranslatedValue('later_today')}",
                       style: Theme.of(context)
                           .textTheme
                           .titleMedium
@@ -935,7 +950,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 title: Row(
                   children: [
                     Text(
-                      "Tomorrow Morning",
+                      "${AppLocalization.of(context)?.getTranslatedValue('tomorrow_morning')}",
                       style: Theme.of(context)
                           .textTheme
                           .titleMedium
@@ -958,7 +973,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                   color: AppColors.blackColor,
                 ),
                 title: Text(
-                  "Chose a date & time",
+                  "${AppLocalization.of(context)?.getTranslatedValue('chose_a_date_and_time')}",
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium
@@ -975,15 +990,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   showNoteDateTimeMainDialoge({
     bool? isCustom,
     bool? isDefault,
+    DateTime? notificationDateTime,
+    DateTime? currentDate,
+    TimeOfDay? timeOfDay,
   }) {
     return showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
-          DateTime currentDate = DateTime.now();
-          DateTime? notificationDateTime;
-          TimeOfDay timeOfDay = TimeOfDay.now();
-
           Future<void> selectDate(BuildContext context) async {
             final DateTime? pickedDate = await showDatePicker(
               context: context,
@@ -995,12 +1009,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               setState(() {
                 currentDate = pickedDate;
                 final dateFormat =
-                    DateFormat('EEEEEEEEE, d MMM y').format(currentDate);
+                    DateFormat('EEE, d MMM y').format(currentDate!);
                 dateCtr.text = dateFormat;
                 // Combine date and time when the date is selected.
-                notificationDateTime = currentDate.add(
-                  Duration(hours: timeOfDay.hour, minutes: timeOfDay.minute),
+                notificationDateTime = currentDate!.add(
+                  Duration(hours: timeOfDay!.hour, minutes: timeOfDay!.minute),
                 );
+                print("notificationDateTime date is :$notificationDateTime");
               });
             }
           }
@@ -1008,14 +1023,15 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           Future<void> displayTimePicker(BuildContext context) async {
             var time = await showTimePicker(
               context: context,
-              initialTime: timeOfDay,
+              initialTime: timeOfDay!,
             );
             if (time != null) {
               setState(
                 () {
                   timeOfDay = time;
-                  notificationDateTime = currentDate.add(
-                    Duration(hours: time.hour, minutes: time.minute),
+                  notificationDateTime = currentDate!.add(
+                    Duration(
+                        hours: time.hour, minutes: time.minute, seconds: 00),
                   );
                   timeCtr.text = "${time.format(context).toLowerCase()}";
                 },
@@ -1030,7 +1046,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             backgroundColor: Theme.of(context).iconTheme.color,
             title: Row(
               children: [
-                Text("Add your reminder",
+                Text(
+                    "${AppLocalization.of(context)?.getTranslatedValue('add_your_reminder')}",
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Theme.of(context).scaffoldBackgroundColor,
                         fontSize: 18)),
@@ -1041,11 +1058,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       dateCtr.clear();
                       timeCtr.clear();
                       isEvening = false;
+                      isNextEvening = false;
                       isNextMorning = false;
+                      isCustom = true;
+                      isDefault = false;
                     });
                   },
                   child: Text(
-                    "Clear",
+                    "${AppLocalization.of(context)?.getTranslatedValue('clear')}",
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium
@@ -1079,7 +1099,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                         ),
                       ),
                       child: Text(
-                        "Custom",
+                        "${AppLocalization.of(context)?.getTranslatedValue('custom')}",
                         style:
                             Theme.of(context).textTheme.titleMedium?.copyWith(
                                   color: Theme.of(context).cardColor,
@@ -1110,7 +1130,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                         ),
                       ),
                       child: Text(
-                        "Default",
+                        "${AppLocalization.of(context)?.getTranslatedValue('default')}",
                         style:
                             Theme.of(context).textTheme.titleMedium?.copyWith(
                                   color: Theme.of(context).cardColor,
@@ -1141,7 +1161,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           contentPadding: EdgeInsets.symmetric(horizontal: 10),
                           title: dateCtr.text == ""
                               ? Text(
-                                  "Select date",
+                                  "${AppLocalization.of(context)?.getTranslatedValue('select_date')}",
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleMedium
@@ -1177,7 +1197,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           contentPadding: EdgeInsets.symmetric(horizontal: 10),
                           title: timeCtr.text == ""
                               ? Text(
-                                  'Select time',
+                                  '${AppLocalization.of(context)?.getTranslatedValue('select_time')}',
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleMedium
@@ -1210,9 +1230,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
                                 child: Text(
-                                  "Cancel",
+                                  "${AppLocalization.of(context)?.getTranslatedValue('cancel')}",
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleMedium
@@ -1228,13 +1250,28 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             ),
                             Expanded(
                               child: MaterialButton(
-                                color: Colors.green[400],
+                                color: dateCtr.text != "" && timeCtr.text != ""
+                                    ? Colors.green[400]
+                                    : Colors.green[100],
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  if (dateCtr.text != "" &&
+                                      timeCtr.text != "") {
+                                    print(
+                                        "notificationDateTime is :: $notificationDateTime");
+                                    notificationServices.showNotification(
+                                        notificationDateTime!,
+                                        widget.title == ""
+                                            ? widget.note!
+                                            : widget.title!,
+                                        timeCtr.text);
+                                    Navigator.pop(context);
+                                  }
+                                },
                                 child: Text(
-                                  "Add",
+                                  "${AppLocalization.of(context)?.getTranslatedValue('add')}",
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleMedium
@@ -1252,59 +1289,62 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                   : Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        ListTile(
-                          onTap: () {
-                            setState(() {
-                              isEvening = !isEvening;
-                              isNextMorning = false;
-                            });
-                          },
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: BorderSide(
-                              color: isEvening
-                                  ? AppColors.blueColor.withOpacity(0.4)
-                                  : Colors.transparent,
+                        if (isCheckNextEvening == false)
+                          ListTile(
+                            onTap: () {
+                              setState(() {
+                                isEvening = !isEvening;
+                                isNextMorning = false;
+                              });
+                            },
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: BorderSide(
+                                color: isEvening
+                                    ? AppColors.blueColor.withOpacity(0.4)
+                                    : Colors.transparent,
+                              ),
+                            ),
+                            selectedTileColor:
+                                AppColors.blueColor.withOpacity(0.2),
+                            selected: isEvening,
+                            splashColor: Colors.transparent,
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 10),
+                            title: Row(
+                              children: [
+                                Text(
+                                  "${AppLocalization.of(context)?.getTranslatedValue('today_evening')}",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor),
+                                ),
+                                Spacer(),
+                                Text(
+                                  "6:00 pm",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor),
+                                ),
+                              ],
+                            ),
+                            trailing: Icon(
+                              Icons.date_range_outlined,
+                              color: Theme.of(context).scaffoldBackgroundColor,
                             ),
                           ),
-                          selectedTileColor:
-                              AppColors.blueColor.withOpacity(0.2),
-                          selected: isEvening,
-                          splashColor: Colors.transparent,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                          title: Row(
-                            children: [
-                              Text(
-                                "Today evening",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor),
-                              ),
-                              Spacer(),
-                              Text(
-                                "6:00 pm",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor),
-                              ),
-                            ],
-                          ),
-                          trailing: Icon(
-                            Icons.date_range_outlined,
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                          ),
-                        ),
                         ListTile(
                           onTap: () {
                             setState(() {
                               isNextMorning = !isNextMorning;
                               isEvening = false;
+                              isNextEvening = false;
                             });
                           },
                           shape: RoundedRectangleBorder(
@@ -1323,7 +1363,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           title: Row(
                             children: [
                               Text(
-                                "Next morning",
+                                "${AppLocalization.of(context)?.getTranslatedValue('next_morning')}",
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium
@@ -1348,6 +1388,56 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             color: Theme.of(context).scaffoldBackgroundColor,
                           ),
                         ),
+                        if (isCheckNextEvening == true)
+                          ListTile(
+                            onTap: () {
+                              setState(() {
+                                isNextEvening = !isNextEvening;
+                                isNextMorning = false;
+                              });
+                            },
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: BorderSide(
+                                color: isEvening
+                                    ? AppColors.blueColor.withOpacity(0.4)
+                                    : Colors.transparent,
+                              ),
+                            ),
+                            selectedTileColor:
+                                AppColors.blueColor.withOpacity(0.2),
+                            selected: isNextEvening,
+                            splashColor: Colors.transparent,
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 10),
+                            title: Row(
+                              children: [
+                                Text(
+                                  "${AppLocalization.of(context)?.getTranslatedValue('next_evening')}",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor),
+                                ),
+                                Spacer(),
+                                Text(
+                                  "6:00 pm",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor),
+                                ),
+                              ],
+                            ),
+                            trailing: Icon(
+                              Icons.date_range_outlined,
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                            ),
+                          ),
                         SizedBox(
                           height: 10,
                         ),
@@ -1358,18 +1448,42 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           onPressed: () {
-                            if (widget.title != "") {
-                              AppFunctions.setNextMorningNotification(
-                                  widget.title!);
-                            }else{
-                              AppFunctions.setNextMorningNotification(
-                                widget.note!);
+                            if (isNextMorning) {
+                              if (widget.title != "") {
+                                AppFunctions.setNextMorningNotification(
+                                    widget.title!);
+                                Navigator.pop(context);
+                              } else {
+                                AppFunctions.setNextMorningNotification(
+                                    widget.note!);
+                                Navigator.pop(context);
+                              }
                             }
-
-                            
+                            if (isEvening) {
+                              if (widget.title != "") {
+                                AppFunctions.setTodayEveningNotification(
+                                    widget.note!);
+                                Navigator.pop(context);
+                              } else {
+                                AppFunctions.setTodayEveningNotification(
+                                    widget.note!);
+                                Navigator.pop(context);
+                              }
+                            }
+                            if (isNextEvening) {
+                              if (widget.title != "") {
+                                AppFunctions.setNextEveningNotification(
+                                    widget.note!);
+                                Navigator.pop(context);
+                              } else {
+                                AppFunctions.setNextEveningNotification(
+                                    widget.note!);
+                                Navigator.pop(context);
+                              }
+                            }
                           },
                           child: Text(
-                            "Add",
+                            "${AppLocalization.of(context)?.getTranslatedValue('add')}",
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium
@@ -1390,6 +1504,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       setState(() {
         isEvening = false;
         isNextMorning = false;
+        isNextEvening = false;
       });
     });
   }

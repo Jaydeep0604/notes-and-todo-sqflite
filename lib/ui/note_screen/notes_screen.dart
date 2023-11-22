@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
+import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/note_model.dart';
 import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
@@ -28,6 +30,7 @@ class _NotesScreenState extends State<NotesScreen> {
 
   bool isPined = false;
   bool isArchived = false;
+  bool isNoOtherData = false;
 
   @override
   void initState() {
@@ -89,15 +92,13 @@ class _NotesScreenState extends State<NotesScreen> {
                                 ? snapshot.data!.length
                                 : 0;
                             if (snapshot.hasData) {
-                              if (snapshot.data==null) {
-                                // Add your dummy data here
+                              if (snapshot.data!.isEmpty) {
                                 return Card(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     color: Theme.of(context)
                                         .scaffoldBackgroundColor,
-                                    // color: AppColors.blackColor,
                                     child: Container(
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 8, vertical: 10),
@@ -122,7 +123,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                             height: 5,
                                           ),
                                           Text(
-                                            "Dummy Title",
+                                            "${AppLocalization.of(context)?.getTranslatedValue('dummy_title')}",
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .titleMedium
@@ -140,7 +141,8 @@ class _NotesScreenState extends State<NotesScreen> {
                                             text: TextSpan(
                                               children: [
                                                 TextSpan(
-                                                  text: "This is a sample note with dummy data.",
+                                                  text:
+                                                      "${AppLocalization.of(context)?.getTranslatedValue('this_is_a_sample_note_with_dummy_data')}",
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .bodySmall
@@ -154,6 +156,21 @@ class _NotesScreenState extends State<NotesScreen> {
                                         ],
                                       ),
                                     ));
+                              }
+                              if (snapshot.data!.isNotEmpty &&
+                                  pinCount == 0 &&
+                                  otherCount == 0) {
+                                return SizedBox(
+                                  height: height * 0.8,
+                                  child: Center(
+                                    child: Text(
+                                      "${AppLocalization.of(context)?.getTranslatedValue('no_data_found')}",
+                                      style: TextStyle(
+                                          color:
+                                              Theme.of(context).highlightColor),
+                                    ),
+                                  ),
+                                );
                               }
                               return Column(
                                 mainAxisSize: MainAxisSize.min,
@@ -204,15 +221,18 @@ class _NotesScreenState extends State<NotesScreen> {
                                                         .getNotesList();
                                                   });
                                                 },
-                                                onDismissed: (id,
-                                                    title,
-                                                    note,
-                                                    email,
-                                                    createDate,
-                                                    editedDate,
-                                                    pin,
-                                                    archive,
-                                                    deleted) {
+                                                onDismissed:
+                                                    (id, archive, pin) {
+                                                  dbHelper?.updateArchive(
+                                                    NotesModel(
+                                                      id: id,
+                                                      archive: archive,
+                                                      pin: pin,
+                                                      image_list: [],
+                                                    ),
+                                                  );
+                                                  snapshot.data!.remove(
+                                                    snapshot.data![index]);
                                                   setState(() {
                                                     noteList = dbHelper!
                                                         .getNotesList();
@@ -228,7 +248,8 @@ class _NotesScreenState extends State<NotesScreen> {
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 10, vertical: 10),
-                                      child: Text("Others"),
+                                      child: Text(
+                                          "${AppLocalization.of(context)?.getTranslatedValue('others')}"),
                                     ),
                                 ],
                               );
@@ -281,18 +302,18 @@ class _NotesScreenState extends State<NotesScreen> {
                                             },
                                             onDismissed: (
                                               id,
-                                              title,
-                                              note,
-                                              email,
-                                              createDate,
-                                              editedDate,
-                                              pin,
                                               archive,
-                                              deleted,
+                                              pin,
                                             ) {
                                               setState(() {
                                                 // dbHelper!.delete(snapshot
                                                 //     .data![index].id!);
+                                                dbHelper?.updateArchive(
+                                                    NotesModel(
+                                                        id: id,
+                                                        archive: archive,
+                                                        pin: pin,
+                                                        image_list: []));
                                                 noteList =
                                                     dbHelper!.getNotesList();
                                                 snapshot.data!.remove(

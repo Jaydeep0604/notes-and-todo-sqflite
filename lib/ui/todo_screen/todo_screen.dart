@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:notes_sqflite/animations/list_animation.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
+import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_detail_screen.dart';
@@ -67,7 +68,7 @@ class _TodoScreenState extends State<TodoScreen> {
                   return Container(
                     child: Center(
                       child: Text(
-                        "No Data Found",
+                        "${AppLocalization.of(context)?.getTranslatedValue('no_data_found')}",
                         style:
                             TextStyle(color: Theme.of(context).highlightColor),
                       ),
