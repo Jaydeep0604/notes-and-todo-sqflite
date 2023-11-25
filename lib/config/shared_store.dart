@@ -111,6 +111,44 @@ class SharedStore {
       return null;
     }
   }
+
+  Future enablePinLock(bool pin) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    bool isSetPin =
+        await preferences.setBool('pin', pin);
+    return isSetPin;
+  }
+
+  Future getPin() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+   bool? pin;
+    try {
+      pin = preferences.getBool("pin");
+      return pin;
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  Future enableBiometricLock(bool biometric) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    bool isSetBiometric =
+        await preferences.setBool('biometric', biometric);
+    return isSetBiometric;
+  }
+
+   Future getBiometric() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+   bool? biometric;
+    try {
+      biometric = preferences.getBool("biometric");
+      return biometric;
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
 }
 
 SharedStore sharedStore = SharedStore();

@@ -19,18 +19,18 @@ class _CustomPasswordButtonState extends State<CustomPasswordButton> {
       borderRadius: BorderRadius.circular(50),
       onTap: widget.onTap,
       child: Container(
-        height: 80,
-        width: 80,
-        decoration: BoxDecoration(
-            color: Theme.of(context).highlightColor.withOpacity(0.1),
-            border: Border.all(
-              color: Theme.of(context).highlightColor,
-            ),
-            shape: BoxShape.circle),
+        height: 65,
+        width: 65,
+        // decoration: BoxDecoration(
+        //     color: Theme.of(context).highlightColor.withOpacity(0.1),
+        //     border: Border.all(
+        //       color: Theme.of(context).highlightColor.withOpacity(0.2),
+        //     ),
+        //     shape: BoxShape.circle),
         child: Center(
           child: Text(
             "${widget.text}",
-            style: TextStyle(fontSize: 26),
+            style: Theme.of(context).textTheme.titleLarge!.copyWith(fontSize: 22)
           ),
         ),
       ),

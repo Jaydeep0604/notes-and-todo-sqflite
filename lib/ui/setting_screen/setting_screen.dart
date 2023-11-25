@@ -278,9 +278,9 @@ class _SettingScreenState extends State<SettingScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildThemeOption(SystemThemeMode.light, "Light"),
-                      _buildThemeOption(SystemThemeMode.dark, "Dark"),
-                      _buildThemeOption(SystemThemeMode.system, "System"),
+                      _buildThemeOption(SystemThemeMode.light, "${AppLocalization.of(context)?.getTranslatedValue("light")}"),
+                      _buildThemeOption(SystemThemeMode.dark, "${AppLocalization.of(context)?.getTranslatedValue("dark")}"),
+                      _buildThemeOption(SystemThemeMode.system, "${AppLocalization.of(context)?.getTranslatedValue("system")}"),
                     ],
                   ),
                 ),
@@ -344,7 +344,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "Hindi",
+                          "${AppLocalization.of(context)?.getTranslatedValue("hindi")}",
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ]),
@@ -365,7 +365,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "Gujarati",
+                          "${AppLocalization.of(context)?.getTranslatedValue("gujarati")}",
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ]),
@@ -386,7 +386,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "English",
+                          "${AppLocalization.of(context)?.getTranslatedValue("english")}",
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ]),
@@ -463,7 +463,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                 width: 20,
                               ),
                               Text(
-                                "${AppLocalization.of(context)?.getTranslatedValue('export_notes')}",
+                                "${AppLocalization.of(context)?.getTranslatedValue('export_note_s')}",
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium!
@@ -508,7 +508,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                 width: 20,
                               ),
                               Text(
-                                "${AppLocalization.of(context)?.getTranslatedValue("export_to-do's")}",
+                                "${AppLocalization.of(context)?.getTranslatedValue("export_schedules")}",
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium!

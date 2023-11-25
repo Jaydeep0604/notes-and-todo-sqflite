@@ -17,7 +17,11 @@ class AppLockScreen extends StatefulWidget {
 }
 
 class _AppLockScreenState extends State<AppLockScreen> {
-  late TextEditingController passCtr, c_passCtr, movieNameCtr, teacherNameCtr;
+  late TextEditingController passCtr,
+      confirm_passCtr,
+      current_passCtr,
+      movieNameCtr,
+      teacherNameCtr;
 
   final _questionKey = GlobalKey<FormState>();
   final _passwordKey = GlobalKey<FormState>();
@@ -30,11 +34,10 @@ class _AppLockScreenState extends State<AppLockScreen> {
   String movieName = '', teacherName = '', password = '';
 
   bool pass_obscureText = true,
+      current_pass_obscureText = true,
       conf_pass_obscureText = true,
       teacher_name_obscureText = true,
       movie_name_obscureText = true;
-
-  bool isAppLockEnable = false;
 
   bool isResetQuestions = false;
   bool isResetPassword = false;
@@ -46,8 +49,36 @@ class _AppLockScreenState extends State<AppLockScreen> {
     movieNameCtr = TextEditingController();
     teacherNameCtr = TextEditingController();
     passCtr = TextEditingController();
-    c_passCtr = TextEditingController();
+    confirm_passCtr = TextEditingController();
+    current_passCtr = TextEditingController();
+    // checkLocks();
     getData();
+  }
+
+  void getData() async {
+    movieName = await sharedStore.getSecurityPassWordMovieName() ?? '';
+    teacherName = await sharedStore.getSecurityPassWordTeacherName() ?? '';
+    password = await sharedStore.getAppLockPassword() ?? '';
+    setState(() {
+      movieNameCtr = TextEditingController(text: movieName);
+      teacherNameCtr = TextEditingController(text: teacherName);
+      current_passCtr = TextEditingController(text: password);
+    });
+  }
+
+  // checkLocks() async {
+  //   isBiometricLock = await sharedStore.getBiometric() ?? false;
+  //   isPinLock = await sharedStore.getBiometric() ?? false;
+  // }
+
+  enablePinLock(bool isPinLockStatus) async {
+    sharedStore.enablePinLock(isPinLockStatus);
+    sharedStore.enableBiometricLock(false);
+  }
+
+  enableBiometric(bool isBiometricLockStatus) async {
+    sharedStore.enableBiometricLock(isBiometricLockStatus);
+    sharedStore.enablePinLock(false);
   }
 
   resetQuestions() {
@@ -61,19 +92,8 @@ class _AppLockScreenState extends State<AppLockScreen> {
   resetPassword() {
     setState(() {
       passCtr.clear();
-      c_passCtr.clear();
+      confirm_passCtr.clear();
       isResetPassword = true;
-    });
-  }
-
-  void getData() async {
-    movieName = await sharedStore.getSecurityPassWordMovieName() ?? '';
-    teacherName = await sharedStore.getSecurityPassWordTeacherName() ?? '';
-    password = await sharedStore.getAppLockPassword() ?? '';
-    setState(() {
-      movieNameCtr = TextEditingController(text: movieName);
-      teacherNameCtr = TextEditingController(text: teacherName);
-      passCtr = TextEditingController(text: password);
     });
   }
 
@@ -172,16 +192,18 @@ class _AppLockScreenState extends State<AppLockScreen> {
                           Icons.fingerprint_sharp,
                         ),
                         title: Text(
-                            "${AppLocalization.of(context)?.getTranslatedValue('Enable Biometric Lock')}"),
+                            "${AppLocalization.of(context)?.getTranslatedValue('enable_biometric_lock')}"),
                         trailing: SwitchWidget(
-                          value: isBioMetricLock,
+                          value: isBiometricLock!,
                           onTap: () {
                             _authenticateWithBiometrics().then((value) {
                               if (value == true) {
                                 setState(() {
                                   setState(() {
-                                    isBioMetricLock = !isBioMetricLock;
+                                    isBiometricLock = !isBiometricLock!;
+                                    isPinLock = false;
                                   });
+                                  enableBiometric(isBiometricLock!);
                                 });
                               }
                             });
@@ -196,9 +218,9 @@ class _AppLockScreenState extends State<AppLockScreen> {
                           CupertinoIcons.lock_shield,
                         ),
                         title: Text(
-                            "${AppLocalization.of(context)?.getTranslatedValue('Enable Pin Lock')}"),
+                            "${AppLocalization.of(context)?.getTranslatedValue('enable_pin_lock')}"),
                         trailing: SwitchWidget(
-                          value: isAppLockEnable,
+                          value: isPinLock!,
                           onTap: () async {
                             movieName = await sharedStore
                                     .getSecurityPassWordMovieName() ??
@@ -212,8 +234,10 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                 teacherName.isNotEmpty &&
                                 password.isNotEmpty) {
                               setState(() {
-                                isAppLockEnable = !isAppLockEnable;
+                                isPinLock = !isPinLock!;
+                                isBiometricLock = false;
                               });
+                              enablePinLock(isPinLock!);
                             } else {
                               if (movieNameCtr.text.isEmpty) {
                                 focusMovie.requestFocus();
@@ -221,13 +245,36 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                 focuseTeacherName.requestFocus();
                               } else if (passCtr.text.isEmpty) {
                                 focusePassword.requestFocus();
-                              } else if (c_passCtr.text.isEmpty) {
+                              } else if (confirm_passCtr.text.isEmpty) {
                                 focuseConfirmPassword.requestFocus();
                               } else {
-                                saveQuestions(
-                                    teacherName: teacherName,
-                                    movieName: movieName);
-                                savePassword(password: password);
+                                final movieName = await sharedStore
+                                    .getSecurityPassWordMovieName();
+                                final teacherName = await sharedStore
+                                    .getSecurityPassWordTeacherName();
+                                final password =
+                                    await sharedStore.getAppLockPassword();
+                                if (movieName == null || movieName == '') {
+                                  AppMessage.showToast(context,
+                                      "${AppLocalization.of(context)?.getTranslatedValue('please_submit_questions')}");
+                                } else if (teacherName == null ||
+                                    teacherName == '') {
+                                  AppMessage.showToast(context,
+                                      "${AppLocalization.of(context)?.getTranslatedValue('please_submit_questions')}");
+                                } else if (password == null || password == '') {
+                                  AppMessage.showToast(context,
+                                      "${AppLocalization.of(context)?.getTranslatedValue('please_set_password')}");
+                                } else {
+                                  enablePinLock(isPinLock!);
+                                  setState(() {
+                                    isPinLock = !isPinLock!;
+                                    isBiometricLock = false;
+                                  });
+                                }
+                                // saveQuestions(
+                                //     teacherName: teacherName,
+                                //     movieName: movieName);
+                                // savePassword(password: password);
                               }
                             }
                           },
@@ -243,7 +290,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
                       Row(
                         children: [
                           Text(
-                            "Security Questions",
+                            "${AppLocalization.of(context)?.getTranslatedValue('security_questions')}",
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge!
@@ -268,7 +315,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
                               resetQuestions();
                             },
                             child: Text(
-                              "Reset",
+                              "${AppLocalization.of(context)?.getTranslatedValue('reset')}",
                               style: Theme.of(context)
                                   .textTheme
                                   .titleLarge!
@@ -290,7 +337,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "• What’s your favorite movie?",
+                                "• ${AppLocalization.of(context)?.getTranslatedValue('what_s_your_favorite_movie')}?",
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               SizedBox(
@@ -299,7 +346,6 @@ class _AppLockScreenState extends State<AppLockScreen> {
                               Container(
                                 child: TextFormField(
                                   // enabled: widget.enabled,
-                                  autofocus: true,
                                   focusNode: focusMovie,
                                   readOnly: movieName == ""
                                       ? false
@@ -310,7 +356,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                   controller: movieNameCtr,
                                   validator: (value) {
                                     if (value!.isEmpty) {
-                                      return "Please fill your favorite movie name";
+                                      return "${AppLocalization.of(context)?.getTranslatedValue('please_fill_your_favorite_movie_name')}";
                                     }
                                     return null;
                                   },
@@ -370,7 +416,8 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                       hintStyle: Theme.of(context)
                                           .textTheme
                                           .titleSmall,
-                                      hintText: "Movie name",
+                                      hintText:
+                                          "${AppLocalization.of(context)?.getTranslatedValue('movie_name')}",
                                       filled: true,
                                       contentPadding: EdgeInsets.only(
                                           left: 10, right: 10, top: 10),
@@ -398,7 +445,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                 height: 20,
                               ),
                               Text(
-                                "• What was your favorite school teacher’s name?",
+                                "• ${AppLocalization.of(context)?.getTranslatedValue('what_was_your_favorite_school_teacher_s_name')}?",
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               SizedBox(
@@ -408,7 +455,6 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                 child: TextFormField(
                                   // enabled: widget.enabled,
                                   focusNode: focuseTeacherName,
-                                  autofocus: true,
                                   readOnly: teacherName == ""
                                       ? false
                                       : isResetQuestions == false
@@ -418,7 +464,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                   controller: teacherNameCtr,
                                   validator: (value) {
                                     if (value!.isEmpty) {
-                                      return "Please fill your favorite school teacher’s name";
+                                      return "${AppLocalization.of(context)?.getTranslatedValue('please_fill_your_favorite_school_teacher_s_name')}";
                                     }
                                     return null;
                                   },
@@ -479,7 +525,8 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                       hintStyle: Theme.of(context)
                                           .textTheme
                                           .titleSmall,
-                                      hintText: "Teacher’s name",
+                                      hintText:
+                                          "${AppLocalization.of(context)?.getTranslatedValue('teacher_s_name')}",
                                       filled: true,
                                       contentPadding: EdgeInsets.only(
                                           left: 10, right: 10, top: 10),
@@ -529,7 +576,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                         }
                                       },
                                       child: Text(
-                                        "Submit Answer",
+                                        "${AppLocalization.of(context)?.getTranslatedValue('submit_answer')}",
                                         style: TextStyle(
                                             color: AppColors.blackColor),
                                       ),
@@ -549,7 +596,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
                       Row(
                         children: [
                           Text(
-                            "Screen Lock Password",
+                            "${AppLocalization.of(context)?.getTranslatedValue('screen_lock_password')}",
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge!
@@ -574,7 +621,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
                               resetPassword();
                             },
                             child: Text(
-                              "Reset",
+                              "${AppLocalization.of(context)?.getTranslatedValue('reset')}",
                               style: Theme.of(context)
                                   .textTheme
                                   .titleLarge!
@@ -593,13 +640,13 @@ class _AppLockScreenState extends State<AppLockScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (password != "" && passCtr.text.isNotEmpty)
+                            if (!isResetPassword && password.isNotEmpty)
                               Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "• Password",
+                                    "• ${AppLocalization.of(context)?.getTranslatedValue('password')}",
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                   ),
@@ -609,12 +656,12 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                   Container(
                                     child: TextFormField(
                                       readOnly: true,
-                                      controller: passCtr,
+                                      controller: current_passCtr,
                                       validator: (value) {
                                         if (value!.isEmpty) {
-                                          return "Please fill password";
+                                          return "${AppLocalization.of(context)?.getTranslatedValue('please_fill_password')}";
                                         } else if (value.length < 4) {
-                                          return "Password length must be atleast 4 digit";
+                                          return "${AppLocalization.of(context)?.getTranslatedValue('password_length_must_be_atleast_4_digit')}";
                                         }
                                         return null;
                                       },
@@ -625,29 +672,31 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                         LengthLimitingTextInputFormatter(4)
                                       ],
                                       style: TextStyle(fontSize: 14),
-                                      obscureText: pass_obscureText,
+                                      obscureText: current_pass_obscureText,
                                       decoration: InputDecoration(
                                         suffixIcon: Transform.scale(
                                           scale: 0.9,
                                           child: InkWell(
                                               onTap: () {
-                                                if (pass_obscureText == true) {
+                                                if (current_pass_obscureText ==
+                                                    true) {
                                                   _authenticateWithBiometrics()
                                                       .then((value) {
                                                     if (value == true) {
                                                       setState(() {
-                                                        pass_obscureText =
+                                                        current_pass_obscureText =
                                                             false;
                                                       });
                                                     }
                                                   });
                                                 } else {
                                                   setState(() {
-                                                    pass_obscureText = true;
+                                                    current_pass_obscureText =
+                                                        true;
                                                   });
                                                 }
                                               },
-                                              child: pass_obscureText
+                                              child: current_pass_obscureText
                                                   ? Icon(Icons
                                                       .visibility_off_outlined)
                                                   : Icon(Icons
@@ -660,7 +709,8 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                         hintStyle: Theme.of(context)
                                             .textTheme
                                             .titleMedium,
-                                        hintText: "Password",
+                                        hintText:
+                                            "${AppLocalization.of(context)?.getTranslatedValue('password')}",
                                         filled: true,
                                         contentPadding: EdgeInsets.only(
                                             left: 10, right: 10, top: 10),
@@ -704,7 +754,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "• Password",
+                                      "• ${AppLocalization.of(context)?.getTranslatedValue('password')}",
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleMedium,
@@ -718,9 +768,9 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                         controller: passCtr,
                                         validator: (value) {
                                           if (value!.isEmpty) {
-                                            return "Please fill password";
+                                            return "${AppLocalization.of(context)?.getTranslatedValue('please_fill_password')}";
                                           } else if (value.length < 4) {
-                                            return "Password length must be atleast 4 digit";
+                                            return "${AppLocalization.of(context)?.getTranslatedValue('password_length_must_be_atleast_4_digit')}";
                                           }
                                           return null;
                                         },
@@ -790,7 +840,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                       height: 20,
                                     ),
                                     Text(
-                                      "• Confirm password",
+                                      "• ${AppLocalization.of(context)?.getTranslatedValue('confirm_password')}",
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleMedium,
@@ -804,15 +854,15 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                         focusNode: focuseConfirmPassword,
                                         obscureText: conf_pass_obscureText,
                                         keyboardType: TextInputType.number,
-                                        controller: c_passCtr,
+                                        controller: confirm_passCtr,
                                         validator: (value) {
                                           if (value!.isEmpty) {
-                                            return "Please fill confirm password";
+                                            return "${AppLocalization.of(context)?.getTranslatedValue('please_fill_confirm_password')}";
                                           } else if (value.length < 4) {
-                                            return "Confirm password length must be atleast 4 digit";
+                                            return "${AppLocalization.of(context)?.getTranslatedValue('confirm_password_length_must_be_atleast_4_digit')}";
                                           } else if (passCtr.text !=
-                                              c_passCtr.text) {
-                                            return "Confirm password must be same as password";
+                                              confirm_passCtr.text) {
+                                            return "${AppLocalization.of(context)?.getTranslatedValue('confirm_password_must_be_same_as_password')}";
                                           }
                                           return null;
                                         },
@@ -847,7 +897,8 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                             hintStyle: Theme.of(context)
                                                 .textTheme
                                                 .titleSmall,
-                                            hintText: "Confirm password",
+                                            hintText:
+                                                "${AppLocalization.of(context)?.getTranslatedValue('confirm_password')}",
                                             filled: true,
                                             contentPadding: EdgeInsets.only(
                                                 left: 10, right: 10, top: 10),
@@ -894,12 +945,12 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                         if (_passwordKey.currentState!
                                             .validate()) {
                                           savePassword(
-                                            password: c_passCtr.text,
+                                            password: confirm_passCtr.text,
                                           );
                                         }
                                       },
                                       child: Text(
-                                        "Set Password",
+                                        "${AppLocalization.of(context)?.getTranslatedValue('set_password')}",
                                         style: TextStyle(
                                             color: AppColors.blackColor),
                                       ),
@@ -929,8 +980,8 @@ class _AppLockScreenState extends State<AppLockScreen> {
       if (value == true) {
         sharedStore.setSecurityPassWordTeacherName(teacherName).then((value) {
           if (value == true) {
-            AppMessage.showToast(
-                context, "Security questions saved successfully");
+            AppMessage.showToast(context,
+                "${AppLocalization.of(context)?.getTranslatedValue('security_questions_saved_successfully')}");
           }
         });
       }
@@ -940,7 +991,14 @@ class _AppLockScreenState extends State<AppLockScreen> {
   void savePassword({required String password}) {
     sharedStore.setAppLockPassword(password).then((value) {
       if (value == true) {
-        AppMessage.showToast(context, "Screen lock seted successfully");
+        AppMessage.showToast(context,
+            "${AppLocalization.of(context)?.getTranslatedValue('screen_lock_seted_successfully')}");
+      }
+    }).then((value) {
+      if (value == true) {
+        setState(() {
+          confirm_passCtr.text = password;
+        });
       }
     });
   }

@@ -430,7 +430,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                               );
                             }
                             clear();
-                            Navigator.pop(context);
+                            Navigator.pop(context, true);
                           }).onError(
                             (error, stackTrace) {
                               print(error.toString());

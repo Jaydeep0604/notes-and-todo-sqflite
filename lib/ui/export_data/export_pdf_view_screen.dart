@@ -56,7 +56,7 @@ class _ExportPdfViewScreenState extends State<ExportPdfViewScreen> {
     if (directory != null) {
       final file = File('${directory.path}/${widget.title}.pdf');
       await file.writeAsBytes(await pdf.save());
-      AppMessage.showToast(context, "PDF saved");
+      AppMessage.showToast(context, "${AppLocalization.of(context)?.getTranslatedValue('pdf_saved')}");
       print('PDF saved to ${file.path}');
     } else {
       print('External storage directory not available');
@@ -99,7 +99,7 @@ class _ExportPdfViewScreenState extends State<ExportPdfViewScreen> {
               child: pw.Row(children: [
                 pw.Text("Note's PDF"),
                 pw.Spacer(),
-                pw.Text("Jaydeep Koladiya"),
+                pw.Text(""),
               ]),
             ),
             pw.SizedBox(height: 10),
@@ -149,7 +149,7 @@ class _ExportPdfViewScreenState extends State<ExportPdfViewScreen> {
                 children: [
                   pw.Text("Todos PDF"),
                   pw.Spacer(),
-                  pw.Text("Jaydeep Koladiya"),
+                  pw.Text(""),
                 ],
               ),
             ),
@@ -194,7 +194,7 @@ class _ExportPdfViewScreenState extends State<ExportPdfViewScreen> {
               ),
               color: AppColors.greenSplashColor,
               child: Text(
-                "Dounload PDF",
+                "${AppLocalization.of(context)?.getTranslatedValue('dounload_pdf')}",
               ),
             ),
           ],

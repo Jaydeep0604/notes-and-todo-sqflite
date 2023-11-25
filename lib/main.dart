@@ -12,7 +12,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 bool isUpdateNoteScreen = false;
 bool isUpdateTodoScreen = false;
-bool isBioMetricLock = false;
+
+bool? isBiometricLock;
+bool? isPinLock;
+
+bool isDialogOpen = false;
+bool isAppActive = false;
+
 
 FlutterLocalNotificationsPlugin localNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -20,6 +26,17 @@ FlutterLocalNotificationsPlugin localNotificationsPlugin =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initializeTimeZones();
+  isPinLock = await sharedStore.getPin();
+  isBiometricLock = await sharedStore.getBiometric();
+  if (isPinLock == null) {
+    await sharedStore.enablePinLock(false);
+    isPinLock = false;
+  }
+  if (isBiometricLock == null) {
+    await sharedStore.enableBiometricLock(false);
+    isBiometricLock = false;
+  }
+
   final themeProvider = ThemeProvider();
   await themeProvider.loadTheme();
   final themeModeString = await sharedStore.getThememode();
@@ -42,6 +59,7 @@ void main() async {
     initializationSettings,
   );
   log("Notifications: $initialize");
+
   runApp(
     MultiProvider(
       providers: [
@@ -110,7 +128,7 @@ class _MyAppState extends State<MyApp> {
             cardColor: AppColors.blackColor,
             textTheme: TextTheme(
               bodySmall: TextStyle(
-                color: Colors.white70,
+                color: Color.fromARGB(255, 241, 241, 239),
               ),
               titleMedium: TextStyle(
                 color: Colors.white,

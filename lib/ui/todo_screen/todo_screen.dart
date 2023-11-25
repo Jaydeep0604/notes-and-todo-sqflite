@@ -64,7 +64,7 @@ class _TodoScreenState extends State<TodoScreen> {
                   ? snapshot.data!.length
                   : 0;
               if (snapshot.hasData) {
-                if (snapshot.data!.isEmpty|| homeTodoCount==0) {
+                if (snapshot.data!.isEmpty || homeTodoCount == 0) {
                   return Container(
                     child: Center(
                       child: Text(
@@ -164,10 +164,11 @@ class _TodoScreenState extends State<TodoScreen> {
                         isUpdateTodo: false,
                       ),
                     ),
-                  ).then((value) => () {
-                        if (value == true) {
-                          setState(() {});
-                        }
+                  ).then((value) => {
+                        if (value == true)
+                          {
+                            loadData()
+                          }
                       });
                   // Navigator.push(
                   //   context,
