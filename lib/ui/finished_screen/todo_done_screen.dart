@@ -46,9 +46,7 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
         return true;
       },
       child: Scaffold(
-        // backgroundColor: AppColors.whiteColor,
         appBar: AppBar(
-          // backgroundColor: AppColors.whiteColor,
           leading: IconButton(
               onPressed: () {
                 setState(() {
@@ -76,13 +74,11 @@ class _TodoDoneScreenState extends State<TodoDoneScreen> {
                   : 0;
               if (snapshot.hasData) {
                 if (snapshot.data!.isEmpty || todoDoneCount == 0) {
-                  return Expanded(
-                    child: Center(
-                      child: Text(
-                        "${AppLocalization.of(context)?.getTranslatedValue('no_data_found')}",
-                        style:
-                            TextStyle(color: Theme.of(context).highlightColor),
-                      ),
+                  return Center(
+                    child: Text(
+                      "${AppLocalization.of(context)?.getTranslatedValue('no_data_found')}",
+                      style:
+                          TextStyle(color: Theme.of(context).highlightColor),
                     ),
                   );
                 }

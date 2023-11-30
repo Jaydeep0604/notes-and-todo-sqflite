@@ -110,11 +110,6 @@ class _TodoWidgetState extends State<TodoWidget> {
             builder: (context) => TodoDetailscreen(
               isUpdateTodo: true,
               id: widget.id,
-              isDone: isDone,
-              todo: widget.todo,
-              date: widget.dueDate,
-              time: widget.dueTime,
-              categoryName: widget.categoryName,
               onUpdate: widget.onUpdate,
               onDelete: widget.onDelete,
             ),

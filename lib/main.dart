@@ -1,10 +1,12 @@
-import 'dart:developer';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:notes_sqflite/config/shared_store.dart';
 import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/provider/theme_provider.dart';
+import 'package:notes_sqflite/services/notification_controller.dart';
 import 'package:notes_sqflite/ui/base/base_screen.dart';
+import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:timezone/data/latest_10y.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +20,6 @@ bool? isPinLock;
 
 bool isDialogOpen = false;
 bool isAppActive = false;
-
 
 FlutterLocalNotificationsPlugin localNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -43,22 +44,26 @@ void main() async {
   if (themeModeString == "" || themeModeString == null) {
     sharedStore.setThemeMode("system");
   }
-  final AndroidInitializationSettings androidSettings =
-      AndroidInitializationSettings("@mipmap/todo_main");
-  final DarwinInitializationSettings IosSettings = DarwinInitializationSettings(
-    requestAlertPermission: true,
-    requestBadgePermission: true,
-    requestCriticalPermission: true,
-    requestSoundPermission: true,
-  );
-  InitializationSettings initializationSettings = InitializationSettings(
-    android: androidSettings,
-    iOS: IosSettings,
-  );
-  bool? initialize = await localNotificationsPlugin.initialize(
-    initializationSettings,
-  );
-  log("Notifications: $initialize");
+  await NotificationController.initializeLocalNotifications();
+  await NotificationController.initializeIsolateReceivePort();
+  await NotificationController.startListeningNotificationEvents();
+
+  // final AndroidInitializationSettings androidSettings =
+  //     AndroidInitializationSettings("@mipmap/todo_main");
+  // final DarwinInitializationSettings IosSettings = DarwinInitializationSettings(
+  //   requestAlertPermission: true,
+  //   requestBadgePermission: true,
+  //   requestCriticalPermission: true,
+  //   requestSoundPermission: true,
+  // );
+  // InitializationSettings initializationSettings = InitializationSettings(
+  //   android: androidSettings,
+  //   iOS: IosSettings,
+  // );
+  // bool? initialize = await localNotificationsPlugin.initialize(
+  //   initializationSettings,
+  // );
+  // log("Notifications: $initialize");
 
   runApp(
     MultiProvider(
@@ -72,6 +77,11 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   MyApp({super.key});
+
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
+  static Color mainColor = const Color(0xFF9D50DD);
 
   static void setLocale(BuildContext context, Locale newLocale) {
     sharedStore.setLanguage(newLocale.languageCode);
@@ -93,7 +103,14 @@ class _MyAppState extends State<MyApp> {
   Locale? _locale;
 
   @override
+  void initState() {
+    NotificationController.startListeningNotificationEvents();
+    super.initState();
+  }
+
+  @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
     sharedStore.getLanguage().then((locale) {
       if (locale != null) {
         setState(() {
@@ -103,7 +120,6 @@ class _MyAppState extends State<MyApp> {
         _locale = Locale("en");
       }
     });
-    super.didChangeDependencies();
   }
 
   void setLocale(Locale locale) async {
@@ -117,6 +133,7 @@ class _MyAppState extends State<MyApp> {
     return Builder(builder: (context) {
       final themeProvider = Provider.of<ThemeProvider>(context);
       return MaterialApp(
+        navigatorKey: MyApp.navigatorKey,
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         darkTheme: ThemeData(

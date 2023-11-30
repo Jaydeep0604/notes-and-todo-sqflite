@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:notes_sqflite/config/constant.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
@@ -12,7 +14,7 @@ import 'package:notes_sqflite/ui/archive_screen/archive_note_screen.dart';
 import 'package:notes_sqflite/ui/delete_note_screen/delete_screen.dart';
 import 'package:notes_sqflite/ui/note_screen/notes_screen.dart';
 import 'package:notes_sqflite/ui/setting_screen/setting_screen.dart';
-import 'package:notes_sqflite/ui/todo_screen/todo_done_screen.dart';
+import 'package:notes_sqflite/ui/finished_screen/todo_done_screen.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 
@@ -42,7 +44,6 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
   late GlobalKey<ScaffoldState> globalScaffoldKey;
 
   late TextEditingController titleCtr, ageCtr, descriptionCtr, emailCtr;
-
 
   void initState() {
     super.initState();
@@ -85,7 +86,8 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
       });
       authenticated = await auth
           .authenticate(
-        localizedReason: "${AppLocalization.of(context)?.getTranslatedValue('scan_your_fingerprint_or_face_to_authenticate')}",
+        localizedReason:
+            "${AppLocalization.of(context)?.getTranslatedValue('scan_your_fingerprint_or_face_to_authenticate')}",
         options: AuthenticationOptions(
           stickyAuth: true,
           biometricOnly: false,
@@ -225,7 +227,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
         centerTitle: true,
       ),
       endDrawer: Container(
-        width: MediaQuery.of(context).size.width * 0.65,
+        width: MediaQuery.of(context).size.width * 0.5,
         child: Drawer(
           backgroundColor: AppColors.drawerBackgroundColor.withOpacity(0.9),
           child: Column(
@@ -332,14 +334,6 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
         ),
       ),
       bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          // color: Colors.black87,
-          // color: AppColors.whiteColor,
-          borderRadius: BorderRadius.only(
-            topRight: Radius.circular(10),
-            topLeft: Radius.circular(10),
-          ),
-        ),
         height: 60,
         child: Row(
           children: [
@@ -357,14 +351,13 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                        color: AppColors.bottomNavigationBarFirstColor,
-                        borderRadius: BorderRadius.circular(10),
-                        border:
-                            Border.all(color: Colors.white.withOpacity(0.4))),
+                      color: AppColors.bottomNavigationBarFirstColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: Center(
                       child: Icon(
                         CupertinoIcons.pencil_ellipsis_rectangle,
-                        color: Theme.of(context).iconTheme.color,
+                        color: Theme.of(context).cardColor,
                         size: isNotes ? 25 : 20,
                       ),
                     ),
@@ -388,14 +381,11 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                     decoration: BoxDecoration(
                       color: AppColors.bottomNavigationBarSecondColor,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.4),
-                      ),
                     ),
                     child: Center(
                       child: Icon(
                         CupertinoIcons.list_bullet_indent,
-                        color: Theme.of(context).iconTheme.color,
+                        color: Theme.of(context).cardColor,
                         size: isTodos ? 25 : 20,
                       ),
                     ),

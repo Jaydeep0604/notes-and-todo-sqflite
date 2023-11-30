@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/note_model.dart';
+import 'package:notes_sqflite/services/notification_services.dart';
 import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:notes_sqflite/widget/note_widget.dart';
@@ -78,6 +78,7 @@ class _NotesScreenState extends State<NotesScreen> {
                               item.pin != 1)
                       ? snapshot.data!.length
                       : 0;
+
                   if (snapshot.hasData) {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -232,7 +233,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                                     ),
                                                   );
                                                   snapshot.data!.remove(
-                                                    snapshot.data![index]);
+                                                      snapshot.data![index]);
                                                   setState(() {
                                                     noteList = dbHelper!
                                                         .getNotesList();
@@ -345,22 +346,24 @@ class _NotesScreenState extends State<NotesScreen> {
               radius: 10,
               onTap: () {
                 // addNoteDialoge();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return NoteDetailScreen(
-                        isUpdateNote: false,
-                      );
-                    },
-                  ),
-                ).then((value) {
-                  if (value == true) {
-                    setState(() {
-                      noteList = dbHelper!.getNotesList();
-                    });
-                  }
-                });
+                notificationServices.testNotification(
+                    id: 6, isUpdateNote: true);
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) {
+                //       return NoteDetailScreen(
+                //         isUpdateNote: false,
+                //       );
+                //     },
+                //   ),
+                // ).then((value) {
+                //   if (value == true) {
+                //     setState(() {
+                //       noteList = dbHelper!.getNotesList();
+                //     });
+                //   }
+                // });
               },
               child: Container(
                   decoration: BoxDecoration(

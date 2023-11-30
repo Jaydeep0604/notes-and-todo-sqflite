@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/language/localisation.dart';
+import 'package:notes_sqflite/model/note_model.dart';
 import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 
@@ -83,17 +84,6 @@ class _NoteWidgetState extends State<NoteWidget> {
               return NoteDetailScreen(
                 isUpdateNote: true,
                 id: widget.id,
-                title: widget.title,
-                note: widget.note,
-                email: widget.email,
-                onDismissed: widget.onDismissed,
-                isPined: widget.pin == 0 ? false : true,
-                isArchived: widget.archive == 0 ? false : true,
-                isDeleted: widget.deleted == 0 ? false : true,
-                onUpdateComplete: widget.onUpdateComplete,
-                createDate: widget.createDate,
-                editedDate: widget.editedDate,
-                imageList: widget.imageList,
               );
             },
           ),
@@ -109,9 +99,16 @@ class _NoteWidgetState extends State<NoteWidget> {
             ? DismissDirection.none
             : widget.deleted == 1
                 ? DismissDirection.none
-                : DismissDirection.horizontal ,
+                : DismissDirection.horizontal,
         onDismissed: (direction) {
-          widget.onDismissed!(widget.id, 1, 0);
+          dbHelper?.updateArchive(
+            NotesModel(
+              id: widget.id,
+              archive: 1,
+              pin: 0,
+              image_list: [],
+            ),
+          );
         },
         background: Container(),
         child: Card(

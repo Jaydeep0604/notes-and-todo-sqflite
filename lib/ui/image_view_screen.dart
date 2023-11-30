@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:notes_sqflite/language/localisation.dart';
+import 'package:notes_sqflite/utils/app_colors.dart';
 
 class ImageViewScreen extends StatefulWidget {
   ImageViewScreen({
@@ -65,11 +66,13 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
           )
         ],
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-          child: Image.file(
-            File(widget.path),
+      body: InteractiveViewer(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+            child: Image.file(
+              File(widget.path),filterQuality: FilterQuality.high,
+            ),
           ),
         ),
       ),

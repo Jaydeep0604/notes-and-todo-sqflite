@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ExportPdfViewScreen extends StatefulWidget {
   ExportPdfViewScreen({
@@ -56,7 +57,8 @@ class _ExportPdfViewScreenState extends State<ExportPdfViewScreen> {
     if (directory != null) {
       final file = File('${directory.path}/${widget.title}.pdf');
       await file.writeAsBytes(await pdf.save());
-      AppMessage.showToast(context, "${AppLocalization.of(context)?.getTranslatedValue('pdf_saved')}");
+      AppMessage.showToast(context,
+          "${AppLocalization.of(context)?.getTranslatedValue('pdf_saved')}");
       print('PDF saved to ${file.path}');
     } else {
       print('External storage directory not available');
@@ -184,6 +186,7 @@ class _ExportPdfViewScreenState extends State<ExportPdfViewScreen> {
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Row(
           children: [
+            
             Spacer(),
             MaterialButton(
               onPressed: () {

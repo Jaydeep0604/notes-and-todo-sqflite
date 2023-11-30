@@ -58,6 +58,8 @@ dependencies:
     sdk: flutter
   printing: ^5.11.1
   local_auth: ^2.1.7
+  awesome_notifications: ^0.8.2
+  awesome_notifications_core:
   
 
 dev_dependencies:
