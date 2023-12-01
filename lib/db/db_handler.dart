@@ -53,6 +53,17 @@ class DBHelper {
     return queryResult.map((data) => NotesModel.fromMap(data)).toList();
   }
 
+  Future<List<TodoModel>> getTodoUsingTitle(String title) async {
+    var dbClient = await db;
+    final map = await dbClient!
+        .rawQuery("SELECT * FROM todos WHERE todo = ?", [title]);
+    if (map.isNotEmpty) {
+      return map.map((data) => TodoModel.fromMap(data)).toList();
+    } else {
+      throw Exception("todo: $title not found");
+    }
+  }
+
   Future<List<TodoModel>> getTodosList() async {
     var dbClient = await db;
     final List<Map<String, Object?>> queryResult =
@@ -118,6 +129,20 @@ class DBHelper {
     var dbClient = await db;
     return await dbClient!.update('todos', todoModel.toMap(),
         where: 'id = ?', whereArgs: [todoModel.id]);
+  }
+
+  Future<int> sheduleFinish(int id) async {
+    var dbClient = await db;
+    final updateFields = <String, dynamic>{};
+    if (id != '') {
+      updateFields['finished'] = 1;
+    }
+    return await dbClient!.update(
+      'todos',
+      updateFields,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   Future<int> updatetile(NotesModel notesModel) async {

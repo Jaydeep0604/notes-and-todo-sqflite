@@ -2,20 +2,45 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:http/http.dart' as http;
 import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
+import 'package:notes_sqflite/ui/todo_screen/todo_detail_screen.dart';
 
 class NotificationController {
   static ReceivedAction? initialAction;
 
-  static Future<void> initializeLocalNotifications() async {
+  static Future<void> initializeNoteLocalNotifications() async {
     await AwesomeNotifications().initialize(
         'resource://drawable/todo_main',
         [
           NotificationChannel(
               channelKey: 'alerts',
               channelName: 'Alerts',
+              channelDescription: 'Notification tests as alerts',
+              playSound: true,
+              onlyAlertOnce: true,
+              groupAlertBehavior: GroupAlertBehavior.Children,
+              importance: NotificationImportance.High,
+              defaultPrivacy: NotificationPrivacy.Private,
+              defaultColor: Colors.deepPurple,
+              ledColor: Colors.deepPurple)
+        ],
+        debug: true);
+
+    // Get initial notification action is optional
+    initialAction = await AwesomeNotifications()
+        .getInitialNotificationAction(removeFromActionEvents: false);
+  }
+
+  static Future<void> initializeTodoLocalNotifications() async {
+    await AwesomeNotifications().initialize(
+        'resource://drawable/todo_main',
+        [
+          NotificationChannel(
+              channelKey: 'alert',
+              channelName: 'Alert',
               channelDescription: 'Notification tests as alerts',
               playSound: true,
               onlyAlertOnce: true,
@@ -47,6 +72,7 @@ class NotificationController {
   ///     NOTIFICATION EVENTS LISTENER
   ///  *********************************************
   ///  Notifications events are only delivered after call this method
+
   static Future<void> startListeningNotificationEvents() async {
     AwesomeNotifications()
         .setListeners(onActionReceivedMethod: onActionReceivedMethod);
@@ -55,7 +81,7 @@ class NotificationController {
   ///  *********************************************
   ///     NOTIFICATION EVENTS
   ///  *********************************************
-  ///
+
   @pragma('vm:entry-point')
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
@@ -76,8 +102,25 @@ class NotificationController {
       } else {
         print("Invalid ID or missing ID in payload");
       }
-    } else if (receivedAction.buttonKeyPressed == 'reject') {
-    
+    } else if (receivedAction.buttonKeyPressed == 'edit') {
+      if (id != '') {
+        MyApp.navigatorKey.currentState!.push(
+          MaterialPageRoute(
+            builder: (context) => TodoDetailscreen(
+              isUpdateTodo: true,
+              id: id,
+            ),
+          ),
+        );
+      } else {
+        print("Invalid ID or missing ID in payload");
+      }
+    } else if (receivedAction.buttonKeyPressed == 'finish') {
+      print("--------------------------");
+      DBHelper dbHelper = DBHelper();
+      dbHelper.sheduleFinish(id).then((value) {
+        print("---------$value");
+      });
     }
 
     // if (receivedAction.actionType == ActionType.SilentAction ||
@@ -99,6 +142,7 @@ class NotificationController {
     //   }
     //   return onActionReceivedImplementationMethod(receivedAction);
     // }
+  
   }
 
   static Future<void> onActionReceivedImplementationMethod(
@@ -114,6 +158,7 @@ class NotificationController {
   ///     REQUESTING NOTIFICATION PERMISSIONS
   ///  *********************************************
   ///
+
   static Future<bool> displayNotificationRationale() async {
     bool userAuthorized = false;
     BuildContext context = MyApp.navigatorKey.currentContext!;
@@ -176,6 +221,7 @@ class NotificationController {
   ///  *********************************************
   ///     BACKGROUND TASKS TEST
   ///  *********************************************
+
   static Future<void> executeLongTaskInBackground() async {
     print("starting long task");
     await Future.delayed(const Duration(seconds: 4));
@@ -188,100 +234,96 @@ class NotificationController {
   ///  *********************************************
   ///     NOTIFICATION CREATION METHODS 19982,107995,676591,261151
   ///  *********************************************
-  ///
-  static Future<void> createNewNotification() async {
-    bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
-    if (!isAllowed) isAllowed = await displayNotificationRationale();
-    if (!isAllowed) return;
 
-    await AwesomeNotifications().createNotification(
-        schedule: NotificationCalendar.fromDate(
-            date: DateTime.now().add(const Duration(seconds: 3))),
-        content: NotificationContent(
-            id: -1, // -1 is replaced by a random number
-            channelKey: 'alerts',
-            title: 'Huston! The eagle has landed!',
-            body: "A small notification test!",
-            bigPicture: '',
-            largeIcon:
-                'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-            notificationLayout: NotificationLayout.BigPicture,
-            payload: {'notificationId': '1234567890'}),
-        actionButtons: [
-          NotificationActionButton(key: 'EDIT', label: 'EDIT'),
-          NotificationActionButton(
-              key: 'FINISH',
-              label: 'FINiSH',
-              actionType: ActionType.SilentAction),
-        ]);
-  }
+  // static Future<void> createNewNotification() async {
+  //   bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+  //   if (!isAllowed) isAllowed = await displayNotificationRationale();
+  //   if (!isAllowed) return;
+  //   await AwesomeNotifications().createNotification(
+  //       schedule: NotificationCalendar.fromDate(
+  //           date: DateTime.now().add(const Duration(seconds: 3))),
+  //       content: NotificationContent(
+  //           id: -1, // -1 is replaced by a random number
+  //           channelKey: 'alerts',
+  //           title: 'Huston! The eagle has landed!',
+  //           body: "A small notification test!",
+  //           bigPicture: '',
+  //           largeIcon:
+  //               'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
+  //           notificationLayout: NotificationLayout.BigPicture,
+  //           payload: {'notificationId': '1234567890'}),
+  //       actionButtons: [
+  //         NotificationActionButton(key: 'EDIT', label: 'EDIT'),
+  //         NotificationActionButton(
+  //             key: 'FINISH',
+  //             label: 'FINiSH',
+  //             actionType: ActionType.SilentAction),
+  //       ]);
+  // }
 
-  static Future<void> scheduleNewNotification() async {
-    bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
-    if (!isAllowed) isAllowed = await displayNotificationRationale();
-    if (!isAllowed) return;
+  // static Future<void> scheduleNewNotification() async {
+  //   bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+  //   if (!isAllowed) isAllowed = await displayNotificationRationale();
+  //   if (!isAllowed) return;
+  //   await myNotifyScheduleInHours(
+  //       title: 'test',
+  //       msg: 'test message',
+  //       heroThumbUrl:
+  //           'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
+  //       hoursFromNow: 5,
+  //       username: 'test user',
+  //       repeatNotif: false);
+  // }
 
-    await myNotifyScheduleInHours(
-        title: 'test',
-        msg: 'test message',
-        heroThumbUrl:
-            'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
-        hoursFromNow: 5,
-        username: 'test user',
-        repeatNotif: false);
-  }
+  // static Future<void> resetBadgeCounter() async {
+  //   await AwesomeNotifications().resetGlobalBadge();
+  // }
 
-  static Future<void> resetBadgeCounter() async {
-    await AwesomeNotifications().resetGlobalBadge();
-  }
-
-  static Future<void> cancelNotifications() async {
-    await AwesomeNotifications().cancelAll();
-  }
+  // static Future<void> cancelNotifications() async {
+  //   await AwesomeNotifications().cancelAll();
+  // }
 }
 
-Future<void> myNotifyScheduleInHours({
-  required int hoursFromNow,
-  required String heroThumbUrl,
-  required String username,
-  required String title,
-  required String msg,
-  bool repeatNotif = false,
-}) async {
-  var nowDate = DateTime.now().add(Duration(seconds: 5));
-  await AwesomeNotifications().createNotification(
-    schedule: NotificationCalendar(
-      //weekday: nowDate.day,
-
-      second: nowDate.second,
-      repeats: repeatNotif,
-      //allowWhileIdle: true,
-    ),
-    // schedule: NotificationCalendar.fromDate(
-    //    date: DateTime.now().add(const Duration(seconds: 10))),
-    content: NotificationContent(
-      id: -1,
-      channelKey: 'basic_channel',
-      title: '${Emojis.food_bowl_with_spoon} $title',
-      body: '$username, $msg',
-      bigPicture: heroThumbUrl,
-      notificationLayout: NotificationLayout.BigPicture,
-
-      //actionType : ActionType.DismissAction,
-      color: Colors.black,
-      backgroundColor: Colors.black,
-      // customSound: 'resource://raw/notif',
-      payload: {'actPag': 'myAct', 'actType': 'food', 'username': username},
-    ),
-    actionButtons: [
-      NotificationActionButton(
-        key: 'NOW',
-        label: 'btnAct1',
-      ),
-      NotificationActionButton(
-        key: 'LATER',
-        label: 'btnAct2',
-      ),
-    ],
-  );
-}
+// Future<void> myNotifyScheduleInHours({
+//   required int hoursFromNow,
+//   required String heroThumbUrl,
+//   required String username,
+//   required String title,
+//   required String msg,
+//   bool repeatNotif = false,
+// }) async {
+//   var nowDate = DateTime.now().add(Duration(seconds: 5));
+//   await AwesomeNotifications().createNotification(
+//     schedule: NotificationCalendar(
+//       //weekday: nowDate.day,
+//       second: nowDate.second,
+//       repeats: repeatNotif,
+//       //allowWhileIdle: true,
+//     ),
+//     // schedule: NotificationCalendar.fromDate(
+//     //    date: DateTime.now().add(const Duration(seconds: 10))),
+//     content: NotificationContent(
+//       id: -1,
+//       channelKey: 'basic_channel',
+//       title: '${Emojis.food_bowl_with_spoon} $title',
+//       body: '$username, $msg',
+//       bigPicture: heroThumbUrl,
+//       notificationLayout: NotificationLayout.BigPicture,
+//       //actionType : ActionType.DismissAction,
+//       color: Colors.black,
+//       backgroundColor: Colors.black,
+//       // customSound: 'resource://raw/notif',
+//       payload: {'actPag': 'myAct', 'actType': 'food', 'username': username},
+//     ),
+//     actionButtons: [
+//       NotificationActionButton(
+//         key: 'NOW',
+//         label: 'btnAct1',
+//       ),
+//       NotificationActionButton(
+//         key: 'LATER',
+//         label: 'btnAct2',
+//       ),
+//     ],
+//   );
+// }

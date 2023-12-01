@@ -361,13 +361,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                     setState(() {
                       isUpdateTodoScreen = true;
                     });
-                    if (notificationDateTime != null) {
-                      AppFunctions.setNotification(
-                        scheduledTime: notificationDateTime!,
-                        body: timeCtr.text,
-                        title: todoCtr.text,
-                      );
-                    }
+
                     clear();
                     Navigator.pop(context, true);
                   }).onError(
@@ -376,6 +370,17 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                       print(stackTrace.toString());
                     },
                   );
+                  if (notificationDateTime != null) {
+                    
+                    dbHelper!.getTodoUsingTitle(todoCtr.text).then((value) {
+                      AppFunctions.setNewSheduleNotification(
+                        id: value.last.id!,
+                        scheduledTime: notificationDateTime!,
+                        body: value.last.dueTime,
+                        title: value.last.todo,
+                      );
+                    });
+                  }
                 }
               },
               child: Text(
@@ -762,7 +767,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
               );
             });
           } else {
-            return CircularProgressIndicator();
+            return Container();
           }
         });
   }

@@ -1,4 +1,3 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:notes_sqflite/config/shared_store.dart';
@@ -6,7 +5,6 @@ import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/provider/theme_provider.dart';
 import 'package:notes_sqflite/services/notification_controller.dart';
 import 'package:notes_sqflite/ui/base/base_screen.dart';
-import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:timezone/data/latest_10y.dart';
 import 'package:provider/provider.dart';
@@ -44,7 +42,8 @@ void main() async {
   if (themeModeString == "" || themeModeString == null) {
     sharedStore.setThemeMode("system");
   }
-  await NotificationController.initializeLocalNotifications();
+  await NotificationController.initializeNoteLocalNotifications();
+  await NotificationController.initializeTodoLocalNotifications();
   await NotificationController.initializeIsolateReceivePort();
   await NotificationController.startListeningNotificationEvents();
 

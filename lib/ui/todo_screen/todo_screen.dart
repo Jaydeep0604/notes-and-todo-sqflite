@@ -1,26 +1,17 @@
 import 'dart:async';
-import 'dart:math';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_sqflite/animations/list_animation.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
-import 'package:notes_sqflite/services/notification_controller.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_detail_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:notes_sqflite/widget/todo_widget.dart';
 
 class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});
-
-  // static reFreshScreen(BuildContext context) {
-  //   _TodoScreenState? state =
-  //       context.findAncestorStateOfType<_TodoScreenState>();
-  //   return state?.loadData();
-  // }
-
+  
   @override
   State<TodoScreen> createState() => _TodoScreenState();
 }
@@ -55,7 +46,6 @@ class _TodoScreenState extends State<TodoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
     return SafeArea(
       child: Stack(
         children: [

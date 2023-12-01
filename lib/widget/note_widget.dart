@@ -116,13 +116,16 @@ class _NoteWidgetState extends State<NoteWidget> {
               borderRadius: BorderRadius.circular(10),
             ),
             color: Theme.of(context).scaffoldBackgroundColor,
-            // color: AppColors.blackColor,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
               width: MediaQuery.of(context).size.width * 0.5,
               // constraints: BoxConstraints(maxHeight: 270, minHeight: 0),
               decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).iconTheme.color!),
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  border: Border.all(
+                    color: Theme.of(context).iconTheme.color!.withOpacity(0.4),
+                    width: 0.7,
+                  ),
                   borderRadius: BorderRadius.circular(10)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

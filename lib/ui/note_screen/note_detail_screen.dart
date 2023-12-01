@@ -399,15 +399,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         if (snapshot.hasData && snapshot.data!.isNotEmpty) {
           titleCtr.text = snapshot.data!.last.title!;
           noteCtr.text = snapshot.data!.last.note!;
-          dateCtr =
-              TextEditingController(text: snapshot.data!.last.edited_date!);
           archive = snapshot.data!.last.archive == 1 ? true : false;
           deleted = snapshot.data!.last.deleted == 1 ? true : false;
           pin = snapshot.data!.last.pin == 1 ? true : false;
           imageList = snapshot.data!.last.image_list;
           if (imageList != null) {
             imageFileList = imageList!
-                .where((path) => path.isNotEmpty) // Filter out empty strings
+                .where((path) => path.isNotEmpty)
                 .map((path) => XFile(path))
                 .toList();
           } else {
@@ -964,7 +962,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             );
           });
         } else {
-          return CircularProgressIndicator();
+          return Container();
         }
       },
     );
@@ -1498,7 +1496,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                       timeCtr.text != "") {
                                     print(
                                         "notificationDateTime is :: $notificationDateTime");
-                                    AppFunctions.setNotification(
+                                    AppFunctions.setNoteNotification(
+                                        id: widget.id!,
                                         scheduledTime: notificationDateTime!,
                                         title: titleCtr.text == ""
                                             ? noteCtr.text
@@ -1694,33 +1693,45 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             if (isNextMorning) {
                               if (titleCtr.text != "") {
                                 AppFunctions.setNextMorningNotification(
-                                    noteTitle: titleCtr.text);
+                                  id: widget.id!,
+                                  noteTitle: titleCtr.text,
+                                );
                                 Navigator.pop(context);
                               } else {
                                 AppFunctions.setNextMorningNotification(
-                                    noteTitle: noteCtr.text);
+                                  id: widget.id!,
+                                  noteTitle: noteCtr.text,
+                                );
                                 Navigator.pop(context);
                               }
                             }
                             if (isEvening) {
                               if (titleCtr.text != "") {
                                 AppFunctions.setTodayEveningNotification(
-                                    noteTitle: noteCtr.text);
+                                  id: widget.id!,
+                                  noteTitle: noteCtr.text,
+                                );
                                 Navigator.pop(context);
                               } else {
                                 AppFunctions.setTodayEveningNotification(
-                                    noteTitle: noteCtr.text);
+                                  id: widget.id!,
+                                  noteTitle: noteCtr.text,
+                                );
                                 Navigator.pop(context);
                               }
                             }
                             if (isNextEvening) {
                               if (titleCtr.text != "") {
                                 AppFunctions.setNextEveningNotification(
-                                    noteTitle: noteCtr.text);
+                                  id: widget.id!,
+                                  noteTitle: noteCtr.text,
+                                );
                                 Navigator.pop(context);
                               } else {
                                 AppFunctions.setNextEveningNotification(
-                                    noteTitle: noteCtr.text);
+                                  id: widget.id!,
+                                  noteTitle: noteCtr.text,
+                                );
                                 Navigator.pop(context);
                               }
                             }
@@ -1751,4 +1762,5 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       });
     });
   }
+
 }

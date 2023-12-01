@@ -345,9 +345,8 @@ class _NotesScreenState extends State<NotesScreen> {
               borderRadius: BorderRadius.circular(50),
               radius: 10,
               onTap: () {
-                // addNoteDialoge();
-                notificationServices.testNotification(
-                    id: 6, isUpdateNote: true);
+                notificationServices.testNotification();
+                
                 // Navigator.push(
                 //   context,
                 //   MaterialPageRoute(

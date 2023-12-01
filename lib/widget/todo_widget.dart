@@ -99,9 +99,7 @@ class _TodoWidgetState extends State<TodoWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(10),
-      splashColor: Colors.transparent,
+    return GestureDetector(
       onTap: () {
         // updateTodoPopupmenu();
         Navigator.push(
@@ -127,11 +125,11 @@ class _TodoWidgetState extends State<TodoWidget> {
           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-            // color: AppColors.blackColor,
+            color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: Theme.of(context).iconTheme.color!,
-            ),
+                color: Theme.of(context).iconTheme.color!.withOpacity(0.4),
+                width: 0.7),
             // gradient: LinearGradient(
             //   tileMode: TileMode.mirror,
             //   begin: Alignment.topLeft,
