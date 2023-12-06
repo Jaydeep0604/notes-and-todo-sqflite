@@ -8,6 +8,8 @@ import 'package:notes_sqflite/ui/app_lock/app_lock_screen.dart';
 import 'package:notes_sqflite/ui/export_data/export_pdf_view_screen.dart';
 import 'package:notes_sqflite/ui/privacy_policy_screen/privacy_policy_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
+import 'package:notes_sqflite/widget/switch_widget.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -243,6 +245,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
                       Icons.light_mode_sharp,
+                      color: Theme.of(context).iconTheme.color,
                     ),
                     title: Text(
                       "${AppLocalization.of(context)?.getTranslatedValue('app_mode')}",
@@ -257,9 +260,11 @@ class _SettingScreenState extends State<SettingScreen> {
                       child: isAppMode
                           ? Icon(
                               Icons.keyboard_arrow_down,
+                              color: Theme.of(context).iconTheme.color,
                             )
                           : Icon(
                               Icons.keyboard_arrow_up,
+                              color: Theme.of(context).iconTheme.color,
                             ),
                     )),
               ),
@@ -278,9 +283,12 @@ class _SettingScreenState extends State<SettingScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildThemeOption(SystemThemeMode.light, "${AppLocalization.of(context)?.getTranslatedValue("light")}"),
-                      _buildThemeOption(SystemThemeMode.dark, "${AppLocalization.of(context)?.getTranslatedValue("dark")}"),
-                      _buildThemeOption(SystemThemeMode.system, "${AppLocalization.of(context)?.getTranslatedValue("system")}"),
+                      _buildThemeOption(SystemThemeMode.light,
+                          "${AppLocalization.of(context)?.getTranslatedValue("light")}"),
+                      _buildThemeOption(SystemThemeMode.dark,
+                          "${AppLocalization.of(context)?.getTranslatedValue("dark")}"),
+                      _buildThemeOption(SystemThemeMode.system,
+                          "${AppLocalization.of(context)?.getTranslatedValue("system")}"),
                     ],
                   ),
                 ),
@@ -291,6 +299,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
                       Icons.translate,
+                      color: Theme.of(context).iconTheme.color,
                     ),
                     title: Text(
                       "${AppLocalization.of(context)?.getTranslatedValue('app_language')}",
@@ -306,9 +315,11 @@ class _SettingScreenState extends State<SettingScreen> {
                       child: islangOpen
                           ? Icon(
                               Icons.keyboard_arrow_down,
+                              color: Theme.of(context).iconTheme.color,
                             )
                           : Icon(
                               Icons.keyboard_arrow_up,
+                              color: Theme.of(context).iconTheme.color,
                             ),
                     )),
               ),
@@ -400,6 +411,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
                       Icons.downloading_rounded,
+                      color: Theme.of(context).iconTheme.color,
                     ),
                     title: Text(
                         "${AppLocalization.of(context)?.getTranslatedValue('export_data')}"),
@@ -413,9 +425,11 @@ class _SettingScreenState extends State<SettingScreen> {
                       child: isExportDataOpen
                           ? Icon(
                               Icons.keyboard_arrow_down,
+                              color: Theme.of(context).iconTheme.color,
                             )
                           : Icon(
                               Icons.keyboard_arrow_up,
+                              color: Theme.of(context).iconTheme.color,
                             ),
                     )),
               ),
@@ -458,6 +472,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             children: [
                               Icon(
                                 Icons.cloud_download_outlined,
+                                color: Theme.of(context).iconTheme.color,
                               ),
                               SizedBox(
                                 width: 20,
@@ -472,6 +487,7 @@ class _SettingScreenState extends State<SettingScreen> {
                               Expanded(child: SizedBox()),
                               Icon(
                                 Icons.touch_app_outlined,
+                                color: Theme.of(context).iconTheme.color,
                               ),
                             ],
                           ),
@@ -503,6 +519,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             children: [
                               Icon(
                                 Icons.cloud_download_outlined,
+                                color: Theme.of(context).iconTheme.color,
                               ),
                               SizedBox(
                                 width: 20,
@@ -517,6 +534,7 @@ class _SettingScreenState extends State<SettingScreen> {
                               Spacer(),
                               Icon(
                                 Icons.touch_app_outlined,
+                                color: Theme.of(context).iconTheme.color,
                               ),
                             ],
                           ),
@@ -531,7 +549,8 @@ class _SettingScreenState extends State<SettingScreen> {
                 child: ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: Icon(
-                Icons.lock_person_rounded,
+                    Icons.lock_person_rounded,
+                    color: Theme.of(context).iconTheme.color,
                   ),
                   title: Text(
                       "${AppLocalization.of(context)?.getTranslatedValue('app_lock')}"),
@@ -545,8 +564,31 @@ class _SettingScreenState extends State<SettingScreen> {
                   },
                   trailing: Icon(
                     Icons.keyboard_arrow_right,
+                    color: Theme.of(context).iconTheme.color,
                   ),
                 ),
+              ),
+              Container(
+                color: Theme.of(context).cardColor,
+                child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      Icons.approval,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
+                    title: Text(
+                      "${AppLocalization.of(context)?.getTranslatedValue('permisions')}",
+                    ),
+                    onTap: () {
+                      openAppSettings();
+                    },
+                    trailing: Transform.scale(
+                      scale: 1,
+                      child: Icon(
+                        Icons.keyboard_arrow_right_sharp,
+                        color: Theme.of(context).iconTheme.color,
+                      ),
+                    )),
               ),
               Container(
                 color: Theme.of(context).cardColor,
@@ -554,6 +596,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   contentPadding: EdgeInsets.zero,
                   leading: Icon(
                     CupertinoIcons.doc_append,
+                    color: Theme.of(context).iconTheme.color,
                   ),
                   title: Text(
                       "${AppLocalization.of(context)?.getTranslatedValue('privacy_policy')}"),
@@ -567,6 +610,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   },
                   trailing: Icon(
                     Icons.keyboard_arrow_right,
+                    color: Theme.of(context).iconTheme.color,
                   ),
                 ),
               ),

@@ -91,7 +91,6 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
         options: AuthenticationOptions(
           stickyAuth: true,
           biometricOnly: false,
-          // useErrorDialogs: false,
         ),
       )
           .then((value) {

@@ -1,4 +1,8 @@
+import 'dart:developer';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/services/notification_services.dart';
 
 class AppFunctions {
@@ -48,5 +52,26 @@ class AppFunctions {
     final schedule = await NotificationCalendar.fromDate(date: todayEvening);
     notificationServices.createNewNoteNotification(
         id: id, schedule: schedule, title: noteTitle, body: "");
+  }
+
+
+  static void flutterLocalNotificationInit() async {
+    final AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings("@mipmap/todo_main");
+    final DarwinInitializationSettings IosSettings =
+        DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestCriticalPermission: true,
+      requestSoundPermission: true,
+    );
+    InitializationSettings initializationSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: IosSettings,
+    );
+    bool? initialize = await localNotificationsPlugin.initialize(
+      initializationSettings,
+    );
+    log("Notifications: $initialize");
   }
 }

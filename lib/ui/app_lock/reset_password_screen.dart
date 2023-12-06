@@ -88,7 +88,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                   color: AppColors.greenSplashColor),
                               child: Padding(
                                 padding: const EdgeInsets.all(2),
-                                child: Icon(Icons.done, size: 14),
+                                child: Icon(Icons.done,color: Theme.of(context).iconTheme.color, size: 14),
                               ),
                             ),
                         ],
@@ -206,7 +206,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                     color: AppColors.greenSplashColor),
                                 child: Padding(
                                   padding: const EdgeInsets.all(2),
-                                  child: Icon(Icons.done, size: 14),
+                                  child: Icon(Icons.done,color: Theme.of(context).iconTheme.color, size: 14),
                                 ),
                               ),
                           ],
@@ -319,7 +319,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                     color: AppColors.greenSplashColor),
                                 child: Padding(
                                   padding: const EdgeInsets.all(2),
-                                  child: Icon(Icons.done, size: 14),
+                                  child: Icon(Icons.done,color: Theme.of(context).iconTheme.color, size: 14),
                                 ),
                               ),
                           ],

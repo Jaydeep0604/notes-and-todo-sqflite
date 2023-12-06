@@ -306,7 +306,9 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                   color: AppColors.greenSplashColor),
                               child: Padding(
                                 padding: const EdgeInsets.all(2),
-                                child: Icon(Icons.done, size: 14),
+                                child: Icon(Icons.done,
+                                    color: Theme.of(context).iconTheme.color,
+                                    size: 14),
                               ),
                             ),
                           Spacer(),
@@ -612,7 +614,9 @@ class _AppLockScreenState extends State<AppLockScreen> {
                                   color: AppColors.greenSplashColor),
                               child: Padding(
                                 padding: const EdgeInsets.all(2),
-                                child: Icon(Icons.done, size: 14),
+                                child: Icon(Icons.done,
+                                    color: Theme.of(context).iconTheme.color,
+                                    size: 14),
                               ),
                             ),
                           Spacer(),

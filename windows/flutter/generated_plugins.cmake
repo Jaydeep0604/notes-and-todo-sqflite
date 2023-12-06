@@ -7,6 +7,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   awesome_notifications_core
   file_selector_windows
   local_auth_windows
+  permission_handler_windows
   printing
   share_plus
   url_launcher_windows

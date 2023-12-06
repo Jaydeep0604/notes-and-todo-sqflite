@@ -14,7 +14,7 @@ class VerticalAnimation extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimationConfiguration.staggeredList(
       position: index,
-      duration: const Duration(milliseconds: 150),
+      duration: const Duration(milliseconds: 100),
       child: SlideAnimation(
         verticalOffset: 30.0,
         horizontalOffset: 0.0,

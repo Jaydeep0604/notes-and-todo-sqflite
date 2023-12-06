@@ -345,24 +345,23 @@ class _NotesScreenState extends State<NotesScreen> {
               borderRadius: BorderRadius.circular(50),
               radius: 10,
               onTap: () {
-                notificationServices.testNotification();
-                
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) {
-                //       return NoteDetailScreen(
-                //         isUpdateNote: false,
-                //       );
-                //     },
-                //   ),
-                // ).then((value) {
-                //   if (value == true) {
-                //     setState(() {
-                //       noteList = dbHelper!.getNotesList();
-                //     });
-                //   }
-                // });
+                // notificationServices.testNotification();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return NoteDetailScreen(
+                        isUpdateNote: false,
+                      );
+                    },
+                  ),
+                ).then((value) {
+                  if (value == true) {
+                    setState(() {
+                      noteList = dbHelper!.getNotesList();
+                    });
+                  }
+                });
               },
               child: Container(
                   decoration: BoxDecoration(

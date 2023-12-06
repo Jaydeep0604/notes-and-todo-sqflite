@@ -4,7 +4,6 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/main.dart';
-import 'package:http/http.dart' as http;
 import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_detail_screen.dart';
 
@@ -24,6 +23,7 @@ class NotificationController {
               groupAlertBehavior: GroupAlertBehavior.Children,
               importance: NotificationImportance.High,
               defaultPrivacy: NotificationPrivacy.Private,
+              soundSource: "resource://raw/note",
               defaultColor: Colors.deepPurple,
               ledColor: Colors.deepPurple)
         ],
@@ -39,16 +39,18 @@ class NotificationController {
         'resource://drawable/todo_main',
         [
           NotificationChannel(
-              channelKey: 'alert',
-              channelName: 'Alert',
-              channelDescription: 'Notification tests as alerts',
-              playSound: true,
-              onlyAlertOnce: true,
-              groupAlertBehavior: GroupAlertBehavior.Children,
-              importance: NotificationImportance.High,
-              defaultPrivacy: NotificationPrivacy.Private,
-              defaultColor: Colors.deepPurple,
-              ledColor: Colors.deepPurple)
+            channelKey: 'alert',
+            channelName: 'Alert',
+            channelDescription: 'Notification tests as alerts',
+            playSound: true,
+            onlyAlertOnce: true,
+            groupAlertBehavior: GroupAlertBehavior.Children,
+            importance: NotificationImportance.High,
+            defaultPrivacy: NotificationPrivacy.Private,
+            soundSource: "resource://raw/shedule_notify",
+            defaultColor: Colors.deepPurple,
+            ledColor: Colors.deepPurple,
+          )
         ],
         debug: true);
 
@@ -74,8 +76,9 @@ class NotificationController {
   ///  Notifications events are only delivered after call this method
 
   static Future<void> startListeningNotificationEvents() async {
-    AwesomeNotifications()
-        .setListeners(onActionReceivedMethod: onActionReceivedMethod);
+    AwesomeNotifications().setListeners(
+      onActionReceivedMethod: onActionReceivedMethod,
+    );
   }
 
   ///  *********************************************
@@ -87,7 +90,6 @@ class NotificationController {
       ReceivedAction receivedAction) async {
     var payload = receivedAction.payload;
     int id = int.parse(payload?['id'] ?? '');
-
     print("Payload: $payload");
     if (receivedAction.buttonKeyPressed == 'open') {
       if (id != '') {
@@ -116,11 +118,8 @@ class NotificationController {
         print("Invalid ID or missing ID in payload");
       }
     } else if (receivedAction.buttonKeyPressed == 'finish') {
-      print("--------------------------");
       DBHelper dbHelper = DBHelper();
-      dbHelper.sheduleFinish(id).then((value) {
-        print("---------$value");
-      });
+      await dbHelper.sheduleFinish(id);
     }
 
     // if (receivedAction.actionType == ActionType.SilentAction ||
@@ -142,7 +141,6 @@ class NotificationController {
     //   }
     //   return onActionReceivedImplementationMethod(receivedAction);
     // }
-  
   }
 
   static Future<void> onActionReceivedImplementationMethod(
@@ -159,77 +157,77 @@ class NotificationController {
   ///  *********************************************
   ///
 
-  static Future<bool> displayNotificationRationale() async {
-    bool userAuthorized = false;
-    BuildContext context = MyApp.navigatorKey.currentContext!;
-    await showDialog(
-        context: context,
-        builder: (BuildContext ctx) {
-          return AlertDialog(
-            title: Text('Get Notified!',
-                style: Theme.of(context).textTheme.titleLarge),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Image.asset(
-                        'assets/images/animated-bell.gif',
-                        height: MediaQuery.of(context).size.height * 0.3,
-                        fit: BoxFit.fitWidth,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                    'Allow Awesome Notifications to send you beautiful notifications!'),
-              ],
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                  },
-                  child: Text(
-                    'Deny',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge
-                        ?.copyWith(color: Colors.red),
-                  )),
-              TextButton(
-                  onPressed: () async {
-                    userAuthorized = true;
-                    Navigator.of(ctx).pop();
-                  },
-                  child: Text(
-                    'Allow',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge
-                        ?.copyWith(color: Colors.deepPurple),
-                  )),
-            ],
-          );
-        });
-    return userAuthorized &&
-        await AwesomeNotifications().requestPermissionToSendNotifications();
-  }
+  // static Future<bool> displayNotificationRationale() async {
+  //   bool userAuthorized = false;
+  //   BuildContext context = MyApp.navigatorKey.currentContext!;
+  //   await showDialog(
+  //       context: context,
+  //       builder: (BuildContext ctx) {
+  //         return AlertDialog(
+  //           title: Text('Get Notified!',
+  //               style: Theme.of(context).textTheme.titleLarge),
+  //           content: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               Row(
+  //                 children: [
+  //                   Expanded(
+  //                     child: Image.asset(
+  //                       'assets/images/animated-bell.gif',
+  //                       height: MediaQuery.of(context).size.height * 0.3,
+  //                       fit: BoxFit.fitWidth,
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //               const SizedBox(height: 20),
+  //               const Text(
+  //                   'Allow Awesome Notifications to send you beautiful notifications!'),
+  //             ],
+  //           ),
+  //           actions: [
+  //             TextButton(
+  //                 onPressed: () {
+  //                   Navigator.of(ctx).pop();
+  //                 },
+  //                 child: Text(
+  //                   'Deny',
+  //                   style: Theme.of(context)
+  //                       .textTheme
+  //                       .titleLarge
+  //                       ?.copyWith(color: Colors.red),
+  //                 )),
+  //             TextButton(
+  //                 onPressed: () async {
+  //                   userAuthorized = true;
+  //                   Navigator.of(ctx).pop();
+  //                 },
+  //                 child: Text(
+  //                   'Allow',
+  //                   style: Theme.of(context)
+  //                       .textTheme
+  //                       .titleLarge
+  //                       ?.copyWith(color: Colors.deepPurple),
+  //                 )),
+  //           ],
+  //         );
+  //       });
+  //   return userAuthorized &&
+  //       await AwesomeNotifications().requestPermissionToSendNotifications();
+  // }
 
   ///  *********************************************
   ///     BACKGROUND TASKS TEST
   ///  *********************************************
 
-  static Future<void> executeLongTaskInBackground() async {
-    print("starting long task");
-    await Future.delayed(const Duration(seconds: 4));
-    final url = Uri.parse("http://google.com");
-    final re = await http.get(url);
-    print(re.body);
-    print("long task done");
-  }
+  // static Future<void> executeLongTaskInBackground() async {
+  //   print("starting long task");
+  //   await Future.delayed(const Duration(seconds: 4));
+  //   final url = Uri.parse("http://google.com");
+  //   final re = await http.get(url);
+  //   print(re.body);
+  //   print("long task done");
+  // }
 
   ///  *********************************************
   ///     NOTIFICATION CREATION METHODS 19982,107995,676591,261151

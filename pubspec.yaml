@@ -60,6 +60,7 @@ dependencies:
   local_auth: ^2.1.7
   awesome_notifications: ^0.8.2
   awesome_notifications_core:
+  permission_handler: ^11.1.0
   
 
 dev_dependencies:
@@ -90,6 +91,7 @@ flutter:
     - assets/lang/gu.json
     - assets/lang/en.json
     - assets/lang/hi.json
+   
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

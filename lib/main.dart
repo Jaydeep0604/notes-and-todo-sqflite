@@ -35,7 +35,6 @@ void main() async {
     await sharedStore.enableBiometricLock(false);
     isBiometricLock = false;
   }
-
   final themeProvider = ThemeProvider();
   await themeProvider.loadTheme();
   final themeModeString = await sharedStore.getThememode();
@@ -46,23 +45,7 @@ void main() async {
   await NotificationController.initializeTodoLocalNotifications();
   await NotificationController.initializeIsolateReceivePort();
   await NotificationController.startListeningNotificationEvents();
-
-  // final AndroidInitializationSettings androidSettings =
-  //     AndroidInitializationSettings("@mipmap/todo_main");
-  // final DarwinInitializationSettings IosSettings = DarwinInitializationSettings(
-  //   requestAlertPermission: true,
-  //   requestBadgePermission: true,
-  //   requestCriticalPermission: true,
-  //   requestSoundPermission: true,
-  // );
-  // InitializationSettings initializationSettings = InitializationSettings(
-  //   android: androidSettings,
-  //   iOS: IosSettings,
-  // );
-  // bool? initialize = await localNotificationsPlugin.initialize(
-  //   initializationSettings,
-  // );
-  // log("Notifications: $initialize");
+  // AppFunctions.flutterLocalNotificationInit();
 
   runApp(
     MultiProvider(
@@ -79,8 +62,6 @@ class MyApp extends StatefulWidget {
 
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
-
-  static Color mainColor = const Color(0xFF9D50DD);
 
   static void setLocale(BuildContext context, Locale newLocale) {
     sharedStore.setLanguage(newLocale.languageCode);
@@ -142,6 +123,8 @@ class _MyAppState extends State<MyApp> {
             iconTheme: IconThemeData(color: AppColors.whiteColor),
             canvasColor: AppColors.canvasColor,
             cardColor: AppColors.blackColor,
+            bottomSheetTheme:
+                BottomSheetThemeData(backgroundColor: Colors.amber),
             textTheme: TextTheme(
               bodySmall: TextStyle(
                 color: Color.fromARGB(255, 241, 241, 239),

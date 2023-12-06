@@ -11,7 +11,7 @@ import 'package:notes_sqflite/widget/todo_widget.dart';
 
 class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});
-  
+
   @override
   State<TodoScreen> createState() => _TodoScreenState();
 }
@@ -36,6 +36,7 @@ class _TodoScreenState extends State<TodoScreen> {
   checkData() {
     Timer.periodic(Duration(milliseconds: 500), (timer) {
       if (isUpdateTodoScreen)
+      if(mounted)
         setState(() {
           loadData();
           print("data updated $isUpdateTodoScreen");
@@ -150,7 +151,6 @@ class _TodoScreenState extends State<TodoScreen> {
                 borderRadius: BorderRadius.circular(50),
                 radius: 10,
                 onTap: () {
-                  
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -159,10 +159,7 @@ class _TodoScreenState extends State<TodoScreen> {
                       ),
                     ),
                   ).then((value) => {
-                        if (value == true)
-                          {
-                            loadData()
-                          }
+                        if (value == true) {loadData()}
                       });
                   // Navigator.push(
                   //   context,

@@ -1,5 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 
@@ -142,6 +143,7 @@ class NotificationServices {
         channelKey: 'alerts',
         title: '$title',
         body: '$body',
+        wakeUpScreen: true,
         bigPicture: '',
         largeIcon: 'resource://drawable/todo_large_icon',
         notificationLayout: NotificationLayout.BigPicture,
@@ -176,6 +178,7 @@ class NotificationServices {
         channelKey: 'alert',
         title: '$title',
         body: '$body',
+        wakeUpScreen: true,
         bigPicture: '',
         largeIcon: 'resource://drawable/todo_large_icon',
         notificationLayout: NotificationLayout.BigPicture,
@@ -193,7 +196,7 @@ class NotificationServices {
           key: 'finish',
           label: 'finish',
           color: AppColors.blueColor,
-          actionType: ActionType.SilentAction 
+          actionType: ActionType.KeepOnTop,
         ),
       ],
     );
