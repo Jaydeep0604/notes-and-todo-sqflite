@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:notes_sqflite/model/note_model.dart';
 import 'package:notes_sqflite/model/notification_model.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
@@ -31,7 +30,7 @@ class DBHelper {
     await db.execute(
         "CREATE TABLE todos (id INTEGER PRIMARY KEY AUTOINCREMENT, todo TEXT NOT NULL, finished INTEGER NOT NULL, due_date TEXT NOT NULL,due_time TEXT NOT NULL, category TEXT NOT NULL)");
     await db.execute(
-        "CREATE TABLE notification (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL)");
+        "CREATE TABLE notification (id INTEGER PRIMARY KEY AUTOINCREMENT, notification_id INTEGER NOT NULL, parent_id INTEGER NOT NULL, title TEXT NOT NULL)");
   }
 
   Future<NotesModel> insertNote(NotesModel notesModel) async {
@@ -55,8 +54,8 @@ class DBHelper {
 
   Future<List<TodoModel>> getTodoUsingTitle(String title) async {
     var dbClient = await db;
-    final map = await dbClient!
-        .rawQuery("SELECT * FROM todos WHERE todo = ?", [title]);
+    final map =
+        await dbClient!.rawQuery("SELECT * FROM todos WHERE todo = ?", [title]);
     if (map.isNotEmpty) {
       return map.map((data) => TodoModel.fromMap(data)).toList();
     } else {
@@ -222,23 +221,30 @@ class DBHelper {
     );
   }
 
-  Future<NotificationModel> insertNotification(
-      NotificationModel notificationModel) async {
+  Future<NotificationDataModel> insertNotification(
+      NotificationDataModel notificationModel) async {
     var dbClient = await db;
     await dbClient!.insert('notification', notificationModel.toMap());
     return notificationModel;
   }
 
-  Future<List<NotificationModel>> getNotification() async {
+  Future<List<NotificationDataModel>> getNotification() async {
     var dbClient = await db;
     final List<Map<String, Object?>> queryResult =
         await dbClient!.query('notification');
-    return queryResult.map((data) => NotificationModel.fromMap(data)).toList();
+    return queryResult
+        .map((data) => NotificationDataModel.fromMap(data))
+        .toList();
   }
 
   Future<int> deleteNotification(int id) async {
-    var dbClient = await db;
-    return await dbClient!
-        .delete('notification', where: 'id = ?', whereArgs: [id]);
+    try {
+      var dbClient = await db;
+      return await dbClient!
+          .delete('notification', where: 'notification_id = ?', whereArgs: [id]);
+    } catch (e) {
+      print('Error deleting notification: $e');
+      return -1;
+    }
   }
 }

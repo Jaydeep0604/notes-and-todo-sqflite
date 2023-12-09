@@ -53,7 +53,6 @@ class NotificationController {
           )
         ],
         debug: true);
-
     // Get initial notification action is optional
     initialAction = await AwesomeNotifications()
         .getInitialNotificationAction(removeFromActionEvents: false);
@@ -76,8 +75,15 @@ class NotificationController {
   ///  Notifications events are only delivered after call this method
 
   static Future<void> startListeningNotificationEvents() async {
+    DBHelper dbHelper = DBHelper();
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: onActionReceivedMethod,
+      onNotificationDisplayedMethod: (receivedNotification) async {
+        var payload = receivedNotification.payload;
+        int notificationId = int.parse(payload?['notificationId'] ?? '');
+        print(notificationId);
+        await dbHelper.deleteNotification(notificationId);
+      },
     );
   }
 
@@ -88,9 +94,13 @@ class NotificationController {
   @pragma('vm:entry-point')
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
+    DBHelper dbHelper = DBHelper();
     var payload = receivedAction.payload;
     int id = int.parse(payload?['id'] ?? '');
+    int notificationId = int.parse(payload?['notificationId'] ?? '');
     print("Payload: $payload");
+    await dbHelper.deleteNotification(notificationId);
+
     if (receivedAction.buttonKeyPressed == 'open') {
       if (id != '') {
         MyApp.navigatorKey.currentState!.push(
@@ -118,7 +128,6 @@ class NotificationController {
         print("Invalid ID or missing ID in payload");
       }
     } else if (receivedAction.buttonKeyPressed == 'finish') {
-      DBHelper dbHelper = DBHelper();
       await dbHelper.sheduleFinish(id);
     }
 

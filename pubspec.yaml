@@ -39,7 +39,6 @@ dependencies:
   flutter_staggered_grid_view: ^0.7.0
   intl: ^0.18.1
   flutter_local_notifications:
-  # timezone: ^0.9.2
   rxdart: ^0.27.7
   http: ^1.1.0
   flutter_timezone: ^1.0.8
@@ -49,7 +48,6 @@ dependencies:
   provider: ^6.0.5
   image_picker: ^1.0.4
   photo_view: ^0.14.0
-  # photo_manager: 
   flutter_share: ^2.0.0
   share_plus: ^7.2.1
   image_gallery_saver: ^2.0.3
@@ -72,7 +70,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

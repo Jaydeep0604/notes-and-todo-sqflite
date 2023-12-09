@@ -1,8 +1,11 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/intl.dart';
+import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/main.dart';
+import 'package:notes_sqflite/model/notification_model.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
+import 'package:notes_sqflite/utils/functions.dart';
 
 class NotificationServices {
   static Future<bool> displayNotificationRationale() async {
@@ -127,19 +130,20 @@ class NotificationServices {
   //   );
   // }
 
-  void createNewNoteNotification(
+  createNewNoteNotification(
       {required int id,
+      required int notificationId,
       required NotificationCalendar schedule,
       required String title,
       required String body}) async {
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
     if (!isAllowed) isAllowed = await displayNotificationRationale();
     if (!isAllowed) return;
-
+    DBHelper dbHelper = DBHelper();
     await AwesomeNotifications().createNotification(
       schedule: schedule,
       content: NotificationContent(
-        id: -1,
+        id: notificationId,
         channelKey: 'alerts',
         title: '$title',
         body: '$body',
@@ -148,8 +152,10 @@ class NotificationServices {
         largeIcon: 'resource://drawable/todo_large_icon',
         notificationLayout: NotificationLayout.BigPicture,
         hideLargeIconOnExpand: true,
+        displayOnForeground: false,
         payload: {
           'id': '$id',
+          'notificationId': '$notificationId',
         },
       ),
       actionButtons: [
@@ -159,22 +165,35 @@ class NotificationServices {
           color: AppColors.blueColor,
         ),
       ],
-    );
+    ).then((value) async {
+
+      DateTime dateTime =
+          AppFunctions.convertNotificationCalendarToDateTime(schedule);
+      String newDateTitle = AppFunctions.notificationFormatDateShow(dateTime);
+
+      NotificationDataModel notificationModel = await NotificationDataModel(
+        notificationId: notificationId,
+        parentId: id,
+        title: newDateTitle,
+      );
+      await dbHelper.insertNotification(notificationModel);
+    });
   }
 
-  void createNewTodoNotification(
+  createNewTodoNotification(
       {required int id,
+      required int notificationId,
       required NotificationCalendar schedule,
       required String title,
       required String body}) async {
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
     if (!isAllowed) isAllowed = await displayNotificationRationale();
     if (!isAllowed) return;
-
+    DBHelper dbHelper = DBHelper();
     await AwesomeNotifications().createNotification(
       schedule: schedule,
       content: NotificationContent(
-        id: -1,
+        id: notificationId,
         channelKey: 'alert',
         title: '$title',
         body: '$body',
@@ -182,8 +201,10 @@ class NotificationServices {
         bigPicture: '',
         largeIcon: 'resource://drawable/todo_large_icon',
         notificationLayout: NotificationLayout.BigPicture,
+        displayOnForeground: false,
         payload: {
           'id': '$id',
+          'notificationId': '$notificationId',
         },
       ),
       actionButtons: [
@@ -199,11 +220,22 @@ class NotificationServices {
           actionType: ActionType.KeepOnTop,
         ),
       ],
-    );
+    ).then((value) {
+      NotificationDataModel notificationModel = NotificationDataModel(
+        notificationId: notificationId,
+        parentId: id,
+        title: schedule.toString(),
+      );
+      dbHelper.insertNotification(notificationModel);
+    });
   }
 
-  static Future<void> cancelNotifications() async {
+  Future<void> cancelNotifications() async {
     await AwesomeNotifications().cancelAll();
+  }
+
+  Future<void> cancelNotificationById(int id) async {
+    await AwesomeNotifications().cancel(id);
   }
 
   // use flutter local notificatin

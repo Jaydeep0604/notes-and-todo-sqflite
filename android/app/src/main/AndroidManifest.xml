@@ -14,7 +14,7 @@
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
-            android:showWhenLocked="true"
+            android:showWhenLocked="false"
             android:theme="@style/Theme.AppCompat.DayNight"
             android:turnScreenOn="true"
             android:exported="true"

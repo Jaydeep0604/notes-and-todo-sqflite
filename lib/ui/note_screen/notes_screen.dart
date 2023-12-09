@@ -4,7 +4,6 @@ import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/note_model.dart';
-import 'package:notes_sqflite/services/notification_services.dart';
 import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:notes_sqflite/widget/note_widget.dart';
@@ -41,7 +40,7 @@ class _NotesScreenState extends State<NotesScreen> {
     noteCtr = TextEditingController();
     emailCtr = TextEditingController();
     loadData();
-    checkData();
+    // checkData();
   }
 
   checkData() {

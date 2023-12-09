@@ -333,15 +333,16 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
         ),
       ),
       bottomNavigationBar: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
         height: 60,
         child: Row(
           children: [
             Expanded(
               flex: isNotes == true ? 1 : 2,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 5),
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(20),
                   onTap: () {
                     setState(() {
                       isNotes = true;
@@ -351,7 +352,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                   child: Container(
                     decoration: BoxDecoration(
                       color: AppColors.bottomNavigationBarFirstColor,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Center(
                       child: Icon(
@@ -367,9 +368,9 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
             Expanded(
               flex: isTodos ? 1 : 2,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 5),
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(20),
                   onTap: () {
                     setState(() {
                       isNotes = false;
@@ -379,7 +380,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                   child: Container(
                     decoration: BoxDecoration(
                       color: AppColors.bottomNavigationBarSecondColor,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Center(
                       child: Icon(
