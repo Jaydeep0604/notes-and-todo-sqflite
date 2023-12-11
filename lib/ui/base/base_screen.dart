@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/widgets.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:notes_sqflite/config/constant.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
@@ -12,9 +11,11 @@ import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/ui/app_lock/screen_lock.dart';
 import 'package:notes_sqflite/ui/archive_screen/archive_note_screen.dart';
 import 'package:notes_sqflite/ui/delete_note_screen/delete_screen.dart';
+import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
 import 'package:notes_sqflite/ui/note_screen/notes_screen.dart';
 import 'package:notes_sqflite/ui/setting_screen/setting_screen.dart';
 import 'package:notes_sqflite/ui/finished_screen/todo_done_screen.dart';
+import 'package:notes_sqflite/ui/todo_screen/todo_detail_screen.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 
@@ -39,7 +40,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
   // ignore: unused_field
   SupportState _supportState = SupportState.unknown;
 
-  bool isNotes = true, isTodos = false;
+  bool isNotes = true, isTodos = false, isAdd = false;
 
   late GlobalKey<ScaffoldState> globalScaffoldKey;
 
@@ -333,32 +334,52 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         height: 60,
         child: Row(
           children: [
             Expanded(
-              flex: isNotes == true ? 1 : 2,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5),
+              flex: isNotes
+                  ? isAdd
+                      ? 1
+                      : 2
+                  : 1,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                color: Theme.of(context).scaffoldBackgroundColor,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(20),
                   onTap: () {
                     setState(() {
                       isNotes = true;
                       isTodos = false;
+                      isAdd = false;
                     });
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: AppColors.bottomNavigationBarFirstColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        border: isNotes && !isAdd
+                            ? Border.all(color: AppColors.blueGrayColor)
+                            : null,
+                        borderRadius: BorderRadius.circular(50)),
                     child: Center(
-                      child: Icon(
-                        CupertinoIcons.pencil_ellipsis_rectangle,
-                        color: Theme.of(context).cardColor,
-                        size: isNotes ? 25 : 20,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            CupertinoIcons.pencil_ellipsis_rectangle,
+                            color: Theme.of(context).highlightColor,
+                            size: isNotes ? 25 : 20,
+                          ),
+                          if (isNotes && !isAdd)
+                            SizedBox(
+                              width: 10,
+                            ),
+                          if (isNotes && !isAdd) Text("Notes")
+                        ],
                       ),
                     ),
                   ),
@@ -366,27 +387,87 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
               ),
             ),
             Expanded(
-              flex: isTodos ? 1 : 2,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5),
+              flex: isAdd ? 2 : 1,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                color: Theme.of(context).scaffoldBackgroundColor,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(20),
                   onTap: () {
                     setState(() {
-                      isNotes = false;
-                      isTodos = true;
+                      isAdd = true;
                     });
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: AppColors.bottomNavigationBarSecondColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        border: isAdd
+                            ? Border.all(color: AppColors.blueGrayColor)
+                            : null,
+                        borderRadius: BorderRadius.circular(50)),
                     child: Center(
-                      child: Icon(
-                        CupertinoIcons.list_bullet_indent,
-                        color: Theme.of(context).cardColor,
-                        size: isTodos ? 25 : 20,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            CupertinoIcons.add,
+                            color: Theme.of(context).highlightColor,
+                            size: isTodos ? 25 : 20,
+                          ),
+                          if (isAdd)
+                            SizedBox(
+                              width: 10,
+                            ),
+                          if (isAdd) Text("Add")
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: isTodos
+                  ? isAdd
+                      ? 1
+                      : 2
+                  : 1,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      isNotes = false;
+                      isTodos = true;
+                      isAdd = false;
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        border: isTodos && !isAdd
+                            ? Border.all(color: AppColors.blueGrayColor)
+                            : null,
+                        borderRadius: BorderRadius.circular(50)),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            CupertinoIcons.list_bullet_indent,
+                            color: Theme.of(context).highlightColor,
+                            size: isTodos ? 25 : 20,
+                          ),
+                          if (isTodos && !isAdd)
+                            SizedBox(
+                              width: 10,
+                            ),
+                          if (isTodos && !isAdd) Text("Shedule")
+                        ],
                       ),
                     ),
                   ),
@@ -396,8 +477,83 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
           ],
         ),
       ),
-      body: isNotes ? NotesScreen() : TodoScreen(),
+      body: Stack(
+        children: [
+          isNotes ? NotesScreen() : TodoScreen(),
+          if (isAdd)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextButton(
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStatePropertyAll(Colors.transparent)),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return NoteDetailScreen(
+                              isUpdateNote: false,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "Note",
+                      style: TextStyle(color: Theme.of(context).highlightColor),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                    child: VerticalDivider(),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TodoDetailscreen(
+                            isUpdateTodo: false,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "Schedule",
+                      style: TextStyle(color: Theme.of(context).highlightColor),
+                    ),
+                  )
+                ],
+              ),
+            ),
+        ],
+      ),
     );
+  }
+
+  RelativeRect buttonMenuPosition(BuildContext context) {
+    // final bool isEnglish =
+    //     LocalizedApp.of(context).delegate.currentLocale.languageCode == 'en';
+    final RenderBox bar = context.findRenderObject() as RenderBox;
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+    const Offset offset = Offset.zero;
+    final RelativeRect position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        bar.localToGlobal(bar.size.bottomCenter(Offset(0, -100)),
+            ancestor: overlay),
+        bar.localToGlobal(bar.size.bottomCenter(Offset(85, 0)),
+            ancestor: overlay),
+      ),
+      offset & overlay.size,
+    );
+    return position;
   }
 
   // checkPassword(

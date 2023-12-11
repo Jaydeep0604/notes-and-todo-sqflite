@@ -1112,7 +1112,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     ))
         .then((value) {
       print("data added");
+      setState(() {
+        isUpdateNoteScreen=true;
+      });
       Navigator.pop(context, true);
+
     }).onError((error, stackTrace) {
       print(error.toString());
       print(stackTrace.toString());

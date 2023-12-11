@@ -371,7 +371,6 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                     },
                   );
                   if (notificationDateTime != null) {
-                    
                     dbHelper!.getTodoUsingTitle(todoCtr.text).then((value) {
                       AppFunctions.setNewSheduleNotification(
                         id: value.last.id!,
