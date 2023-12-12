@@ -123,7 +123,7 @@ class _NoteWidgetState extends State<NoteWidget> {
               decoration: BoxDecoration(
                   color: Theme.of(context).scaffoldBackgroundColor,
                   border: Border.all(
-                    color: Theme.of(context).iconTheme.color!.withOpacity(0.4),
+                    color: Theme.of(context).iconTheme.color!.withOpacity(0.7),
                     width: 0.7,
                   ),
                   borderRadius: BorderRadius.circular(10)),

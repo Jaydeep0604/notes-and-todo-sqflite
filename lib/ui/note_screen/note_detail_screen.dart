@@ -498,7 +498,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             image_list: [],
                           ),
                         );
-                        Navigator.pop(context);
+                        Navigator.pop(context,true);
                       },
                       child: Row(
                         children: [
@@ -523,7 +523,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       onTap: () {
                         dbHelper?.deleteForeverNote(widget.id!).then(
                           (value) {
-                            Navigator.pop(context);
+                            Navigator.pop(context,true);
                           },
                         );
                       },
@@ -949,81 +949,93 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                   runSpacing: 5.0,
                                   children: List.generate(snapshot.data!.length,
                                       (index) {
-                                    return snapshot.data![index].parentId == widget.id ? GestureDetector(
-                                      onTap: () {
-                                        print(snapshot.data![index].title);
-                                        DateTime notificationDateTime =
-                                            AppFunctions
-                                                .convertStringToDateTime(
-                                                    snapshot
-                                                        .data![index].title!);
-                                        DateTime notificationDate =
-                                            AppFunctions.covertDateTimeToDate(
-                                                notificationDateTime);
-                                        DateTime notificationTime =
-                                            AppFunctions.covertDateTimeToTime(
-                                                notificationDateTime);
+                                    return snapshot.data![index].parentId ==
+                                            widget.id
+                                        ? GestureDetector(
+                                            onTap: () {
+                                              print(
+                                                  snapshot.data![index].title);
+                                              DateTime notificationDateTime =
+                                                  AppFunctions
+                                                      .convertStringToDateTime(
+                                                          snapshot.data![index]
+                                                              .title!);
+                                              DateTime notificationDate =
+                                                  AppFunctions
+                                                      .covertDateTimeToDate(
+                                                          notificationDateTime);
+                                              DateTime notificationTime =
+                                                  AppFunctions
+                                                      .covertDateTimeToTime(
+                                                          notificationDateTime);
 
-                                        showResetNotificationDialoge(
-                                          notificationId: snapshot
-                                              .data![index].notificationId!,
-                                          currentDate: notificationDate,
-                                          timeOfDay: TimeOfDay(
-                                            hour: notificationTime.hour,
-                                            minute: notificationTime.minute,
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.only(left: 8),
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                          color: AppColors.blueColor
-                                              .withOpacity(0.2),
-                                          border: Border.all(
-                                            color: AppColors.blueColor,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              "${snapshot.data![index].title!}",
-                                              style: TextStyle(
-                                                  overflow:
-                                                      TextOverflow.ellipsis),
-                                            ),
-                                            SizedBox(width: 5),
-                                            InkWell(
-                                              splashColor: Colors.transparent,
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              onTap: () {
-                                                dbHelper!.deleteNotification(
-                                                    snapshot.data![index]
-                                                        .notificationId!);
-                                                notificationServices
-                                                    .cancelNotificationById(
-                                                        snapshot.data![index]
-                                                            .notificationId!);
-                                                setState(() {
-                                                  loadNotifications();
-                                                });
-                                              },
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(3),
-                                                child: Icon(
-                                                  Icons.cancel,
-                                                  size: 20,
+                                              showResetNotificationDialoge(
+                                                notificationId: snapshot
+                                                    .data![index]
+                                                    .notificationId!,
+                                                currentDate: notificationDate,
+                                                timeOfDay: TimeOfDay(
+                                                  hour: notificationTime.hour,
+                                                  minute:
+                                                      notificationTime.minute,
+                                                ),
+                                              );
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.only(left: 8),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                                color: AppColors.blueColor
+                                                    .withOpacity(0.2),
+                                                border: Border.all(
+                                                  color: AppColors.blueColor,
                                                 ),
                                               ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ): Container();
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    "${snapshot.data![index].title!}",
+                                                    style: TextStyle(
+                                                        overflow: TextOverflow
+                                                            .ellipsis),
+                                                  ),
+                                                  SizedBox(width: 5),
+                                                  InkWell(
+                                                    splashColor:
+                                                        Colors.transparent,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50),
+                                                    onTap: () {
+                                                      dbHelper!.deleteNotification(
+                                                          snapshot.data![index]
+                                                              .notificationId!);
+                                                      notificationServices
+                                                          .cancelNotificationById(
+                                                              snapshot
+                                                                  .data![index]
+                                                                  .notificationId!);
+                                                      setState(() {
+                                                        loadNotifications();
+                                                      });
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              3),
+                                                      child: Icon(
+                                                        Icons.cancel,
+                                                        size: 20,
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        : Container();
                                   }),
                                 );
                               }
@@ -1113,10 +1125,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         .then((value) {
       print("data added");
       setState(() {
-        isUpdateNoteScreen=true;
+        isUpdateNoteScreen = true;
       });
       Navigator.pop(context, true);
-
     }).onError((error, stackTrace) {
       print(error.toString());
       print(stackTrace.toString());
@@ -1182,6 +1193,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       ),
                     )
                         .then((value) {
+                      setState(() {
+                        isUpdateNoteScreen = true;
+                      });
                       Navigator.pop(context);
                       Navigator.pop(context);
                     });
@@ -2013,9 +2027,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       ),
                       Expanded(
                         child: MaterialButton(
-                          color: 
-                               Colors.green[400],
-                              
+                          color: Colors.green[400],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),

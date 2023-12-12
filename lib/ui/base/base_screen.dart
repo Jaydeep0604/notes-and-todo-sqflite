@@ -378,7 +378,9 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                             SizedBox(
                               width: 10,
                             ),
-                          if (isNotes && !isAdd) Text("Notes")
+                          if (isNotes && !isAdd)
+                            Text(
+                                "${AppLocalization.of(context)?.getTranslatedValue('notes')}")
                         ],
                       ),
                     ),
@@ -419,7 +421,9 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                             SizedBox(
                               width: 10,
                             ),
-                          if (isAdd) Text("Add")
+                          if (isAdd)
+                            Text(
+                                "${AppLocalization.of(context)?.getTranslatedValue('add')}")
                         ],
                       ),
                     ),
@@ -466,7 +470,9 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                             SizedBox(
                               width: 10,
                             ),
-                          if (isTodos && !isAdd) Text("Shedule")
+                          if (isTodos && !isAdd)
+                            Text(
+                                "${AppLocalization.of(context)?.getTranslatedValue('schedules')}")
                         ],
                       ),
                     ),
@@ -483,77 +489,78 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
           if (isAdd)
             Align(
               alignment: Alignment.bottomCenter,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextButton(
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStatePropertyAll(Colors.transparent)),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return NoteDetailScreen(
-                              isUpdateNote: false,
-                            );
-                          },
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    color: Theme.of(context).canvasColor.withOpacity(0.3)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    InkWell(
+                      splashFactory: NoSplash.splashFactory,
+                        highlightColor: Colors.transparent,
+                      
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return NoteDetailScreen(
+                                isUpdateNote: false,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 3),
+                        child: Text(
+                          "${AppLocalization.of(context)?.getTranslatedValue('note')}",
+                          style: TextStyle(color: AppColors.blueColor),
                         ),
-                      );
-                    },
-                    child: Text(
-                      "Note",
-                      style: TextStyle(color: Theme.of(context).highlightColor),
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                    child: VerticalDivider(),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TodoDetailscreen(
-                            isUpdateTodo: false,
+                    SizedBox(
+                      height: 15,
+                      child: VerticalDivider(
+                        color: AppColors.greenSplashColor,
+                        thickness: 1,
+                      ),
+                    ),
+                    Container(
+                      child: InkWell(
+                        splashFactory: NoSplash.splashFactory,
+                        highlightColor: Colors.transparent,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TodoDetailscreen(
+                                isUpdateTodo: false,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 3),
+                          child: Text(
+                            "${AppLocalization.of(context)?.getTranslatedValue('schedule')}",
+                            style: TextStyle(color: AppColors.blueColor),
                           ),
                         ),
-                      );
-                    },
-                    child: Text(
-                      "Schedule",
-                      style: TextStyle(color: Theme.of(context).highlightColor),
-                    ),
-                  )
-                ],
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
         ],
       ),
     );
-  }
-
-  RelativeRect buttonMenuPosition(BuildContext context) {
-    // final bool isEnglish =
-    //     LocalizedApp.of(context).delegate.currentLocale.languageCode == 'en';
-    final RenderBox bar = context.findRenderObject() as RenderBox;
-    final RenderBox overlay =
-        Overlay.of(context).context.findRenderObject() as RenderBox;
-    const Offset offset = Offset.zero;
-    final RelativeRect position = RelativeRect.fromRect(
-      Rect.fromPoints(
-        bar.localToGlobal(bar.size.bottomCenter(Offset(0, -100)),
-            ancestor: overlay),
-        bar.localToGlobal(bar.size.bottomCenter(Offset(85, 0)),
-            ancestor: overlay),
-      ),
-      offset & overlay.size,
-    );
-    return position;
   }
 
   // checkPassword(
