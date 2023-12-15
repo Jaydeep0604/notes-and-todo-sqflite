@@ -1,11 +1,23 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
-import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/services/notification_services.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class AppFunctions {
+  bool _isPermissionGranted = false;
+
+  static Future<void> requestStoragePermission() async {
+    final status = await Permission.storage.request();
+    status == PermissionStatus.granted;
+  }
+
+  static Future<void> requestNotificationPermission() async {
+    final status = await Permission.notification.request();
+    status == PermissionStatus.granted;
+  }
+
   static setNoteNotification(
       {required int id,
       required DateTime scheduledTime,

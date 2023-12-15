@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/language/localisation.dart';
@@ -17,9 +16,15 @@ import 'package:notes_sqflite/utils/functions.dart';
 import 'package:share_plus/share_plus.dart';
 
 class NoteDetailScreen extends StatefulWidget {
-  NoteDetailScreen({super.key, this.id, required this.isUpdateNote});
+  NoteDetailScreen({
+    super.key,
+    this.id,
+    required this.isUpdateNote,
+    this.scannedText,
+  });
   int? id;
   bool isUpdateNote;
+  String? scannedText;
 
   @override
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
@@ -60,6 +65,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
 
     titleCtr = TextEditingController();
     noteCtr = TextEditingController();
+    if (widget.isUpdateNote == false) {
+      if (widget.scannedText != "") {
+        noteCtr.text = widget.scannedText ?? '';
+      } else {
+        noteCtr.text = "";
+      }
+    }
 
     // imageFileList = widget.imageList!.map((path) => XFile(path)).toList();
     if (widget.isUpdateNote) {

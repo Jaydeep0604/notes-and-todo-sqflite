@@ -15,6 +15,7 @@ import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
 import 'package:notes_sqflite/ui/note_screen/notes_screen.dart';
 import 'package:notes_sqflite/ui/setting_screen/setting_screen.dart';
 import 'package:notes_sqflite/ui/finished_screen/todo_done_screen.dart';
+import 'package:notes_sqflite/ui/text_recognizer/text_recognizer_screen.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_detail_screen.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
@@ -563,6 +564,28 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                             horizontal: 15, vertical: 5),
                         child: Text(
                           "${AppLocalization.of(context)?.getTranslatedValue('Add Schedule')}",
+                          style: TextStyle(color: AppColors.whiteColor),
+                        ),
+                      ),
+                    ),
+                     SizedBox(
+                      width: 10,
+                    ),
+                    OpenContainer(
+                      transitionType: _containerTransitionType,
+                      transitionDuration: Duration(milliseconds: 400),
+                      closedElevation: 1,
+                      openElevation: 1,
+                      closedColor: AppColors.orangeSplashColor,
+                      closedShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      openBuilder: (context, _) => TextRecognizerScreen(),
+                      closedBuilder: (context, _) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 5),
+                        child: Text(
+                          "${AppLocalization.of(context)?.getTranslatedValue('scane_note')}",
                           style: TextStyle(color: AppColors.whiteColor),
                         ),
                       ),
