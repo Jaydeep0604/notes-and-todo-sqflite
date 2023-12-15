@@ -1,7 +1,10 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:notes_sqflite/animations/open_container.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_detail_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
+import 'package:provider/provider.dart';
 
 class TodoWidget extends StatefulWidget {
   TodoWidget({
@@ -97,26 +100,26 @@ class _TodoWidgetState extends State<TodoWidget> {
     }
   }
 
+//  Navigator.push(
+//           context,
+//           MaterialPageRoute(
+//             builder: (context) => TodoDetailscreen(
+//               isUpdateTodo: true,
+//               id: widget.id,
+//               onUpdate: widget.onUpdate,
+//               onDelete: widget.onDelete,
+//             ),
+//           ),
+//         ).then((value) {
+//           setState(() {});
+//         });
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // updateTodoPopupmenu();
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TodoDetailscreen(
-              isUpdateTodo: true,
-              id: widget.id,
-              onUpdate: widget.onUpdate,
-              onDelete: widget.onDelete,
-            ),
-          ),
-        ).then((value) {
-          setState(() {});
-        });
-      },
-      child: Card(
+    return OpenScheduleContainerWrapper(
+      id: widget.id,
+      onUpdate: widget.onUpdate,
+      onDelete: widget.onDelete,
+      closedChild: Card(
         color: Theme.of(context).scaffoldBackgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -573,3 +576,4 @@ class _TodoWidgetState extends State<TodoWidget> {
   //   );
   // }
 }
+

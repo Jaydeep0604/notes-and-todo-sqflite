@@ -165,11 +165,11 @@ class AppFunctions {
     return DateFormat('hh:mm a').parse(formattedTimeString);
   }
 
-  static resetNotification(int notificationID)async {
-    DBHelper dbHelper = DBHelper();
-   await notificationServices.cancelNotificationById(notificationID);
-    // dbHelper!.
-  }
+  // static resetNotification(int notificationID)async {
+  //   DBHelper dbHelper = DBHelper();
+  //  await notificationServices.cancelNotificationById(notificationID);
+  //   // dbHelper!.
+  // }
 
   static void flutterLocalNotificationInit() async {
     final AndroidInitializationSettings androidSettings =

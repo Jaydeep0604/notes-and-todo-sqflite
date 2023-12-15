@@ -73,7 +73,7 @@ class _NotesScreenState extends State<NotesScreen> {
                           item.pin != 1)
                   ? snapshot.data!.length
                   : 0;
-    
+
               if (snapshot.hasData) {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -81,8 +81,8 @@ class _NotesScreenState extends State<NotesScreen> {
                   children: [
                     FutureBuilder(
                       future: noteList,
-                      builder: (context,
-                          AsyncSnapshot<List<NotesModel>> snapshot) {
+                      builder:
+                          (context, AsyncSnapshot<List<NotesModel>> snapshot) {
                         int pinCount = snapshot.data != null &&
                                 snapshot.data!.any((item) => item.pin == 1)
                             ? snapshot.data!.length
@@ -93,24 +93,25 @@ class _NotesScreenState extends State<NotesScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                color: Theme.of(context)
-                                    .scaffoldBackgroundColor,
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
                                 child: Container(
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 10),
-                                  width: MediaQuery.of(context).size.width *
-                                      0.45,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.5,
                                   // constraints: BoxConstraints(maxHeight: 270, minHeight: 0),
                                   decoration: BoxDecoration(
                                       border: Border.all(
-                                          color: Theme.of(context)
-                                              .iconTheme
-                                              .color!),
-                                      borderRadius:
-                                          BorderRadius.circular(10)),
+                                        color: Theme.of(context)
+                                            .iconTheme
+                                            .color!
+                                            .withOpacity(0.7),
+                                        width: 0.7,
+                                      ),
+                                      borderRadius: BorderRadius.circular(10)),
                                   child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
@@ -162,8 +163,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                 child: Text(
                                   "${AppLocalization.of(context)?.getTranslatedValue('no_data_found')}",
                                   style: TextStyle(
-                                      color:
-                                          Theme.of(context).highlightColor),
+                                      color: Theme.of(context).highlightColor),
                                 ),
                               ),
                             );
@@ -187,22 +187,20 @@ class _NotesScreenState extends State<NotesScreen> {
                                     children: [
                                       if (snapshot.data![index].pin == 1)
                                         Container(
-                                          padding: EdgeInsets.only(
-                                              right: 4, top: 4),
+                                          padding:
+                                              EdgeInsets.only(right: 4, top: 4),
                                           child: NoteWidget(
                                             dbHelper: dbHelper!,
                                             keyvalue: ValueKey<int>(
                                                 snapshot.data![index].id!),
                                             id: snapshot.data![index].id!,
-                                            title: snapshot
-                                                .data![index].title
+                                            title: snapshot.data![index].title
                                                 .toString(),
                                             note: snapshot.data![index].note
                                                 .toString(),
                                             pin: snapshot.data![index].pin!,
                                             archive: 0,
-                                            email: snapshot
-                                                .data![index].email
+                                            email: snapshot.data![index].email
                                                 .toString(),
                                             deleted: 0,
                                             createDate: snapshot
@@ -213,12 +211,11 @@ class _NotesScreenState extends State<NotesScreen> {
                                                 .data![index].image_list,
                                             onUpdateComplete: () {
                                               setState(() {
-                                                noteList = dbHelper!
-                                                    .getNotesList();
+                                                noteList =
+                                                    dbHelper!.getNotesList();
                                               });
                                             },
-                                            onDismissed:
-                                                (id, archive, pin) {
+                                            onDismissed: (id, archive, pin) {
                                               dbHelper?.updateArchive(
                                                 NotesModel(
                                                   id: id,
@@ -230,8 +227,8 @@ class _NotesScreenState extends State<NotesScreen> {
                                               snapshot.data!.remove(
                                                   snapshot.data![index]);
                                               setState(() {
-                                                noteList = dbHelper!
-                                                    .getNotesList();
+                                                noteList =
+                                                    dbHelper!.getNotesList();
                                               });
                                             },
                                           ),
@@ -276,24 +273,21 @@ class _NotesScreenState extends State<NotesScreen> {
                                         note: snapshot.data![index].note
                                             .toString(),
                                         pin: snapshot.data![index].pin!,
-                                        archive:
-                                            snapshot.data![index].deleted!,
+                                        archive: snapshot.data![index].deleted!,
                                         email: snapshot.data![index].email
                                             .toString(),
-                                        deleted:
-                                            snapshot.data![index].deleted!,
+                                        deleted: snapshot.data![index].deleted!,
                                         createDate: snapshot
                                             .data![index].create_date
                                             .toString(),
                                         editedDate: snapshot
                                             .data![index].edited_date
                                             .toString(),
-                                        imageList: snapshot
-                                            .data![index].image_list,
+                                        imageList:
+                                            snapshot.data![index].image_list,
                                         onUpdateComplete: () {
                                           setState(() {
-                                            noteList =
-                                                dbHelper!.getNotesList();
+                                            noteList = dbHelper!.getNotesList();
                                           });
                                         },
                                         onDismissed: (
@@ -304,16 +298,14 @@ class _NotesScreenState extends State<NotesScreen> {
                                           setState(() {
                                             // dbHelper!.delete(snapshot
                                             //     .data![index].id!);
-                                            dbHelper?.updateArchive(
-                                                NotesModel(
-                                                    id: id,
-                                                    archive: archive,
-                                                    pin: pin,
-                                                    image_list: []));
-                                            noteList =
-                                                dbHelper!.getNotesList();
-                                            snapshot.data!.remove(
-                                                snapshot.data![index]);
+                                            dbHelper?.updateArchive(NotesModel(
+                                                id: id,
+                                                archive: archive,
+                                                pin: pin,
+                                                image_list: []));
+                                            noteList = dbHelper!.getNotesList();
+                                            snapshot.data!
+                                                .remove(snapshot.data![index]);
                                           });
                                         })
                                     : SizedBox()

@@ -1,6 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/notification_model.dart';
@@ -8,6 +7,7 @@ import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:notes_sqflite/utils/functions.dart';
 
 class NotificationServices {
+  
   static Future<bool> displayNotificationRationale() async {
     bool userAuthorized = false;
     BuildContext context = MyApp.navigatorKey.currentContext!;
@@ -166,7 +166,6 @@ class NotificationServices {
         ),
       ],
     ).then((value) async {
-
       DateTime dateTime =
           AppFunctions.convertNotificationCalendarToDateTime(schedule);
       String newDateTitle = AppFunctions.notificationFormatDateShow(dateTime);
@@ -174,6 +173,7 @@ class NotificationServices {
       NotificationDataModel notificationModel = await NotificationDataModel(
         notificationId: notificationId,
         parentId: id,
+        region: "notes",
         title: newDateTitle,
       );
       await dbHelper.insertNotification(notificationModel);
@@ -194,7 +194,7 @@ class NotificationServices {
       schedule: schedule,
       content: NotificationContent(
         id: notificationId,
-        channelKey: 'alert',
+        channelKey: 'scheduled',
         title: '$title',
         body: '$body',
         wakeUpScreen: true,
@@ -221,16 +221,21 @@ class NotificationServices {
         ),
       ],
     ).then((value) {
+      DateTime dateTime =
+          AppFunctions.convertNotificationCalendarToDateTime(schedule);
+      String newDateTitle = AppFunctions.notificationFormatDateShow(dateTime);
+
       NotificationDataModel notificationModel = NotificationDataModel(
         notificationId: notificationId,
         parentId: id,
-        title: schedule.toString(),
+        region: "schedules",
+        title: newDateTitle,
       );
       dbHelper.insertNotification(notificationModel);
     });
   }
 
-  Future<void> cancelNotifications() async {
+  Future<void> cancelAllNotifications() async {
     await AwesomeNotifications().cancelAll();
   }
 

@@ -39,8 +39,8 @@ class NotificationController {
         'resource://drawable/todo_main',
         [
           NotificationChannel(
-            channelKey: 'alert',
-            channelName: 'Alert',
+            channelKey: 'scheduled',
+            channelName: 'Scheduled',
             channelDescription: 'Notification tests as alerts',
             playSound: true,
             onlyAlertOnce: true,

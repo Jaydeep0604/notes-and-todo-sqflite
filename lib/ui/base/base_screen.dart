@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:notes_sqflite/config/constant.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
@@ -18,9 +17,11 @@ import 'package:notes_sqflite/ui/finished_screen/todo_done_screen.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_detail_screen.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
+import 'package:animations/animations.dart';
 
 class Base extends StatefulWidget {
   const Base({super.key});
+
   static openDrawer(BuildContext context) {
     _BaseState? state = context.findAncestorStateOfType<_BaseState>();
     state?.openDrawer();
@@ -46,6 +47,9 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
 
   late TextEditingController titleCtr, ageCtr, descriptionCtr, emailCtr;
 
+  ContainerTransitionType _containerTransitionType =
+      ContainerTransitionType.fade;
+
   void initState() {
     super.initState();
     globalScaffoldKey = GlobalKey<ScaffoldState>();
@@ -64,15 +68,21 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
         isDialogOpen == false
             ? showGeneralDialog(
                 context: context,
-                pageBuilder: (BuildContext buildContext,
-                    Animation<double> animation,
-                    Animation<double> secondaryAnimation) {
-                  return ScreenLock();
+                transitionBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return Opacity(
+                    opacity: animation.value,
+                    child: ScreenLock(),
+                  );
+                },
+                pageBuilder: (buildContext, animation, secondaryAnimation) {
+                  // ignore: null_check_always_fails
+                  return null!;
                 },
                 barrierDismissible: true,
                 barrierLabel: "",
                 barrierColor: Colors.black.withOpacity(0.5),
-                transitionDuration: Duration(milliseconds: 200),
+                transitionDuration: Duration(milliseconds: 250),
               )
             : null;
       });
@@ -147,15 +157,31 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
             isDialogOpen == false
                 ? showGeneralDialog(
                     context: context,
-                    pageBuilder: (BuildContext buildContext,
-                        Animation<double> animation,
-                        Animation<double> secondaryAnimation) {
-                      return ScreenLock();
+                    transitionBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      // final curvedValue =
+                      //     Curves.easeInOutBack.transform(animation.value) - 1.0;
+                      return Opacity(
+                        opacity: animation.value,
+                        child: ScreenLock(),
+                      );
+                      // Transform(
+                      //   transform: Matrix4.translationValues(
+                      //       0.0, curvedValue * 200, 0.0),
+                      //   child: Opacity(
+                      //     opacity: animation.value,
+                      //     child: ScreenLock(),
+                      //   ),
+                      // );
+                    },
+                    pageBuilder: (buildContext, animation, secondaryAnimation) {
+                      // ignore: null_check_always_fails
+                      return null!;
                     },
                     barrierDismissible: true,
                     barrierLabel: "",
                     barrierColor: Colors.black.withOpacity(0.5),
-                    transitionDuration: Duration(milliseconds: 200),
+                    transitionDuration: Duration(milliseconds: 250),
                   )
                 : null;
           }
@@ -333,22 +359,28 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        height: 60,
-        child: Row(
-          children: [
-            Expanded(
-              flex: isNotes
-                  ? isAdd
-                      ? 1
-                      : 2
-                  : 1,
-              child: Container(
+      bottomNavigationBar: Material(
+        elevation: 20,
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          color: Theme.of(context).scaffoldBackgroundColor,
+          height: 60,
+          child: Row(
+            children: [
+              AnimatedContainer(
+                width: isNotes
+                    ? isAdd
+                        ? MediaQuery.of(context).size.width * 0.2
+                        : MediaQuery.of(context).size.width * 0.5
+                    : MediaQuery.of(context).size.width * 0.2,
+                duration: Duration(milliseconds: 200),
+                // curve: Curves.bounceOut,
                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(20),
+                  splashFactory: NoSplash.splashFactory,
+                  highlightColor: Colors.transparent,
                   onTap: () {
                     setState(() {
                       isNotes = true;
@@ -387,13 +419,18 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                   ),
                 ),
               ),
-            ),
-            Expanded(
-              flex: isAdd ? 2 : 1,
-              child: Container(
+              Spacer(),
+              AnimatedContainer(
+                width: isAdd
+                    ? MediaQuery.of(context).size.width * 0.5
+                    : MediaQuery.of(context).size.width * 0.2,
+                duration: Duration(milliseconds: 200),
+                // curve: Curves.bounceOut,
                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: InkWell(
+                  splashFactory: NoSplash.splashFactory,
+                  highlightColor: Colors.transparent,
                   onTap: () {
                     setState(() {
                       isAdd = true;
@@ -415,32 +452,28 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                           Icon(
                             CupertinoIcons.add,
                             color: Theme.of(context).highlightColor,
-                            size: isTodos ? 25 : 20,
+                            size: isAdd ? 25 : 20,
                           ),
-                          if (isAdd)
-                            SizedBox(
-                              width: 10,
-                            ),
-                          if (isAdd)
-                            Text(
-                                "${AppLocalization.of(context)?.getTranslatedValue('add')}")
                         ],
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Expanded(
-              flex: isTodos
-                  ? isAdd
-                      ? 1
-                      : 2
-                  : 1,
-              child: Container(
+              Spacer(),
+              AnimatedContainer(
+                width: isTodos
+                    ? isAdd
+                        ? MediaQuery.of(context).size.width * 0.2
+                        : MediaQuery.of(context).size.width * 0.5
+                    : MediaQuery.of(context).size.width * 0.2,
+                duration: Duration(milliseconds: 200),
+                // curve: Curves.easeIn,
                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: InkWell(
+                  splashFactory: NoSplash.splashFactory,
+                  highlightColor: Colors.transparent,
                   onTap: () {
                     setState(() {
                       isNotes = false;
@@ -478,82 +511,69 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
       body: Stack(
         children: [
           isNotes ? NotesScreen() : TodoScreen(),
           if (isAdd)
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    color: Theme.of(context).canvasColor.withOpacity(0.3)),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 5),
+              child: Align(
+                alignment: Alignment.bottomCenter,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    InkWell(
-                      splashFactory: NoSplash.splashFactory,
-                        highlightColor: Colors.transparent,
-                      
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return NoteDetailScreen(
-                                isUpdateNote: false,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                      child: Padding(
+                    OpenContainer(
+                      transitionType: _containerTransitionType,
+                      transitionDuration: Duration(milliseconds: 400),
+                      openBuilder: (context, _) => NoteDetailScreen(
+                        isUpdateNote: false,
+                      ),
+                      closedElevation: 1,
+                      closedColor: AppColors.blueColor,
+                      openElevation: 1,
+                      closedShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      closedBuilder: (context, _) => Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 3),
+                            horizontal: 15, vertical: 5),
                         child: Text(
-                          "${AppLocalization.of(context)?.getTranslatedValue('note')}",
-                          style: TextStyle(color: AppColors.blueColor),
+                          "${AppLocalization.of(context)?.getTranslatedValue('Add Note')}",
+                          style: TextStyle(color: AppColors.whiteColor),
                         ),
                       ),
                     ),
                     SizedBox(
-                      height: 15,
-                      child: VerticalDivider(
-                        color: AppColors.greenSplashColor,
-                        thickness: 1,
-                      ),
+                      width: 10,
                     ),
-                    Container(
-                      child: InkWell(
-                        splashFactory: NoSplash.splashFactory,
-                        highlightColor: Colors.transparent,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TodoDetailscreen(
-                                isUpdateTodo: false,
-                              ),
-                            ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 3),
-                          child: Text(
-                            "${AppLocalization.of(context)?.getTranslatedValue('schedule')}",
-                            style: TextStyle(color: AppColors.blueColor),
-                          ),
+                    OpenContainer(
+                      transitionType: _containerTransitionType,
+                      transitionDuration: Duration(milliseconds: 400),
+                      closedElevation: 1,
+                      openElevation: 1,
+                      closedColor: AppColors.greenSplashColor,
+                      closedShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      openBuilder: (context, _) => TodoDetailscreen(
+                        isUpdateTodo: false,
+                      ),
+                      closedBuilder: (context, _) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 5),
+                        child: Text(
+                          "${AppLocalization.of(context)?.getTranslatedValue('Add Schedule')}",
+                          style: TextStyle(color: AppColors.whiteColor),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -939,3 +959,14 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
   //   }
   // }
 }
+//  flex: isNotes
+//                   ? isAdd
+//                       ? 1
+//                       : 2
+//                   : 1,
+//               flex: isAdd ? 2 : 1,
+//               flex: isTodos
+//                   ? isAdd
+//                       ? 1
+//                       : 2
+//                   : 1,

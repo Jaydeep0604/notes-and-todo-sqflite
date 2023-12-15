@@ -30,7 +30,7 @@ class DBHelper {
     await db.execute(
         "CREATE TABLE todos (id INTEGER PRIMARY KEY AUTOINCREMENT, todo TEXT NOT NULL, finished INTEGER NOT NULL, due_date TEXT NOT NULL,due_time TEXT NOT NULL, category TEXT NOT NULL)");
     await db.execute(
-        "CREATE TABLE notification (id INTEGER PRIMARY KEY AUTOINCREMENT, notification_id INTEGER NOT NULL, parent_id INTEGER NOT NULL, title TEXT NOT NULL)");
+        "CREATE TABLE notification (id INTEGER PRIMARY KEY AUTOINCREMENT, notification_id INTEGER NOT NULL, parent_id INTEGER NOT NULL,region TEXT NOT NULL, title TEXT NOT NULL)");
   }
 
   Future<NotesModel> insertNote(NotesModel notesModel) async {
@@ -240,8 +240,8 @@ class DBHelper {
   Future<int> deleteNotification(int id) async {
     try {
       var dbClient = await db;
-      return await dbClient!
-          .delete('notification', where: 'notification_id = ?', whereArgs: [id]);
+      return await dbClient!.delete('notification',
+          where: 'notification_id = ?', whereArgs: [id]);
     } catch (e) {
       print('Error deleting notification: $e');
       return -1;

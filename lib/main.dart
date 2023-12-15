@@ -116,7 +116,7 @@ class _MyAppState extends State<MyApp> {
       return MaterialApp(
         navigatorKey: MyApp.navigatorKey,
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'Note & Schedule',
         darkTheme: ThemeData(
             brightness: Brightness.dark,
             highlightColor: AppColors.whiteColor,

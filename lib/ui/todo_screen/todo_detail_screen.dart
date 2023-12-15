@@ -4,7 +4,9 @@ import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/db/list_data.dart';
 import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/main.dart';
+import 'package:notes_sqflite/model/notification_model.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
+import 'package:notes_sqflite/services/notification_services.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:notes_sqflite/utils/functions.dart';
@@ -30,6 +32,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
   DBHelper? dbHelper;
 
   late Future<List<TodoModel>> sheduleList;
+  late Future<List<NotificationDataModel>> notificationList;
 
   late TextEditingController timeCtr;
   late TextEditingController dateCtr;
@@ -37,6 +40,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
 
   bool isFinished = false;
   String? categoryName;
+  int? notificationId;
 
   void initState() {
     super.initState();
@@ -48,6 +52,15 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
 
     if (widget.isUpdateTodo) {
       loadData();
+
+      notificationList = dbHelper!.getNotification();
+      notificationList.then((value) {
+        for (var item in value) {
+          if (item.parentId == widget.id && item.region == "schedules") {
+            notificationId = item.notificationId;
+          }
+        }
+      });
     }
     if (!widget.isUpdateTodo) {
       categoryName = ListData.category[0];
@@ -64,65 +77,8 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
     dateCtr.clear();
   }
 
-  DateTime currentDate = DateTime.now();
-  DateTime? notificationDateTime;
-  TimeOfDay timeOfDay = TimeOfDay.now();
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: currentDate,
-      firstDate: DateTime(2015),
-      lastDate: DateTime(2050),
-    );
-    if (pickedDate != null && pickedDate != currentDate) {
-      setState(() {
-        currentDate = pickedDate;
-        final dateFormat = DateFormat('EEEEEEEEE, d MMM y').format(currentDate);
-        dateCtr.text = dateFormat;
-        // Combine date and time when the date is selected.
-        notificationDateTime = currentDate.add(
-          Duration(hours: timeOfDay.hour, minutes: timeOfDay.minute),
-        );
-      });
-    }
-  }
-
-  Future<void> displayTimePicker(BuildContext context) async {
-    var time = await showTimePicker(
-      context: context,
-      initialTime: timeOfDay,
-    );
-    if (time != null) {
-      setState(
-        () {
-          timeOfDay = time;
-          // Combine date and time when the time is selected.
-          notificationDateTime = currentDate.add(
-            Duration(hours: time.hour, minutes: time.minute, seconds: 00),
-          );
-          timeCtr.text = "${time.format(context).toLowerCase()}";
-        },
-      );
-    }
-  }
-
-  RelativeRect buttonMenuPosition(BuildContext context) {
-    final RenderBox bar = context.findRenderObject() as RenderBox;
-    final RenderBox overlay =
-        Overlay.of(context).context.findRenderObject() as RenderBox;
-    const Offset offset = Offset.zero;
-    final RelativeRect position = RelativeRect.fromRect(
-      Rect.fromPoints(
-        bar.localToGlobal(bar.size.center(Offset(0, 0)), ancestor: overlay),
-        bar.localToGlobal(bar.size.center(Offset(0, 0)), ancestor: overlay),
-      ),
-      offset & overlay.size,
-    );
-    return position;
-  }
-
   final formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -140,6 +96,50 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
   }
 
   Widget newSheduleWidget() {
+    DateTime currentDate = DateTime.now();
+    DateTime? notificationDateTime;
+    TimeOfDay timeOfDay = TimeOfDay.now();
+    Future<void> _selectDate(BuildContext context) async {
+      final DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: currentDate,
+        firstDate: DateTime(2015),
+        lastDate: DateTime(2050),
+      );
+      if (pickedDate != null && pickedDate != currentDate) {
+        setState(() {
+          currentDate = pickedDate;
+          final dateFormat =
+              DateFormat('EEEEEEEEE, d MMM y').format(currentDate);
+          dateCtr.text = dateFormat;
+          notificationDateTime = pickedDate;
+        });
+      }
+    }
+
+    Future<void> displayTimePicker(BuildContext context) async {
+      var time = await showTimePicker(
+        context: context,
+        initialTime: timeOfDay,
+      );
+      if (time != null) {
+        if (mounted)
+          setState(
+            () {
+              notificationDateTime = currentDate.add(
+                Duration(hours: 00, minutes: 00, seconds: 00),
+              );
+              timeOfDay = time;
+              notificationDateTime = currentDate.add(
+                Duration(hours: time.hour, minutes: time.minute, seconds: 00),
+              );
+              print("$notificationDateTime+++++++++++");
+              timeCtr.text = "${time.format(context).toLowerCase()}";
+            },
+          );
+      }
+    }
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,7 +174,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                   TextFormField(
                     controller: todoCtr,
                     minLines: 1,
-                    autofocus: true,
+                    // autofocus: true,
                     maxLines: null,
                     style: Theme.of(context).textTheme.titleMedium,
                     validator: (value) {
@@ -361,25 +361,24 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                     setState(() {
                       isUpdateTodoScreen = true;
                     });
-
+                    if (notificationDateTime != null) {
+                      dbHelper!.getTodoUsingTitle(todoCtr.text).then((value) {
+                        AppFunctions.setNewSheduleNotification(
+                          id: value.last.id!,
+                          scheduledTime: notificationDateTime!,
+                          body: value.last.dueTime,
+                          title: value.last.todo,
+                        );
+                      });
+                    }
                     clear();
-                    Navigator.pop(context, true);
+                    Navigator.pop(context);
                   }).onError(
                     (error, stackTrace) {
                       print(error.toString());
                       print(stackTrace.toString());
                     },
                   );
-                  if (notificationDateTime != null) {
-                    dbHelper!.getTodoUsingTitle(todoCtr.text).then((value) {
-                      AppFunctions.setNewSheduleNotification(
-                        id: value.last.id!,
-                        scheduledTime: notificationDateTime!,
-                        body: value.last.dueTime,
-                        title: value.last.todo,
-                      );
-                    });
-                  }
                 }
               },
               child: Text(
@@ -397,17 +396,77 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
   }
 
   Widget updateSheduleWidget() {
+    DateTime? currentDate;
+    DateTime currentTime;
+    DateTime? notificationDateTime;
+    TimeOfDay timeOfDay;
+
     return FutureBuilder(
         future: sheduleList,
         builder: (context, AsyncSnapshot<List<TodoModel>> snapshot) {
           if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            timeCtr.text = snapshot.data!.last.dueTime;
-            dateCtr.text = snapshot.data!.last.dueDate;
-            todoCtr.text = snapshot.data!.last.todo;
-            categoryName = snapshot.data!.last.category;
-            isFinished = snapshot.data!.last.finished == 1 ? true : false;
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              timeCtr.text = snapshot.data!.last.dueTime;
+              dateCtr.text = snapshot.data!.last.dueDate;
+              todoCtr.text = snapshot.data!.last.todo;
+              categoryName = snapshot.data!.last.category;
+              isFinished = snapshot.data!.last.finished == 1 ? true : false;
+            });
+            currentDate = dateCtr.text != ''
+                ? DateFormat('EEEEEEEEE, dd MMM yyyy', 'en_US')
+                    .parseLoose('${dateCtr.text}')
+                : DateTime.now();
 
+            currentTime = timeCtr.text != ''
+                ? DateFormat('h:mm a', 'en_US').parseLoose('${timeCtr.text}')
+                : DateTime.now();
+            timeOfDay =
+                TimeOfDay(hour: currentTime.hour, minute: currentTime.minute);
             return StatefulBuilder(builder: (context, setState) {
+              Future<void> _selectDate(BuildContext context) async {
+                final DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: currentDate,
+                  firstDate: DateTime(2015),
+                  lastDate: DateTime(2050),
+                );
+                if (pickedDate != null && pickedDate != currentDate) {
+                  setState(() {
+                    currentDate = pickedDate;
+                    final dateFormat =
+                        DateFormat('EEEEEEEEE, d MMM y').format(currentDate!);
+                    dateCtr.text = dateFormat;
+                    notificationDateTime = pickedDate;
+                  });
+                }
+              }
+
+              Future<void> displayTimePicker(BuildContext context) async {
+                var time = await showTimePicker(
+                  context: context,
+                  initialTime: timeOfDay,
+                );
+                if (time != null) {
+                  if (mounted)
+                    setState(
+                      () {
+                        notificationDateTime = currentDate!.add(
+                          Duration(hours: 00, minutes: 00, seconds: 00),
+                        );
+                        timeOfDay = time;
+                        notificationDateTime = currentDate!.subtract(
+                          Duration(
+                              hours: time.hour,
+                              minutes: time.minute,
+                              seconds: 00),
+                        );
+                        print("$notificationDateTime+++++++++++");
+                        timeCtr.text = "${time.format(context).toLowerCase()}";
+                      },
+                    );
+                }
+              }
+
               showDeleteDialoge() {
                 return showDialog(
                   context: context,
@@ -746,7 +805,24 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                               category: categoryName!,
                             ))
                                 .then((value) {
-                              Navigator.pop(context, true);
+                              if (dateCtr.text != "" && timeCtr.text != "") {
+                                if (notificationId != "") {
+                                  notificationServices
+                                      .cancelNotificationById(notificationId??0);
+                                }
+                                DateTime dateTime = DateFormat(
+                                        'EEEEEEEEE, dd MMM yyyy h:mm a',
+                                        'en_US')
+                                    .parseLoose(
+                                        '${dateCtr.text} ${timeCtr.text}');
+                                AppFunctions.setNewSheduleNotification(
+                                  id: widget.id!,
+                                  scheduledTime: dateTime,
+                                  body: timeCtr.text,
+                                  title: todoCtr.text,
+                                );
+                              }
+                              Navigator.pop(context);
                               widget.onUpdate!();
                             });
                           }

@@ -996,7 +996,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
     sharedStore.setAppLockPassword(password).then((value) {
       if (value == true) {
         AppMessage.showToast(context,
-            "${AppLocalization.of(context)?.getTranslatedValue('screen_lock_seted_successfully')}");
+            "${AppLocalization.of(context)?.getTranslatedValue('screen_lock_pin_saved_successfully')}");
       }
     }).then((value) {
       if (value == true) {

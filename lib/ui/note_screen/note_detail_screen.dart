@@ -141,9 +141,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
       },
+      // ignore: deprecated_member_use
       child: WillPopScope(
         onWillPop: () async {
-          Navigator.pop(context, true);
+          Navigator.pop(context);
           return true;
         },
         child: Scaffold(
@@ -165,7 +166,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             tooltip:
                 "${AppLocalization.of(context)?.getTranslatedValue('navigate_up')}",
             onPressed: () {
-              Navigator.pop(context, true);
+              Navigator.pop(context);
             },
             icon: Icon(Icons.arrow_back,
                 color: Theme.of(context).iconTheme.color),
@@ -498,7 +499,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             image_list: [],
                           ),
                         );
-                        Navigator.pop(context,true);
+                        Navigator.pop(context, true);
                       },
                       child: Row(
                         children: [
@@ -523,7 +524,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       onTap: () {
                         dbHelper?.deleteForeverNote(widget.id!).then(
                           (value) {
-                            Navigator.pop(context,true);
+                            Navigator.pop(context, true);
                           },
                         );
                       },
@@ -698,7 +699,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                     tooltip:
                         "${AppLocalization.of(context)?.getTranslatedValue('navigate_up')}",
                     onPressed: () {
-                      Navigator.pop(context, true);
+                      Navigator.pop(context);
                     },
                     icon: Icon(Icons.arrow_back,
                         color: Theme.of(context).iconTheme.color),
@@ -949,38 +950,38 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                   runSpacing: 5.0,
                                   children: List.generate(snapshot.data!.length,
                                       (index) {
-                                    return snapshot.data![index].parentId ==
+                                    return snapshot.data![index].region=="notes" && snapshot.data![index].parentId ==
                                             widget.id
                                         ? GestureDetector(
-                                            onTap: () {
-                                              print(
-                                                  snapshot.data![index].title);
-                                              DateTime notificationDateTime =
-                                                  AppFunctions
-                                                      .convertStringToDateTime(
-                                                          snapshot.data![index]
-                                                              .title!);
-                                              DateTime notificationDate =
-                                                  AppFunctions
-                                                      .covertDateTimeToDate(
-                                                          notificationDateTime);
-                                              DateTime notificationTime =
-                                                  AppFunctions
-                                                      .covertDateTimeToTime(
-                                                          notificationDateTime);
+                                            // onTap: () {
+                                            //   print(
+                                            //       snapshot.data![index].title);
+                                            //   DateTime notificationDateTime =
+                                            //       AppFunctions
+                                            //           .convertStringToDateTime(
+                                            //               snapshot.data![index]
+                                            //                   .title!);
+                                            //   DateTime notificationDate =
+                                            //       AppFunctions
+                                            //           .covertDateTimeToDate(
+                                            //               notificationDateTime);
+                                            //   DateTime notificationTime =
+                                            //       AppFunctions
+                                            //           .covertDateTimeToTime(
+                                            //               notificationDateTime);
 
-                                              showResetNotificationDialoge(
-                                                notificationId: snapshot
-                                                    .data![index]
-                                                    .notificationId!,
-                                                currentDate: notificationDate,
-                                                timeOfDay: TimeOfDay(
-                                                  hour: notificationTime.hour,
-                                                  minute:
-                                                      notificationTime.minute,
-                                                ),
-                                              );
-                                            },
+                                            //   showResetNotificationDialoge(
+                                            //     notificationId: snapshot
+                                            //         .data![index]
+                                            //         .notificationId!,
+                                            //     currentDate: notificationDate,
+                                            //     timeOfDay: TimeOfDay(
+                                            //       hour: notificationTime.hour,
+                                            //       minute:
+                                            //           notificationTime.minute,
+                                            //     ),
+                                            //   );
+                                            // },
                                             child: Container(
                                               padding: EdgeInsets.only(left: 8),
                                               decoration: BoxDecoration(
@@ -1360,7 +1361,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 final dateFormat =
                     DateFormat('EEE, dd MMM yyyy').format(currentDate!);
                 dateCtr.text = dateFormat;
-                // Combine date and time when the date is selected.
                 notificationDateTime = currentDate!.add(
                   Duration(hours: timeOfDay!.hour, minutes: timeOfDay!.minute),
                 );
@@ -1880,193 +1880,193 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     });
   }
 
-  showResetNotificationDialoge(
-      {required DateTime currentDate,
-      required TimeOfDay timeOfDay,
-      required int notificationId}) {
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
-          Future<void> selectDate(BuildContext context) async {
-            final DateTime? pickedDate = await showDatePicker(
-              context: context,
-              initialDate: currentDate,
-              firstDate: DateTime(2015),
-              lastDate: DateTime(2050),
-            );
+  // showResetNotificationDialoge(
+  //     {required DateTime currentDate,
+  //     required TimeOfDay timeOfDay,
+  //     required int notificationId}) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => StatefulBuilder(
+  //       builder: (context, setState) {
+  //         Future<void> selectDate(BuildContext context) async {
+  //           final DateTime? pickedDate = await showDatePicker(
+  //             context: context,
+  //             initialDate: currentDate,
+  //             firstDate: DateTime(2015),
+  //             lastDate: DateTime(2050),
+  //           );
 
-            if (pickedDate != null && pickedDate != currentDate) {
-              setState(() {
-                currentDate = pickedDate;
-                final dateFormat =
-                    DateFormat('EEE, d MMM y').format(currentDate!);
-                dateCtr.text = dateFormat;
-                // Combine date and time when the date is selected.
-                notificationDateTime = currentDate!.add(
-                  Duration(hours: timeOfDay!.hour, minutes: timeOfDay!.minute),
-                );
-                print("notificationDateTime date is :$notificationDateTime");
-              });
-            }
-          }
+  //           if (pickedDate != null && pickedDate != currentDate) {
+  //             setState(() {
+  //               currentDate = pickedDate;
+  //               final dateFormat =
+  //                   DateFormat('EEE, d MMM y').format(currentDate!);
+  //               dateCtr.text = dateFormat;
+  //               // Combine date and time when the date is selected.
+  //               notificationDateTime = currentDate!.add(
+  //                 Duration(hours: timeOfDay!.hour, minutes: timeOfDay!.minute),
+  //               );
+  //               print("notificationDateTime date is :$notificationDateTime");
+  //             });
+  //           }
+  //         }
 
-          Future<void> displayTimePicker(BuildContext context) async {
-            var time = await showTimePicker(
-              context: context,
-              initialTime: timeOfDay!,
-            );
-            if (time != null) {
-              setState(
-                () {
-                  timeOfDay = time;
-                  notificationDateTime = currentDate!.add(
-                    Duration(
-                        hours: time.hour, minutes: time.minute, seconds: 00),
-                  );
-                  timeCtr.text = "${time.format(context).toLowerCase()}";
-                },
-              );
-            }
-          }
+  //         Future<void> displayTimePicker(BuildContext context) async {
+  //           var time = await showTimePicker(
+  //             context: context,
+  //             initialTime: timeOfDay!,
+  //           );
+  //           if (time != null) {
+  //             setState(
+  //               () {
+  //                 timeOfDay = time;
+  //                 notificationDateTime = currentDate!.add(
+  //                   Duration(
+  //                       hours: time.hour, minutes: time.minute, seconds: 00),
+  //                 );
+  //                 timeCtr.text = "${time.format(context).toLowerCase()}";
+  //               },
+  //             );
+  //           }
+  //         }
 
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            backgroundColor: Theme.of(context).iconTheme.color,
-            title: Row(
-              children: [
-                Text(
-                    "${AppLocalization.of(context)?.getTranslatedValue('add_your_reminder')}",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        fontSize: 18)),
-                Spacer(),
-              ],
-            ),
-            actions: [
-              SizedBox(
-                height: 10,
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListTile(
-                    onTap: () {
-                      selectDate(context);
-                    },
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(
-                        color: Colors.transparent,
-                      ),
-                    ),
-                    splashColor: Colors.transparent,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                    title: Text(
-                      "${DateFormat('EEE, dd MMM yyyy').format(currentDate)}",
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).scaffoldBackgroundColor),
-                    ),
-                    trailing: Icon(
-                      Icons.date_range_outlined,
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                    ),
-                  ),
-                  ListTile(
-                    splashColor: Colors.transparent,
-                    onTap: () {
-                      displayTimePicker(context);
-                    },
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(
-                        color: Colors.transparent,
-                      ),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                    title: Text(
-                      "${timeOfDay.format(context)}",
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).scaffoldBackgroundColor),
-                    ),
-                    trailing: Icon(
-                      Icons.watch_later_outlined,
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: MaterialButton(
-                          color: Colors.blue[400],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "${AppLocalization.of(context)?.getTranslatedValue('cancel')}",
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                    fontSize: 12,
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                        child: MaterialButton(
-                          color: Colors.green[400],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          onPressed: () async {
-                            if (notificationId != '') {
-                              dbHelper!.deleteNotification(notificationId);
-                              AppFunctions.resetNotification(notificationId);
-                            }
-                            await AppFunctions.setNoteNotification(
-                                id: widget.id!,
-                                scheduledTime: notificationDateTime!,
-                                title: titleCtr.text == ""
-                                    ? noteCtr.text
-                                    : titleCtr.text,
-                                body: timeCtr.text);
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "${AppLocalization.of(context)?.getTranslatedValue('add')}",
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                    fontSize: 12,
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor),
-                          ),
-                        ),
-                      )
-                    ],
-                  )
-                ],
-              )
-            ],
-          );
-        },
-      ),
-    ).then((value) {
-      loadNotifications();
-    });
-  }
+  //         return AlertDialog(
+  //           shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.circular(20),
+  //           ),
+  //           backgroundColor: Theme.of(context).iconTheme.color,
+  //           title: Row(
+  //             children: [
+  //               Text(
+  //                   "${AppLocalization.of(context)?.getTranslatedValue('add_your_reminder')}",
+  //                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
+  //                       color: Theme.of(context).scaffoldBackgroundColor,
+  //                       fontSize: 18)),
+  //               Spacer(),
+  //             ],
+  //           ),
+  //           actions: [
+  //             SizedBox(
+  //               height: 10,
+  //             ),
+  //             Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 ListTile(
+  //                   onTap: () {
+  //                     selectDate(context);
+  //                   },
+  //                   shape: RoundedRectangleBorder(
+  //                     borderRadius: BorderRadius.circular(10),
+  //                     side: BorderSide(
+  //                       color: Colors.transparent,
+  //                     ),
+  //                   ),
+  //                   splashColor: Colors.transparent,
+  //                   contentPadding: EdgeInsets.symmetric(horizontal: 10),
+  //                   title: Text(
+  //                     "${DateFormat('EEE, dd MMM yyyy').format(currentDate)}",
+  //                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
+  //                         color: Theme.of(context).scaffoldBackgroundColor),
+  //                   ),
+  //                   trailing: Icon(
+  //                     Icons.date_range_outlined,
+  //                     color: Theme.of(context).scaffoldBackgroundColor,
+  //                   ),
+  //                 ),
+  //                 ListTile(
+  //                   splashColor: Colors.transparent,
+  //                   onTap: () {
+  //                     displayTimePicker(context);
+  //                   },
+  //                   shape: RoundedRectangleBorder(
+  //                     borderRadius: BorderRadius.circular(10),
+  //                     side: BorderSide(
+  //                       color: Colors.transparent,
+  //                     ),
+  //                   ),
+  //                   contentPadding: EdgeInsets.symmetric(horizontal: 10),
+  //                   title: Text(
+  //                     "${timeOfDay.format(context)}",
+  //                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
+  //                         color: Theme.of(context).scaffoldBackgroundColor),
+  //                   ),
+  //                   trailing: Icon(
+  //                     Icons.watch_later_outlined,
+  //                     color: Theme.of(context).scaffoldBackgroundColor,
+  //                   ),
+  //                 ),
+  //                 SizedBox(
+  //                   height: 10,
+  //                 ),
+  //                 Row(
+  //                   children: [
+  //                     Expanded(
+  //                       child: MaterialButton(
+  //                         color: Colors.blue[400],
+  //                         shape: RoundedRectangleBorder(
+  //                           borderRadius: BorderRadius.circular(10),
+  //                         ),
+  //                         onPressed: () {
+  //                           Navigator.pop(context);
+  //                         },
+  //                         child: Text(
+  //                           "${AppLocalization.of(context)?.getTranslatedValue('cancel')}",
+  //                           style: Theme.of(context)
+  //                               .textTheme
+  //                               .titleMedium
+  //                               ?.copyWith(
+  //                                   fontSize: 12,
+  //                                   color: Theme.of(context)
+  //                                       .scaffoldBackgroundColor),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                     SizedBox(
+  //                       width: 10,
+  //                     ),
+  //                     Expanded(
+  //                       child: MaterialButton(
+  //                         color: Colors.green[400],
+  //                         shape: RoundedRectangleBorder(
+  //                           borderRadius: BorderRadius.circular(10),
+  //                         ),
+  //                         onPressed: () async {
+  //                           if (notificationId != '') {
+  //                             dbHelper!.deleteNotification(notificationId);
+  //                             // AppFunctions.resetNotification(notificationId);
+  //                           }
+  //                           await AppFunctions.setNoteNotification(
+  //                               id: widget.id!,
+  //                               scheduledTime: notificationDateTime!,
+  //                               title: titleCtr.text == ""
+  //                                   ? noteCtr.text
+  //                                   : titleCtr.text,
+  //                               body: timeCtr.text);
+  //                           Navigator.pop(context);
+  //                         },
+  //                         child: Text(
+  //                           "${AppLocalization.of(context)?.getTranslatedValue('add')}",
+  //                           style: Theme.of(context)
+  //                               .textTheme
+  //                               .titleMedium
+  //                               ?.copyWith(
+  //                                   fontSize: 12,
+  //                                   color: Theme.of(context)
+  //                                       .scaffoldBackgroundColor),
+  //                         ),
+  //                       ),
+  //                     )
+  //                   ],
+  //                 )
+  //               ],
+  //             )
+  //           ],
+  //         );
+  //       },
+  //     ),
+  //   ).then((value) {
+  //     loadNotifications();
+  //   });
+  // }
 }
