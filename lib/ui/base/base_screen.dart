@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:notes_sqflite/animations/slide_animation.dart';
 import 'package:notes_sqflite/config/constant.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/language/localisation.dart';
@@ -277,9 +278,13 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 splashColor: AppColors.greenSplashColor,
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return TodoDoneScreen();
-                  }));
+
+                  Navigator.push(
+                    context,
+                    SlideAnimation.createRightRoute(
+                      TodoDoneScreen(),
+                    ),
+                  );
                 },
                 title: Text(
                   "${AppLocalization.of(context)?.getTranslatedValue('finished')}",
@@ -297,11 +302,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ArchiveNoteScreen(),
-                    ),
-                  );
+                      context, SlideAnimation.createRightRoute(ArchiveNoteScreen()));
                 },
                 title: Text(
                   "${AppLocalization.of(context)?.getTranslatedValue('archive')}",
@@ -320,11 +321,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DeleteNoteScreen(),
-                    ),
-                  );
+                      context, SlideAnimation.createRightRoute(DeleteNoteScreen()));
                 },
                 title: Text(
                   "${AppLocalization.of(context)?.getTranslatedValue('deleted')}",
@@ -343,11 +340,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SettingScreen(),
-                    ),
-                  );
+                      context, SlideAnimation.createOpenRoute(SettingScreen()));
                 },
                 title: Text(
                   "${AppLocalization.of(context)?.getTranslatedValue('settings')}",

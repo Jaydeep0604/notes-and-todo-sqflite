@@ -40,7 +40,6 @@ dependencies:
   intl: ^0.18.1
   flutter_local_notifications:
   rxdart: ^0.27.7
-  http: ^1.1.0
   flutter_timezone: ^1.0.8
   flutter_staggered_animations: ^1.1.1
   auto_animated: ^3.2.0
