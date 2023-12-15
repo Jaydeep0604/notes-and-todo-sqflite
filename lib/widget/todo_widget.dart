@@ -131,7 +131,7 @@ class _TodoWidgetState extends State<TodoWidget> {
             color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-                color: Theme.of(context).iconTheme.color!.withOpacity(0.4),
+                color: Theme.of(context).iconTheme.color!.withOpacity(0.6),
                 width: 0.7),
             // gradient: LinearGradient(
             //   tileMode: TileMode.mirror,
@@ -576,4 +576,3 @@ class _TodoWidgetState extends State<TodoWidget> {
   //   );
   // }
 }
-

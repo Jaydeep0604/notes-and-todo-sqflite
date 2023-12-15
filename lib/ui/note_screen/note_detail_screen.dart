@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_sqflite/db/db_handler.dart';
 import 'package:notes_sqflite/language/localisation.dart';
@@ -24,7 +25,8 @@ class NoteDetailScreen extends StatefulWidget {
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
 }
 
-class _NoteDetailScreenState extends State<NoteDetailScreen> {
+class _NoteDetailScreenState extends State<NoteDetailScreen>
+    with SingleTickerProviderStateMixin {
   DBHelper? dbHelper;
   bool isEvening = false, isNextEvening = false, isCheckNextEvening = false;
   bool isNextMorning = false;
@@ -480,7 +482,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 color: Theme.of(context).canvasColor,
                 icon: Icon(
                   Icons.more_vert,
-                  color: Theme.of(context).iconTheme.color,
+                  size: 25,
+                  color: Theme.of(context).highlightColor,
                 ),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
@@ -499,13 +502,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             image_list: [],
                           ),
                         );
-                        Navigator.pop(context, true);
+                        Navigator.pop(context);
                       },
                       child: Row(
                         children: [
                           Icon(
                             Icons.restore,
-                            color: Theme.of(context).highlightColor,
+                            color: Theme.of(context).scaffoldBackgroundColor,
                           ),
                           SizedBox(
                             width: 10,
@@ -515,7 +518,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium
-                                ?.copyWith(fontSize: 14),
+                                ?.copyWith(
+                                    fontSize: 14,
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
                           )
                         ],
                       ),
@@ -524,7 +530,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       onTap: () {
                         dbHelper?.deleteForeverNote(widget.id!).then(
                           (value) {
-                            Navigator.pop(context, true);
+                            Navigator.pop(context);
                           },
                         );
                       },
@@ -542,7 +548,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium
-                                ?.copyWith(fontSize: 14),
+                                ?.copyWith(
+                                    fontSize: 14,
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
                           )
                         ],
                       ),
@@ -705,37 +714,101 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                         color: Theme.of(context).iconTheme.color),
                   ),
                   actions: [
-                    IconButton(
-                      tooltip:
-                          "${AppLocalization.of(context)?.getTranslatedValue('pin')}",
-                      onPressed: () {
-                        chnagePin();
-                      },
-                      icon: Transform.scale(
-                        scale: 1,
+                    GestureDetector(
+                      onTap: chnagePin,
+                      child: AnimatedSwitcher(
+                        duration: Duration(milliseconds: 200),
+                        switchInCurve: Curves.easeOut,
+                        switchOutCurve: Curves.easeOut,
+                        transitionBuilder:
+                            (Widget child, Animation<double> animation) {
+                          return ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          );
+                        },
                         child: pin!
-                            ? Icon(Icons.push_pin,
-                                color: Theme.of(context).iconTheme.color)
-                            : Icon(Icons.push_pin_outlined,
-                                color: Theme.of(context).iconTheme.color),
+                            ? Icon(
+                                Icons.push_pin,
+                                size: 25,
+                                color: Theme.of(context).iconTheme.color,
+                                key: ValueKey<int>(1),
+                              )
+                            : Icon(
+                                Icons.push_pin_outlined,
+                                color: Theme.of(context).iconTheme.color,
+                                size: 25,
+                                key: ValueKey<int>(2),
+                              ),
                       ),
                     ),
-                    IconButton(
-                      tooltip:
-                          "${AppLocalization.of(context)?.getTranslatedValue('archive')}",
-                      onPressed: () {
-                        chnageArchive();
-                      },
-                      icon: Transform.scale(
-                        scale: 1,
+                    SizedBox(
+                      width: 15,
+                    ),
+                    GestureDetector(
+                      onTap: chnageArchive,
+                      child: AnimatedSwitcher(
+                        duration: Duration(milliseconds: 200),
+                        switchInCurve: Curves.easeOut,
+                        switchOutCurve: Curves.easeOut,
+                        transitionBuilder:
+                            (Widget child, Animation<double> animation) {
+                          return ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          );
+                        },
                         child: archive!
-                            ? Icon(Icons.archive,
-                                color: Theme.of(context).iconTheme.color)
-                            : Icon(Icons.archive_outlined,
-                                color: Theme.of(context).iconTheme.color),
+                            ? Icon(
+                                Icons.archive,
+                                size: 25,
+                                color: Theme.of(context).iconTheme.color,
+                                key: ValueKey<int>(1),
+                              )
+                            : Icon(
+                                Icons.archive_outlined,
+                                color: Theme.of(context).iconTheme.color,
+                                size: 25,
+                                key: ValueKey<int>(2),
+                              ),
                       ),
                     ),
+                    if (deleted == false)
+                      SizedBox(
+                        width: 10,
+                      ),
+                    // IconButton(
+                    //   tooltip:
+                    //       "${AppLocalization.of(context)?.getTranslatedValue('pin')}",
+                    //   onPressed: () {
+                    //     chnagePin();
+                    //   },
+                    //   icon: Transform.scale(
+                    //     scale: 1,
+                    //     child: pin!
+                    //         ? Icon(Icons.push_pin,
+                    //             color: Theme.of(context).iconTheme.color)
+                    //         : Icon(Icons.push_pin_outlined,
+                    //             color: Theme.of(context).iconTheme.color),
+                    //   ),
+                    // ),
+                    // IconButton(
+                    //   tooltip:
+                    //       "${AppLocalization.of(context)?.getTranslatedValue('archive')}",
+                    //   onPressed: () {
+                    //     chnageArchive();
+                    //   },
+                    //   icon: Transform.scale(
+                    //     scale: 1,
+                    //     child: archive!
+                    //         ? Icon(Icons.archive,
+                    //             color: Theme.of(context).iconTheme.color)
+                    //         : Icon(Icons.archive_outlined,
+                    //             color: Theme.of(context).iconTheme.color),
+                    //   ),
+                    // ),
                     if (deleted!) deletePopUpMenu(),
+
                     SizedBox(
                       width: 10,
                     ),
@@ -950,8 +1023,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                                   runSpacing: 5.0,
                                   children: List.generate(snapshot.data!.length,
                                       (index) {
-                                    return snapshot.data![index].region=="notes" && snapshot.data![index].parentId ==
-                                            widget.id
+                                    return snapshot.data![index].region ==
+                                                "notes" &&
+                                            snapshot.data![index].parentId ==
+                                                widget.id
                                         ? GestureDetector(
                                             // onTap: () {
                                             //   print(
@@ -1128,7 +1203,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       setState(() {
         isUpdateNoteScreen = true;
       });
-      Navigator.pop(context, true);
+      Navigator.pop(context);
     }).onError((error, stackTrace) {
       print(error.toString());
       print(stackTrace.toString());
