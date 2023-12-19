@@ -296,16 +296,15 @@ class _NotesScreenState extends State<NotesScreen> {
                                           pin,
                                         ) {
                                           setState(() {
-                                            // dbHelper!.delete(snapshot
-                                            //     .data![index].id!);
+                                            snapshot.data!
+                                                .remove(snapshot.data![index]);
                                             dbHelper?.updateArchive(NotesModel(
                                                 id: id,
                                                 archive: archive,
                                                 pin: pin,
                                                 image_list: []));
                                             noteList = dbHelper!.getNotesList();
-                                            snapshot.data!
-                                                .remove(snapshot.data![index]);
+                                            
                                           });
                                         })
                                     : SizedBox()

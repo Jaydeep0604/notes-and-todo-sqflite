@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   static const Color whiteColor = Colors.white;
-  static const Color canvasColor = Color.fromARGB(255, 168, 201, 181);
+  static const Color canvasColor = Color(0xFFA8C9B5);
   static const Color blackColor = Colors.black;
   static const Color yellowColor = Colors.yellow;
   static const Color blueGrayColor = Colors.blueGrey;

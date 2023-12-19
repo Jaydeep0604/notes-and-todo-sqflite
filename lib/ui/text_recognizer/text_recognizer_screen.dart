@@ -1,9 +1,12 @@
 import 'dart:io';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:notes_sqflite/ui/note_screen/note_detail_screen.dart';
+import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class TextRecognizerScreen extends StatefulWidget {
@@ -16,6 +19,8 @@ class TextRecognizerScreen extends StatefulWidget {
 class _TextRecognizerScreenState extends State<TextRecognizerScreen>
     with WidgetsBindingObserver {
   bool _isPermissionGranted = false;
+  bool isTorch = false;
+  bool isImportImage = false;
 
   late final Future<void> _future;
   CameraController? _cameraController;
@@ -50,6 +55,20 @@ class _TextRecognizerScreenState extends State<TextRecognizerScreen>
     }
   }
 
+  File? image;
+  Future<bool> pickImage() async {
+    try {
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return false;
+      final imageTemp = File(image.path);
+      setState(() => this.image = imageTemp);
+      return true;
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+      return false;
+    }
+  }
+
   final textRecognizer = TextRecognizer();
   @override
   Widget build(BuildContext context) {
@@ -71,38 +90,184 @@ class _TextRecognizerScreenState extends State<TextRecognizerScreen>
                   }
                 },
               ),
-            Scaffold(
-              appBar: AppBar(
-                title: const Text('Text Recognition Sample'),
-              ),
-              backgroundColor: _isPermissionGranted ? Colors.transparent : null,
-              body: _isPermissionGranted
-                  ? Column(
-                      children: [
-                        Expanded(
-                          child: Container(),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.only(bottom: 30.0),
-                          child: Center(
-                            child: ElevatedButton(
-                              onPressed: _scanImage,
-                              child: const Text('Scan text'),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : Center(
-                      child: Container(
-                        padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-                        child: const Text(
-                          'Camera permission denied',
-                          textAlign: TextAlign.center,
+            isImportImage
+                ? Scaffold(
+                    appBar: AppBar(
+                      backgroundColor: Colors.black,
+                      title: Text(
+                        "Image",
+                        style: TextStyle(color: AppColors.whiteColor),
+                      ),
+                      automaticallyImplyLeading: false,
+                      leading: IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: AppColors.whiteColor,
                         ),
                       ),
+                      actions: [
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                isImportImage = false;
+                              });
+                            },
+                            icon: Icon(
+                              Icons.document_scanner,
+                              color: AppColors.whiteColor,
+                            )),
+                        SizedBox(
+                          width: 10,
+                        ),
+                      ],
                     ),
-            ),
+                    bottomNavigationBar: Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStatePropertyAll(AppColors.blueColor),
+                            ),
+                            onPressed: () async {
+                              final inputImage = InputImage.fromFile(image!);
+                              final recognizedText =
+                                  await textRecognizer.processImage(inputImage);
+                              Navigator.pop(context);
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      NoteDetailScreen(
+                                          isUpdateNote: false,
+                                          scannedText: recognizedText.text),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              'scan_text',
+                              style: TextStyle(
+                                color: AppColors.whiteColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    body: InteractiveViewer(
+                      child: Center(
+                        child: Image.file(image!),
+                      ),
+                    ),
+                  )
+                : Scaffold(
+                    appBar: AppBar(
+                      backgroundColor: Colors.black,
+                      title: Text(
+                        "Scan",
+                        style: TextStyle(color: AppColors.whiteColor),
+                      ),
+                      automaticallyImplyLeading: false,
+                      leading: IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: AppColors.whiteColor,
+                        ),
+                      ),
+                      actions: [
+                        IconButton(
+                            onPressed: () {
+                              pickImage().then((value) {
+                                if (value == true) {
+                                  setState(() {
+                                    isImportImage = true;
+                                  });
+                                }
+                              });
+                            },
+                            icon: Icon(
+                              Icons.add_photo_alternate_rounded,
+                              color: AppColors.whiteColor,
+                            )),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              isTorch = !isTorch;
+                            });
+                            if (isTorch) {
+                              _cameraController!.setFlashMode(FlashMode.torch);
+                            } else {
+                              _cameraController!.setFlashMode(FlashMode.off);
+                            }
+                          },
+                          icon: isTorch
+                              ? Icon(
+                                  Icons.flashlight_on_rounded,
+                                  color: AppColors.whiteColor,
+                                )
+                              : Icon(
+                                  Icons.flashlight_off_rounded,
+                                  color: AppColors.yellowColor,
+                                ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                      ],
+                    ),
+                    backgroundColor:
+                        _isPermissionGranted ? Colors.transparent : null,
+                    body: _isPermissionGranted
+                        ? Column(
+                            children: [
+                              Expanded(
+                                child: Container(),
+                              ),
+                              Container(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    ElevatedButton(
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStatePropertyAll(
+                                                AppColors.blueColor),
+                                      ),
+                                      onPressed: _scanImage,
+                                      child: const Text(
+                                        'scan_text',
+                                        style: TextStyle(
+                                          color: AppColors.whiteColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                        : Center(
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                  left: 24.0, right: 24.0),
+                              child: const Text(
+                                'Camera permission denied',
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                  ),
           ],
         );
       },
@@ -113,8 +278,6 @@ class _TextRecognizerScreenState extends State<TextRecognizerScreen>
     final status = await Permission.camera.request();
     _isPermissionGranted = status == PermissionStatus.granted;
   }
-
-  
 
   void _startCamera() {
     if (_cameraController != null) {
@@ -127,7 +290,7 @@ class _TextRecognizerScreenState extends State<TextRecognizerScreen>
       _cameraController?.dispose();
     }
   }
-
+  
   void _initCameraController(List<CameraDescription> cameras) {
     if (_cameraController != null) {
       return;
@@ -154,8 +317,8 @@ class _TextRecognizerScreenState extends State<TextRecognizerScreen>
       ResolutionPreset.max,
       enableAudio: false,
     );
-
     await _cameraController!.initialize();
+    await _cameraController!.setFocusMode(FocusMode.auto);
     await _cameraController!.setFlashMode(FlashMode.off);
 
     if (!mounted) {
@@ -176,13 +339,11 @@ class _TextRecognizerScreenState extends State<TextRecognizerScreen>
 
       final inputImage = InputImage.fromFile(file);
       final recognizedText = await textRecognizer.processImage(inputImage);
-
+      Navigator.pop(context);
       await navigator.push(
         MaterialPageRoute(
-          builder: (BuildContext context) =>
-              NoteDetailScreen(
-                isUpdateNote: false,
-                scannedText: recognizedText.text),
+          builder: (BuildContext context) => NoteDetailScreen(
+              isUpdateNote: false, scannedText: recognizedText.text),
         ),
       );
     } catch (e) {

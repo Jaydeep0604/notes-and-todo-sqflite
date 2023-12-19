@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:notes_sqflite/language/localisation.dart';
-import 'package:notes_sqflite/utils/app_colors.dart';
 
 class ImageViewScreen extends StatefulWidget {
   ImageViewScreen({

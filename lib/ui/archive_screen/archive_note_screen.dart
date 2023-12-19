@@ -60,21 +60,7 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
           centerTitle: false,
         ),
         body: SafeArea(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Padding(
-            //   padding: const EdgeInsets.only(left: 15),
-            //   child: Text(
-            //     "Archive",
-            //     style: TextStyle(
-            //         color: AppColors.whiteColor
-            //         fontWeight: FontWeight.w500,
-            //         fontSize: 14),
-            //   ),
-            // ),
-            FutureBuilder(
+            child: FutureBuilder(
               future: noteList,
               builder: (context, AsyncSnapshot<List<NotesModel>> snapshot) {
                 int archiveCount = snapshot.data != null &&
@@ -94,61 +80,61 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
                       ),
                     );
                   }
-                  return MasonryGridView.count(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 0,
-                    mainAxisSpacing: 0,
-                    itemCount: archiveCount,
-                    primary: false,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return snapshot.data![index].archive == 1
-                          ? snapshot.data![index].deleted == 0
-                              ? NoteWidget(
-                                  dbHelper: dbHelper!,
-                                  keyvalue:
-                                      ValueKey<int>(snapshot.data![index].id!),
-                                  id: snapshot.data![index].id!,
-                                  title: snapshot.data![index].title.toString(),
-                                  note: snapshot.data![index].note.toString(),
-                                  pin: snapshot.data![index].pin!,
-                                  archive: snapshot.data![index].archive!,
-                                  email: snapshot.data![index].email.toString(),
-                                  deleted: snapshot.data![index].deleted!,
-                                  createDate: snapshot.data![index].create_date
-                                      .toString(),
-                                  editedDate: snapshot.data![index].edited_date
-                                      .toString(),
-                                  imageList: snapshot.data![index].image_list,
-                                  onUpdateComplete: () {
-                                    setState(() {
-                                      noteList = dbHelper!.getNotesList();
-                                    });
-                                  },
-                                  // onDismissed: (
-                                  //   id,
-                                  //   archive,
-                                  // ) {
-                                  //   setState(() {
-                                  //     // dbHelper!.delete(snapshot.data![index].id!);
-                                  //     noteList = dbHelper!.getNotesList();
-                                  //     snapshot.data!
-                                  //         .remove(snapshot.data![index]);
-                                  //   });
-                                  // },
-                                )
-                              : Container()
-                          : Container();
-                    },
+                  return Expanded(
+                    child: MasonryGridView.count(
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 0,
+                      mainAxisSpacing: 0,
+                      itemCount: archiveCount,
+                      primary: false,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return snapshot.data![index].archive == 1
+                            ? snapshot.data![index].deleted == 0
+                                ? NoteWidget(
+                                    dbHelper: dbHelper!,
+                                    keyvalue:
+                                        ValueKey<int>(snapshot.data![index].id!),
+                                    id: snapshot.data![index].id!,
+                                    title: snapshot.data![index].title.toString(),
+                                    note: snapshot.data![index].note.toString(),
+                                    pin: snapshot.data![index].pin!,
+                                    archive: snapshot.data![index].archive!,
+                                    email: snapshot.data![index].email.toString(),
+                                    deleted: snapshot.data![index].deleted!,
+                                    createDate: snapshot.data![index].create_date
+                                        .toString(),
+                                    editedDate: snapshot.data![index].edited_date
+                                        .toString(),
+                                    imageList: snapshot.data![index].image_list,
+                                    onUpdateComplete: () {
+                                      setState(() {
+                                        noteList = dbHelper!.getNotesList();
+                                      });
+                                    },
+                                    // onDismissed: (
+                                    //   id,
+                                    //   archive,
+                                    // ) {
+                                    //   setState(() {
+                                    //     // dbHelper!.delete(snapshot.data![index].id!);
+                                    //     noteList = dbHelper!.getNotesList();
+                                    //     snapshot.data!
+                                    //         .remove(snapshot.data![index]);
+                                    //   });
+                                    // },
+                                  )
+                                : Container()
+                            : Container();
+                      },
+                    ),
                   );
                 } else {
                   return Center(child: CircularProgressIndicator());
                 }
               },
-            ),
-          ],
-        )),
+            )),
       ),
     );
   }

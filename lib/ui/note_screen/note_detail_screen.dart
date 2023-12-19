@@ -1962,6 +1962,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         isEvening = false;
         isNextMorning = false;
         isNextEvening = false;
+        dateCtr.clear();
+        timeCtr.clear();
       });
       loadNotifications();
     });
@@ -1982,7 +1984,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   //             firstDate: DateTime(2015),
   //             lastDate: DateTime(2050),
   //           );
-
   //           if (pickedDate != null && pickedDate != currentDate) {
   //             setState(() {
   //               currentDate = pickedDate;
@@ -1997,7 +1998,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   //             });
   //           }
   //         }
-
   //         Future<void> displayTimePicker(BuildContext context) async {
   //           var time = await showTimePicker(
   //             context: context,
@@ -2016,7 +2016,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   //             );
   //           }
   //         }
-
   //         return AlertDialog(
   //           shape: RoundedRectangleBorder(
   //             borderRadius: BorderRadius.circular(20),

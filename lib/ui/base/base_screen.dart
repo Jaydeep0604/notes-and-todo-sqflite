@@ -302,8 +302,8 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 splashColor: AppColors.orangeSplashColor,
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.push(
-                      context, SlideAnimation.createRightRoute(ArchiveNoteScreen()));
+                  Navigator.push(context,
+                      SlideAnimation.createRightRoute(ArchiveNoteScreen()));
                 },
                 title: Text(
                   "${AppLocalization.of(context)?.getTranslatedValue('archive')}",
@@ -321,8 +321,8 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                 splashColor: AppColors.redColor,
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.push(
-                      context, SlideAnimation.createRightRoute(DeleteNoteScreen()));
+                  Navigator.push(context,
+                      SlideAnimation.createRightRoute(DeleteNoteScreen()));
                 },
                 title: Text(
                   "${AppLocalization.of(context)?.getTranslatedValue('deleted')}",
@@ -514,83 +514,85 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
         children: [
           isNotes ? NotesScreen() : TodoScreen(),
           if (isAdd)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    OpenContainer(
-                      transitionType: _containerTransitionType,
-                      transitionDuration: Duration(milliseconds: 400),
-                      openBuilder: (context, _) => NoteDetailScreen(
-                        isUpdateNote: false,
-                      ),
-                      closedElevation: 1,
-                      closedColor: AppColors.blueColor,
-                      openElevation: 1,
-                      closedShape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      closedBuilder: (context, _) => Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 5),
-                        child: Text(
-                          "${AppLocalization.of(context)?.getTranslatedValue('Add Note')}",
-                          style: TextStyle(color: AppColors.whiteColor),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 5),
+                child: Container(
+                  height: 30,
+                  child: ListView(
+                    padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width/3),
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      OpenContainer(
+                        transitionType: _containerTransitionType,
+                        transitionDuration: Duration(milliseconds: 400),
+                        openBuilder: (context, _) => NoteDetailScreen(
+                          isUpdateNote: false,
+                        ),
+                        closedElevation: 1,
+                        closedColor: AppColors.blueColor,
+                        openElevation: 1,
+                        closedShape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        closedBuilder: (context, _) => Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 5),
+                          child: Text(
+                            "${AppLocalization.of(context)?.getTranslatedValue('Add Note')}",
+                            style: TextStyle(color: AppColors.whiteColor),
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    OpenContainer(
-                      transitionType: _containerTransitionType,
-                      transitionDuration: Duration(milliseconds: 400),
-                      closedElevation: 1,
-                      openElevation: 1,
-                      closedColor: AppColors.greenSplashColor,
-                      closedShape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                      SizedBox(
+                        width: 10,
                       ),
-                      openBuilder: (context, _) => TodoDetailscreen(
-                        isUpdateTodo: false,
-                      ),
-                      closedBuilder: (context, _) => Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 5),
-                        child: Text(
-                          "${AppLocalization.of(context)?.getTranslatedValue('Add Schedule')}",
-                          style: TextStyle(color: AppColors.whiteColor),
+                      OpenContainer(
+                        transitionType: _containerTransitionType,
+                        transitionDuration: Duration(milliseconds: 400),
+                        closedElevation: 1,
+                        openElevation: 1,
+                        closedColor: AppColors.greenSplashColor,
+                        closedShape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        openBuilder: (context, _) => TodoDetailscreen(
+                          isUpdateTodo: false,
+                        ),
+                        closedBuilder: (context, _) => Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 5),
+                          child: Text(
+                            "${AppLocalization.of(context)?.getTranslatedValue('Add Schedule')}",
+                            style: TextStyle(color: AppColors.whiteColor),
+                          ),
                         ),
                       ),
-                    ),
-                     SizedBox(
-                      width: 10,
-                    ),
-                    OpenContainer(
-                      transitionType: _containerTransitionType,
-                      transitionDuration: Duration(milliseconds: 400),
-                      closedElevation: 1,
-                      openElevation: 1,
-                      closedColor: AppColors.orangeSplashColor,
-                      closedShape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                      SizedBox(
+                        width: 10,
                       ),
-                      openBuilder: (context, _) => TextRecognizerScreen(),
-                      closedBuilder: (context, _) => Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 5),
-                        child: Text(
-                          "${AppLocalization.of(context)?.getTranslatedValue('scane_note')}",
-                          style: TextStyle(color: AppColors.whiteColor),
+                      OpenContainer(
+                        transitionType: _containerTransitionType,
+                        transitionDuration: Duration(milliseconds: 400),
+                        closedElevation: 1,
+                        openElevation: 1,
+                        closedColor: AppColors.orangeSplashColor,
+                        closedShape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        openBuilder: (context, _) => TextRecognizerScreen(),
+                        closedBuilder: (context, _) => Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 5),
+                          child: Text(
+                            "${AppLocalization.of(context)?.getTranslatedValue('scane_note')}",
+                            style: TextStyle(color: AppColors.whiteColor),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

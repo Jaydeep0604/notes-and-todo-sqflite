@@ -1,13 +1,12 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:notes_sqflite/config/shared_store.dart';
 import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/provider/theme_provider.dart';
 import 'package:notes_sqflite/services/notification_controller.dart';
+import 'package:notes_sqflite/services/theme_services.dart';
 import 'package:notes_sqflite/ui/base/base_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
-import 'package:notes_sqflite/utils/functions.dart';
 import 'package:timezone/data/latest_10y.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -26,6 +25,8 @@ FlutterLocalNotificationsPlugin localNotificationsPlugin =
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   initializeTimeZones();
   // AppFunctions.requestStoragePermission();
   // AppFunctions.requestStoragePermission();
@@ -120,78 +121,9 @@ class _MyAppState extends State<MyApp> {
         navigatorKey: MyApp.navigatorKey,
         debugShowCheckedModeBanner: false,
         title: 'Note & Schedule',
-        darkTheme: ThemeData(
-            brightness: Brightness.dark,
-            highlightColor: AppColors.whiteColor,
-            scaffoldBackgroundColor: Colors.black,
-            iconTheme: IconThemeData(color: AppColors.whiteColor),
-            canvasColor: AppColors.canvasColor,
-            cardColor: AppColors.blackColor,
-            bottomSheetTheme:
-                BottomSheetThemeData(backgroundColor: Colors.amber),
-            textTheme: TextTheme(
-              bodySmall: TextStyle(
-                color: Color.fromARGB(255, 241, 241, 239),
-              ),
-              titleMedium: TextStyle(
-                color: Colors.white,
-              ),
-              labelMedium: TextStyle(
-                color: Colors.black,
-              ),
-            ),
-            appBarTheme: AppBarTheme(
-              elevation: 0,
-              backgroundColor: Colors.black,
-              titleTextStyle: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-              ),
-              iconTheme: IconThemeData(
-                color: Colors.white,
-              ),
-            ),
-            bottomNavigationBarTheme: BottomNavigationBarThemeData(
-              backgroundColor: Colors.black,
-            ),
-            useMaterial3: true
-            /* dark theme settings */
-            ),
+        darkTheme: ThemeServices.darkMode,
         themeMode: themeProvider.themeMode, // Use theme from provider
-        theme: ThemeData(
-          brightness: Brightness.light,
-          highlightColor: AppColors.blackColor,
-          scaffoldBackgroundColor: Colors.white,
-          iconTheme: IconThemeData(color: AppColors.blackColor),
-          canvasColor: AppColors.canvasColor,
-          cardColor: AppColors.whiteColor,
-          textTheme: TextTheme(
-            bodySmall: TextStyle(
-              color: Colors.black87,
-            ),
-            titleMedium: TextStyle(
-              color: Colors.black,
-            ),
-            labelMedium: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          appBarTheme: AppBarTheme(
-            elevation: 0,
-            backgroundColor: Colors.white,
-            titleTextStyle: TextStyle(
-              color: Colors.black,
-              fontSize: 22,
-            ),
-            iconTheme: IconThemeData(
-              color: Colors.black,
-            ),
-          ),
-          bottomNavigationBarTheme: BottomNavigationBarThemeData(
-            backgroundColor: Colors.white,
-          ),
-          useMaterial3: true,
-        ),
+        theme: ThemeServices.lightMode,
         localizationsDelegates: [
           AppLocalization.delegate,
           GlobalMaterialLocalizations.delegate,
