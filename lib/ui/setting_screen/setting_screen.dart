@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:notes_sqflite/animations/slide_animation.dart';
 import 'package:notes_sqflite/config/shared_store.dart';
 import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/main.dart';
@@ -8,7 +9,7 @@ import 'package:notes_sqflite/ui/app_lock/app_lock_screen.dart';
 import 'package:notes_sqflite/ui/export_data/export_pdf_view_screen.dart';
 import 'package:notes_sqflite/ui/privacy_policy_screen/privacy_policy_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
-import 'package:notes_sqflite/widget/switch_widget.dart';
+import 'package:notes_sqflite/widget/theme_container.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -153,468 +154,548 @@ class _SettingScreenState extends State<SettingScreen> {
     //   );
     // }
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon:
-              Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
-        ),
-        title: Text(
-          "${AppLocalization.of(context)?.getTranslatedValue('settings')}",
-          style: TextStyle(
-              // color: AppColors.whiteColor
-              ),
-        ),
-      ),
-      body: SafeArea(
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          child: Column(
-            children: [
-              // Container(
-              //   color: Theme.of(context).cardColor,
-              //   child: ListTile(
-              //     contentPadding: EdgeInsets.zero,
-              //     leading: Icon(
-              //       Icons.notifications,
-              //     ),
-              //     title: Text("Notifications"),
-              //     onTap: () {
-              //       setState(() {
-              //         isNotification = !isNotification;
-              //       });
-              //     },
-              //     trailing: Transform.scale(
-              //       scale: 1,
-              //       child: isNotification
-              //           ? Icon(
-              //               Icons.keyboard_arrow_down,
-              //             )
-              //           : Icon(
-              //               Icons.keyboard_arrow_up,
-              //             ),
-              //     ),
-              //   ),
-              // ),
-              // Visibility(
-              //   visible: isNotification,
-              //   child: Container(
-              //     width: MediaQuery.of(context).size.width,
-              //     decoration: BoxDecoration(
-              //       color: Theme.of(context).canvasColor.withOpacity(0.2),
-              //       borderRadius: BorderRadius.circular(10),
-              //       border: Border.all(
-              //         color: Theme.of(context).canvasColor,
-              //       ),
-              //     ),
-              //     child: Padding(
-              //       padding: const EdgeInsets.symmetric(
-              //           horizontal: 10, vertical: 10),
-              //       child: Column(
-              //         mainAxisAlignment: MainAxisAlignment.center,
-              //         crossAxisAlignment: CrossAxisAlignment.start,
-              //         children: [
-              //           Row(
-              //             children: [
-              //               Text(
-              //                 "Allow Push Notifications",
-              //                 style: Theme.of(context).textTheme.titleMedium,
-              //               ),
-              //               Spacer(),
-              //               SwitchWidget(
-              //                 value: isOn,
-              //                 onTap: () {
-              //                   setState(() {
-              //                     isOn = !isOn;
-              //                   });
-              //                 },
-              //               )
-              //             ],
-              //           ),
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              Container(
-                color: Theme.of(context).cardColor,
-                child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Icon(
-                      Icons.light_mode_sharp,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                    title: Text(
-                      "${AppLocalization.of(context)?.getTranslatedValue('app_mode')}",
-                    ),
-                    onTap: () {
-                      setState(() {
-                        isAppMode = !isAppMode;
-                      });
-                    },
-                    trailing: Transform.scale(
-                      scale: 1,
-                      child: isAppMode
-                          ? Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Theme.of(context).iconTheme.color,
-                            )
-                          : Icon(
-                              Icons.keyboard_arrow_up,
-                              color: Theme.of(context).iconTheme.color,
-                            ),
-                    )),
-              ),
-              Visibility(
-                visible: isAppMode,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).canvasColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: Theme.of(context).canvasColor,
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildThemeOption(SystemThemeMode.light,
-                          "${AppLocalization.of(context)?.getTranslatedValue("light")}"),
-                      _buildThemeOption(SystemThemeMode.dark,
-                          "${AppLocalization.of(context)?.getTranslatedValue("dark")}"),
-                      _buildThemeOption(SystemThemeMode.system,
-                          "${AppLocalization.of(context)?.getTranslatedValue("system")}"),
-                    ],
-                  ),
+    return ThemedContainer(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back,
+                color: Theme.of(context).iconTheme.color),
+          ),
+          title: Text(
+            "${AppLocalization.of(context)?.getTranslatedValue('settings')}",
+            style: TextStyle(
+                // color: AppColors.whiteColor
                 ),
-              ),
-              Container(
-                color: Theme.of(context).cardColor,
-                child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Icon(
-                      Icons.translate,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                    title: Text(
-                      "${AppLocalization.of(context)?.getTranslatedValue('app_language')}",
-                      // style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    onTap: () {
-                      setState(() {
-                        islangOpen = !islangOpen;
-                      });
-                    },
-                    trailing: Transform.scale(
-                      scale: 1,
-                      child: islangOpen
-                          ? Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Theme.of(context).iconTheme.color,
-                            )
-                          : Icon(
-                              Icons.keyboard_arrow_up,
-                              color: Theme.of(context).iconTheme.color,
-                            ),
-                    )),
-              ),
-              Visibility(
-                visible: islangOpen,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).canvasColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: Theme.of(context).canvasColor,
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(children: [
-                        SizedBox(width: 10),
-                        Radio<Locale>(
-                          activeColor: AppColors.bottomNavigationBarSecondColor,
-                          value: Locale("hi"),
-                          groupValue: _locale,
-                          onChanged: (language) {
-                            setState(() {
-                              _locale = language as Locale;
-                            });
-                            if (language != null) {
-                              MyApp.setLocale(context, _locale as Locale);
-                            }
-                          },
+          ),
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                children: [
+                  // Container(
+                  //   color: Theme.of(context).cardColor,
+                  //   child: ListTile(
+                  //     contentPadding: EdgeInsets.zero,
+                  //     leading: Icon(
+                  //       Icons.notifications,
+                  //     ),
+                  //     title: Text("Notifications"),
+                  //     onTap: () {
+                  //       setState(() {
+                  //         isNotification = !isNotification;
+                  //       });
+                  //     },
+                  //     trailing: Transform.scale(
+                  //       scale: 1,
+                  //       child: isNotification
+                  //           ? Icon(
+                  //               Icons.keyboard_arrow_down,
+                  //             )
+                  //           : Icon(
+                  //               Icons.keyboard_arrow_up,
+                  //             ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // Visibility(
+                  //   visible: isNotification,
+                  //   child: Container(
+                  //     width: MediaQuery.of(context).size.width,
+                  //     decoration: BoxDecoration(
+                  //       color: Theme.of(context).canvasColor.withOpacity(0.2),
+                  //       borderRadius: BorderRadius.circular(10),
+                  //       border: Border.all(
+                  //         color: Theme.of(context).canvasColor,
+                  //       ),
+                  //     ),
+                  //     child: Padding(
+                  //       padding: const EdgeInsets.symmetric(
+                  //           horizontal: 10, vertical: 10),
+                  //       child: Column(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                  //         children: [
+                  //           Row(
+                  //             children: [
+                  //               Text(
+                  //                 "Allow Push Notifications",
+                  //                 style: Theme.of(context).textTheme.titleMedium,
+                  //               ),
+                  //               Spacer(),
+                  //               SwitchWidget(
+                  //                 value: isOn,
+                  //                 onTap: () {
+                  //                   setState(() {
+                  //                     isOn = !isOn;
+                  //                   });
+                  //                 },
+                  //               )
+                  //             ],
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: ListTile(
+                        // contentPadding: EdgeInsets.zero,
+                        shape: StadiumBorder(side: BorderSide.none),
+                        leading: Icon(
+                          Icons.light_mode_sharp,
+                          color: Theme.of(context).iconTheme.color,
                         ),
-                        SizedBox(width: 10),
-                        Text(
-                          "${AppLocalization.of(context)?.getTranslatedValue("hindi")}",
-                          style: Theme.of(context).textTheme.titleMedium,
+                        title: Text(
+                          "${AppLocalization.of(context)?.getTranslatedValue('app_mode')}",
                         ),
-                      ]),
-                      Row(children: [
-                        SizedBox(width: 10),
-                        Radio<Locale>(
-                          activeColor: AppColors.bottomNavigationBarSecondColor,
-                          value: Locale("gu"),
-                          groupValue: _locale,
-                          onChanged: (language) {
-                            setState(() {
-                              _locale = language as Locale;
-                            });
-                            if (language != null) {
-                              MyApp.setLocale(context, _locale as Locale);
-                            }
-                          },
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          "${AppLocalization.of(context)?.getTranslatedValue("gujarati")}",
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ]),
-                      Row(children: [
-                        SizedBox(width: 10),
-                        Radio<Locale>(
-                          activeColor: AppColors.bottomNavigationBarSecondColor,
-                          value: Locale("en"),
-                          groupValue: _locale,
-                          onChanged: (language) {
-                            setState(() {
-                              _locale = language as Locale;
-                            });
-                            if (language != null) {
-                              MyApp.setLocale(context, _locale as Locale);
-                            }
-                          },
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          "${AppLocalization.of(context)?.getTranslatedValue("english")}",
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ]),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                color: Theme.of(context).cardColor,
-                child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Icon(
-                      Icons.downloading_rounded,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                    title: Text(
-                        "${AppLocalization.of(context)?.getTranslatedValue('export_data')}"),
-                    onTap: () {
-                      setState(() {
-                        isExportDataOpen = !isExportDataOpen;
-                      });
-                    },
-                    trailing: Transform.scale(
-                      scale: 1,
-                      child: isExportDataOpen
-                          ? Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Theme.of(context).iconTheme.color,
-                            )
-                          : Icon(
-                              Icons.keyboard_arrow_up,
-                              color: Theme.of(context).iconTheme.color,
-                            ),
-                    )),
-              ),
-              Visibility(
-                visible: isExportDataOpen,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: Theme.of(context).canvasColor,
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ExportPdfViewScreen(
-                                  isNoteView: true, title: "note's preview"),
-                            ),
-                          );
+                          setState(() {
+                            isAppMode = !isAppMode;
+                          });
                         },
-                        child: Container(
+                        trailing: Transform.scale(
+                          scale: 1,
+                          child: isAppMode
+                              ? Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: Theme.of(context).iconTheme.color,
+                                )
+                              : Icon(
+                                  Icons.keyboard_arrow_up,
+                                  color: Theme.of(context).iconTheme.color,
+                                ),
+                        )),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Visibility(
+                    visible: isAppMode,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10)),
                             color:
                                 Theme.of(context).canvasColor.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Theme.of(context).canvasColor,
+                            ),
                           ),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 15),
-                          child: Row(
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(
-                                Icons.cloud_download_outlined,
-                                color: Theme.of(context).iconTheme.color,
+                              _buildThemeOption(SystemThemeMode.light,
+                                  "${AppLocalization.of(context)?.getTranslatedValue("light")}"),
+                              _buildThemeOption(SystemThemeMode.dark,
+                                  "${AppLocalization.of(context)?.getTranslatedValue("dark")}"),
+                              _buildThemeOption(SystemThemeMode.system,
+                                  "${AppLocalization.of(context)?.getTranslatedValue("system")}"),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: ListTile(
+                        shape: StadiumBorder(side: BorderSide.none),
+                        leading: Icon(
+                          Icons.translate,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        title: Text(
+                          "${AppLocalization.of(context)?.getTranslatedValue('app_language')}",
+                          // style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        onTap: () {
+                          setState(() {
+                            islangOpen = !islangOpen;
+                          });
+                        },
+                        trailing: Transform.scale(
+                          scale: 1,
+                          child: islangOpen
+                              ? Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: Theme.of(context).iconTheme.color,
+                                )
+                              : Icon(
+                                  Icons.keyboard_arrow_up,
+                                  color: Theme.of(context).iconTheme.color,
+                                ),
+                        )),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Visibility(
+                    visible: islangOpen,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).canvasColor.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Theme.of(context).canvasColor,
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(children: [
+                                SizedBox(width: 10),
+                                Radio<Locale>(
+                                  activeColor:
+                                      AppColors.bottomNavigationBarSecondColor,
+                                  value: Locale("hi"),
+                                  groupValue: _locale,
+                                  onChanged: (language) {
+                                    setState(() {
+                                      _locale = language as Locale;
+                                    });
+                                    if (language != null) {
+                                      MyApp.setLocale(
+                                          context, _locale as Locale);
+                                    }
+                                  },
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  "${AppLocalization.of(context)?.getTranslatedValue("hindi")}",
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                              ]),
+                              Row(children: [
+                                SizedBox(width: 10),
+                                Radio<Locale>(
+                                  activeColor:
+                                      AppColors.bottomNavigationBarSecondColor,
+                                  value: Locale("gu"),
+                                  groupValue: _locale,
+                                  onChanged: (language) {
+                                    setState(() {
+                                      _locale = language as Locale;
+                                    });
+                                    if (language != null) {
+                                      MyApp.setLocale(
+                                          context, _locale as Locale);
+                                    }
+                                  },
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  "${AppLocalization.of(context)?.getTranslatedValue("gujarati")}",
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                              ]),
+                              Row(children: [
+                                SizedBox(width: 10),
+                                Radio<Locale>(
+                                  activeColor:
+                                      AppColors.bottomNavigationBarSecondColor,
+                                  value: Locale("en"),
+                                  groupValue: _locale,
+                                  onChanged: (language) {
+                                    setState(() {
+                                      _locale = language as Locale;
+                                    });
+                                    if (language != null) {
+                                      MyApp.setLocale(
+                                          context, _locale as Locale);
+                                    }
+                                  },
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  "${AppLocalization.of(context)?.getTranslatedValue("english")}",
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                              ]),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: ListTile(
+                        shape: StadiumBorder(side: BorderSide.none),
+                        leading: Icon(
+                          Icons.downloading_rounded,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        title: Text(
+                            "${AppLocalization.of(context)?.getTranslatedValue('export_data')}"),
+                        onTap: () {
+                          setState(() {
+                            isExportDataOpen = !isExportDataOpen;
+                          });
+                        },
+                        trailing: Transform.scale(
+                          scale: 1,
+                          child: isExportDataOpen
+                              ? Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: Theme.of(context).iconTheme.color,
+                                )
+                              : Icon(
+                                  Icons.keyboard_arrow_up,
+                                  color: Theme.of(context).iconTheme.color,
+                                ),
+                        )),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Visibility(
+                    visible: isExportDataOpen,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Theme.of(context).canvasColor,
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    SlideAnimation.createDownToOpenRoute(
+                                        ExportPdfViewScreen(
+                                            isNoteView: true,
+                                            title: "note's preview")),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        topRight: Radius.circular(10)),
+                                    color: Theme.of(context)
+                                        .canvasColor
+                                        .withOpacity(0.2),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 15, horizontal: 15),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.cloud_download_outlined,
+                                        color:
+                                            Theme.of(context).iconTheme.color,
+                                      ),
+                                      SizedBox(
+                                        width: 20,
+                                      ),
+                                      Text(
+                                        "${AppLocalization.of(context)?.getTranslatedValue('export_note_s')}",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium!
+                                            .copyWith(
+                                                fontWeight: FontWeight.normal),
+                                      ),
+                                      Expanded(child: SizedBox()),
+                                      Icon(
+                                        Icons.touch_app_outlined,
+                                        color:
+                                            Theme.of(context).iconTheme.color,
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              Text(
-                                "${AppLocalization.of(context)?.getTranslatedValue('export_note_s')}",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .copyWith(fontWeight: FontWeight.normal),
-                              ),
-                              Expanded(child: SizedBox()),
-                              Icon(
-                                Icons.touch_app_outlined,
-                                color: Theme.of(context).iconTheme.color,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    SlideAnimation.createDownToOpenRoute(
+                                        ExportPdfViewScreen(
+                                            isNoteView: false,
+                                            title: "to-do's preview")),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(10),
+                                        bottomRight: Radius.circular(10)),
+                                    color: Theme.of(context)
+                                        .canvasColor
+                                        .withOpacity(0.2),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 15, horizontal: 15),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.cloud_download_outlined,
+                                        color:
+                                            Theme.of(context).iconTheme.color,
+                                      ),
+                                      SizedBox(
+                                        width: 20,
+                                      ),
+                                      Text(
+                                        "${AppLocalization.of(context)?.getTranslatedValue("export_schedules")}",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium!
+                                            .copyWith(
+                                                fontWeight: FontWeight.normal),
+                                      ),
+                                      Spacer(),
+                                      Icon(
+                                        Icons.touch_app_outlined,
+                                        color:
+                                            Theme.of(context).iconTheme.color,
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ExportPdfViewScreen(
-                                  isNoteView: false, title: "to-do's preview"),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(10),
-                                bottomRight: Radius.circular(10)),
-                            color:
-                                Theme.of(context).canvasColor.withOpacity(0.2),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 15),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.cloud_download_outlined,
-                                color: Theme.of(context).iconTheme.color,
-                              ),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              Text(
-                                "${AppLocalization.of(context)?.getTranslatedValue("export_schedules")}",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .copyWith(fontWeight: FontWeight.normal),
-                              ),
-                              Spacer(),
-                              Icon(
-                                Icons.touch_app_outlined,
-                                color: Theme.of(context).iconTheme.color,
-                              ),
-                            ],
-                          ),
+                        SizedBox(
+                          height: 10,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                color: Theme.of(context).cardColor,
-                child: ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(
-                    Icons.lock_person_rounded,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
-                  title: Text(
-                      "${AppLocalization.of(context)?.getTranslatedValue('app_lock')}"),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AppLockScreen(),
-                      ),
-                    );
-                  },
-                  trailing: Icon(
-                    Icons.keyboard_arrow_right,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
-                ),
-              ),
-              Container(
-                color: Theme.of(context).cardColor,
-                child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Icon(
-                      Icons.approval,
-                      color: Theme.of(context).iconTheme.color,
+                      ],
                     ),
-                    title: Text(
-                      "${AppLocalization.of(context)?.getTranslatedValue('permisions')}",
-                    ),
-                    onTap: () {
-                      openAppSettings();
-                    },
-                    trailing: Transform.scale(
-                      scale: 1,
-                      child: Icon(
-                        Icons.keyboard_arrow_right_sharp,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: ListTile(
+                      shape: StadiumBorder(side: BorderSide.none),
+                      leading: Icon(
+                        Icons.lock_person_rounded,
                         color: Theme.of(context).iconTheme.color,
                       ),
-                    )),
-              ),
-              Container(
-                color: Theme.of(context).cardColor,
-                child: ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(
-                    CupertinoIcons.doc_append,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
-                  title: Text(
-                      "${AppLocalization.of(context)?.getTranslatedValue('privacy_policy')}"),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PrivacyPolicyScreen(),
+                      title: Text(
+                          "${AppLocalization.of(context)?.getTranslatedValue('app_lock')}"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          SlideAnimation.createDownToOpenRoute(AppLockScreen()),
+                        );
+                      },
+                      trailing: Icon(
+                        Icons.keyboard_arrow_right,
+                        color: Theme.of(context).iconTheme.color,
                       ),
-                    );
-                  },
-                  trailing: Icon(
-                    Icons.keyboard_arrow_right,
-                    color: Theme.of(context).iconTheme.color,
+                    ),
                   ),
-                ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: ListTile(
+                        shape: StadiumBorder(side: BorderSide.none),
+                        leading: Icon(
+                          Icons.approval,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        title: Text(
+                          "${AppLocalization.of(context)?.getTranslatedValue('permisions')}",
+                        ),
+                        onTap: () {
+                          openAppSettings();
+                        },
+                        trailing: Transform.scale(
+                          scale: 1,
+                          child: Icon(
+                            Icons.keyboard_arrow_right_sharp,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
+                        )),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: ListTile(
+                      shape: StadiumBorder(side: BorderSide.none),
+                      leading: Icon(
+                        CupertinoIcons.doc_append,
+                        color: Theme.of(context).iconTheme.color,
+                      ),
+                      title: Text(
+                          "${AppLocalization.of(context)?.getTranslatedValue('privacy_policy')}"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          SlideAnimation.createDownToOpenRoute(
+                              PrivacyPolicyScreen()),
+                        );
+                      },
+                      trailing: Icon(
+                        Icons.keyboard_arrow_right,
+                        color: Theme.of(context).iconTheme.color,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

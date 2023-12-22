@@ -14,13 +14,11 @@ class FadeLiveWidget extends StatelessWidget {
           begin: 0,
           end: 1,
         ).animate(animation),
-        // And slide transition
         child: SlideTransition(
           position: Tween<Offset>(
             begin: Offset(0.3, 0),
             end: Offset.zero,
           ).animate(animation),
-          // Paste you Widget
           child: child,
         ),
       ),

@@ -1,10 +1,7 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_sqflite/animations/open_container.dart';
-import 'package:notes_sqflite/ui/todo_screen/todo_detail_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
-import 'package:provider/provider.dart';
 
 class TodoWidget extends StatefulWidget {
   TodoWidget({

@@ -6,7 +6,7 @@ import 'package:notes_sqflite/provider/theme_provider.dart';
 import 'package:notes_sqflite/services/notification_controller.dart';
 import 'package:notes_sqflite/services/theme_services.dart';
 import 'package:notes_sqflite/ui/base/base_screen.dart';
-import 'package:notes_sqflite/utils/app_colors.dart';
+import 'package:notes_sqflite/utils/functions.dart';
 import 'package:timezone/data/latest_10y.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -25,11 +25,9 @@ FlutterLocalNotificationsPlugin localNotificationsPlugin =
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   initializeTimeZones();
-  // AppFunctions.requestStoragePermission();
-  // AppFunctions.requestStoragePermission();
+  AppFunctions.requestStoragePermission();
+  AppFunctions.requestStoragePermission();
   isPinLock = await sharedStore.getPin();
   isBiometricLock = await sharedStore.getBiometric();
   if (isPinLock == null) {

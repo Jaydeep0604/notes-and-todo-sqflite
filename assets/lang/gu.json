@@ -9,6 +9,9 @@
     "7":"૭",
     "8":"૮",
     "9":"૯",
+    "add_note":"નોંધ ઉમેરો",
+    "add_schedule":"સમયપત્રક ઉમેરો",
+    "scane_note":"નોંધ સ્કેન કરો",
     "delete_forever":"કાયમ માટે કાઢો",
     "restore":"પુનઃસ્થાપિત",
     "schedule":"સમયપત્રક",
@@ -106,5 +109,6 @@
     "dounload_pdf":"PDF ડાઉનલોડ કરો",
     "security_questions_saved_successfully":"સુરક્ષા પ્રશ્નો સફળતાપૂર્વક સાચવ્યા",
     "screen_lock_seted_successfully":"સ્ક્રીન લૉક સફળતાપૂર્વક સેટ કર્યું",
+    "screen_lock_pin_saved_successfully":"સ્ક્રીન લૉક પિન સફળતાપૂર્વક સાચવવામાં આવી",
     "our_note_and_to-do_app_respects_your_privacy_we_don't_collect_personal_information_or_store_data_outside_the_app_your_notes_and_to-dos_are_stored_exclusively_on_your_device's_local_storage_we_prioritize_data_security_although_no_method_is_entirely_foolproof_we_may_update_this_policy_and_any_changes_will_be_posted_here_if_you_have_questions_please_contact_us_your_use_of_the_app_indicates_your_consent_to_these_terms":"અમારી નોંધ અને કરવા માટેની એપ્લિકેશન તમારી ગોપનીયતાને માન આપે છે. અમે વ્યક્તિગત માહિતી એકત્રિત કરતા નથી અથવા એપ્લિકેશનની બહાર ડેટા સ્ટોર કરતા નથી. તમારી નોંધો અને કરવાનાં કાર્યો ફક્ત તમારા ઉપકરણના સ્થાનિક સ્ટોરેજ પર સંગ્રહિત થાય છે. અમે ડેટા સુરક્ષાને પ્રાથમિકતા આપીએ છીએ, જો કે કોઈપણ પદ્ધતિ સંપૂર્ણપણે ફૂલપ્રૂફ નથી. અમે આ નીતિને અપડેટ કરી શકીએ છીએ, અને કોઈપણ ફેરફારો અહીં પોસ્ટ કરવામાં આવશે. જો તમને પ્રશ્નો હોય, તો કૃપા કરીને અમારો સંપર્ક કરો. એપ્લિકેશનનો તમારો ઉપયોગ આ શરતો માટે તમારી સંમતિ દર્શાવે છે."
 }

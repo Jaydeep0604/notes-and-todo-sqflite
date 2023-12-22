@@ -9,6 +9,9 @@
     "7":"७",
     "8":"८",
     "9":"९",
+    "add_note":"नोट जोड़े",
+    "add_schedule":"शेड्यूल जोड़ें",
+    "scane_note":"नोट स्कैन करें",
     "delete_forever":"हमेशा के लिए हटाएं",
     "restore":"पुनर्स्थापित",
     "schedule":"अनुसूचि",
@@ -106,5 +109,6 @@
     "dounload_pdf":"डाउनलोड PDF",
     "security_questions_saved_successfully":"सुरक्षा प्रश्न सफलतापूर्वक सहेजे गए",
     "screen_lock_seted_successfully":"स्क्रीन लॉक सफलतापूर्वक सेट हो गया",
+    "screen_lock_pin_saved_successfully":"स्क्रीन लॉक पिन सफलतापूर्वक सहेजा गया",
     "our_note_and_to-do_app_respects_your_privacy_we_don't_collect_personal_information_or_store_data_outside_the_app_your_notes_and_to-dos_are_stored_exclusively_on_your_device's_local_storage_we_prioritize_data_security_although_no_method_is_entirely_foolproof_we_may_update_this_policy_and_any_changes_will_be_posted_here_if_you_have_questions_please_contact_us_your_use_of_the_app_indicates_your_consent_to_these_terms":"हमारा नोट और टू-डू ऐप आपकी गोपनीयता का सम्मान करता है। हम व्यक्तिगत जानकारी एकत्र नहीं करते हैं या ऐप के बाहर डेटा संग्रहीत नहीं करते हैं। आपके नोट्स और कार्य विशेष रूप से आपके डिवाइस के स्थानीय संग्रहण पर संग्रहीत होते हैं। हम डेटा सुरक्षा को प्राथमिकता देते हैं, हालांकि कोई भी तरीका पूरी तरह से अचूक नहीं है। हम इस नीति को अपडेट कर सकते हैं, और कोई भी बदलाव यहां पोस्ट किया जाएगा। यदि आपके कोई सवाल हैं, कृपया हमसे संपर्क करें। ऐप का आपका उपयोग इन शर्तों के प्रति आपकी सहमति को दर्शाता है।"
 }

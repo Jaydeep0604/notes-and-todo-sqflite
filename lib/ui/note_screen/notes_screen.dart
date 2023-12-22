@@ -62,6 +62,7 @@ class _NotesScreenState extends State<NotesScreen> {
     return SafeArea(
       child: SingleChildScrollView(
         child: Container(
+          
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: FutureBuilder(
             future: noteList,
@@ -99,14 +100,14 @@ class _NotesScreenState extends State<NotesScreen> {
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 10),
                                   width:
-                                      MediaQuery.of(context).size.width * 0.5,
+                                      MediaQuery.of(context).size.width * 0.45,
                                   // constraints: BoxConstraints(maxHeight: 270, minHeight: 0),
                                   decoration: BoxDecoration(
                                       border: Border.all(
                                         color: Theme.of(context)
                                             .iconTheme
                                             .color!
-                                            .withOpacity(0.7),
+                                            .withOpacity(0.6),
                                         width: 0.7,
                                       ),
                                       borderRadius: BorderRadius.circular(10)),

@@ -13,6 +13,7 @@ import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:notes_sqflite/utils/app_message.dart';
 import 'package:notes_sqflite/utils/functions.dart';
+import 'package:notes_sqflite/widget/theme_container.dart';
 import 'package:share_plus/share_plus.dart';
 
 class NoteDetailScreen extends StatefulWidget {
@@ -161,9 +162,12 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
           Navigator.pop(context);
           return true;
         },
-        child: Scaffold(
-          body: SafeArea(
-            child: widget.isUpdateNote ? UpdateNoteWidget() : NewNoteWidget(),
+        child: ThemedContainer(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: SafeArea(
+              child: widget.isUpdateNote ? UpdateNoteWidget() : NewNoteWidget(),
+            ),
           ),
         ),
       ),
@@ -176,10 +180,12 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         AppBar(
+          backgroundColor: Colors.transparent,
           leading: IconButton(
             tooltip:
                 "${AppLocalization.of(context)?.getTranslatedValue('navigate_up')}",
             onPressed: () {
+              FocusManager.instance.primaryFocus?.unfocus();
               Navigator.pop(context);
             },
             icon: Icon(Icons.arrow_back,
@@ -716,6 +722,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 AppBar(
+                  backgroundColor: Colors.transparent,
                   leading: IconButton(
                     tooltip:
                         "${AppLocalization.of(context)?.getTranslatedValue('navigate_up')}",

@@ -6,16 +6,26 @@ import 'package:notes_sqflite/services/notification_services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class AppFunctions {
-  bool _isPermissionGranted = false;
-
-  static Future<void> requestStoragePermission() async {
+  static Future<bool> requestStoragePermission() async {
+    bool isGranted;
     final status = await Permission.storage.request();
-    status == PermissionStatus.granted;
+    if (await status == PermissionStatus.granted) {
+      isGranted = true;
+    } else {
+      isGranted = false;
+    }
+    return isGranted;
   }
 
-  static Future<void> requestNotificationPermission() async {
+  static Future<bool> requestNotificationPermission() async {
+    bool isGranted;
     final status = await Permission.notification.request();
-    status == PermissionStatus.granted;
+    if (status == PermissionStatus.granted) {
+      isGranted = true;
+    } else {
+      isGranted = false;
+    }
+    return isGranted;
   }
 
   static setNoteNotification(

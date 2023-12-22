@@ -10,6 +10,7 @@ import 'package:notes_sqflite/services/notification_services.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:notes_sqflite/utils/functions.dart';
+import 'package:notes_sqflite/widget/theme_container.dart';
 
 class TodoDetailscreen extends StatefulWidget {
   bool isUpdateTodo;
@@ -85,11 +86,14 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
       },
-      child: Scaffold(
-        body: Form(
-          key: formKey,
-          child:
-              widget.isUpdateTodo ? updateSheduleWidget() : newSheduleWidget(),
+      child: ThemedContainer(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Form(
+            key: formKey,
+            child:
+                widget.isUpdateTodo ? updateSheduleWidget() : newSheduleWidget(),
+          ),
         ),
       ),
     );
@@ -145,10 +149,12 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         AppBar(
+          backgroundColor: Colors.transparent,
           leading: IconButton(
             tooltip:
                 "${AppLocalization.of(context)?.getTranslatedValue('navigate_up')}",
             onPressed: () {
+              FocusManager.instance.primaryFocus?.unfocus();
               Navigator.pop(context);
             },
             icon: Icon(Icons.arrow_back,
@@ -174,7 +180,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                   TextFormField(
                     controller: todoCtr,
                     minLines: 1,
-                    // autofocus: true,
+                    autofocus: true,
                     maxLines: null,
                     style: Theme.of(context).textTheme.titleMedium,
                     validator: (value) {
@@ -346,39 +352,50 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
               onPressed: () {
                 if (formKey.currentState!.validate()) {
                   FocusManager.instance.primaryFocus?.unfocus();
-                  dbHelper!
-                      .insertTodo(
-                    TodoModel(
-                      todo: todoCtr.text,
-                      finished: isFinished == false ? 0 : 1,
-                      dueDate: dateCtr.text,
-                      dueTime: timeCtr.text,
-                      category: categoryName.toString(),
-                    ),
-                  )
-                      .then((value) {
-                    print("data added");
-                    setState(() {
-                      isUpdateTodoScreen = true;
-                    });
-                    if (notificationDateTime != null) {
-                      dbHelper!.getTodoUsingTitle(todoCtr.text).then((value) {
-                        AppFunctions.setNewSheduleNotification(
-                          id: value.last.id!,
-                          scheduledTime: notificationDateTime!,
-                          body: value.last.dueTime,
-                          title: value.last.todo,
-                        );
-                      });
+                  AppFunctions.requestStoragePermission().then((value) {
+                    if (value == true) {
+                      dbHelper!
+                          .insertTodo(
+                        TodoModel(
+                          todo: todoCtr.text,
+                          finished: isFinished == false ? 0 : 1,
+                          dueDate: dateCtr.text,
+                          dueTime: timeCtr.text,
+                          category: categoryName.toString(),
+                        ),
+                      )
+                          .then((value) {
+                        print("data added");
+                        setState(() {
+                          isUpdateTodoScreen = true;
+                        });
+                        if (notificationDateTime != null) {
+                          AppFunctions.requestNotificationPermission()
+                              .then((value) {
+                            if (value == true) {
+                              dbHelper!
+                                  .getTodoUsingTitle(todoCtr.text)
+                                  .then((value) {
+                                AppFunctions.setNewSheduleNotification(
+                                  id: value.last.id!,
+                                  scheduledTime: notificationDateTime!,
+                                  body: value.last.dueTime,
+                                  title: value.last.todo,
+                                );
+                              });
+                            }
+                          });
+                        }
+                        clear();
+                        Navigator.pop(context);
+                      }).onError(
+                        (error, stackTrace) {
+                          print(error.toString());
+                          print(stackTrace.toString());
+                        },
+                      );
                     }
-                    clear();
-                    Navigator.pop(context);
-                  }).onError(
-                    (error, stackTrace) {
-                      print(error.toString());
-                      print(stackTrace.toString());
-                    },
-                  );
+                  });
                 }
               },
               child: Text(
@@ -542,6 +559,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   AppBar(
+                    backgroundColor: Colors.transparent,
                     leading: IconButton(
                       tooltip:
                           "${AppLocalization.of(context)?.getTranslatedValue('navigate_up')}",
@@ -795,35 +813,47 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                         onPressed: () {
                           if (formKey.currentState!.validate()) {
                             FocusManager.instance.primaryFocus?.unfocus();
-                            dbHelper!
-                                .updateTodo(TodoModel(
-                              id: widget.id,
-                              todo: todoCtr.text,
-                              finished: isFinished == true ? 1 : 0,
-                              dueDate: dateCtr.text,
-                              dueTime: timeCtr.text,
-                              category: categoryName!,
-                            ))
+                            AppFunctions.requestStoragePermission()
                                 .then((value) {
-                              if (dateCtr.text != "" && timeCtr.text != "") {
-                                if (notificationId != "") {
-                                  notificationServices
-                                      .cancelNotificationById(notificationId??0);
-                                }
-                                DateTime dateTime = DateFormat(
-                                        'EEEEEEEEE, dd MMM yyyy h:mm a',
-                                        'en_US')
-                                    .parseLoose(
-                                        '${dateCtr.text} ${timeCtr.text}');
-                                AppFunctions.setNewSheduleNotification(
-                                  id: widget.id!,
-                                  scheduledTime: dateTime,
-                                  body: timeCtr.text,
-                                  title: todoCtr.text,
-                                );
+                              if (value == true) {
+                                dbHelper!
+                                    .updateTodo(TodoModel(
+                                  id: widget.id,
+                                  todo: todoCtr.text,
+                                  finished: isFinished == true ? 1 : 0,
+                                  dueDate: dateCtr.text,
+                                  dueTime: timeCtr.text,
+                                  category: categoryName!,
+                                ))
+                                    .then((value) {
+                                  if (dateCtr.text != "" &&
+                                      timeCtr.text != "") {
+                                    if (notificationId != "") {
+                                      notificationServices
+                                          .cancelNotificationById(
+                                              notificationId ?? 0);
+                                    }
+                                    DateTime dateTime = DateFormat(
+                                            'EEEEEEEEE, dd MMM yyyy h:mm a',
+                                            'en_US')
+                                        .parseLoose(
+                                            '${dateCtr.text} ${timeCtr.text}');
+                                    AppFunctions.requestNotificationPermission()
+                                        .then((value) {
+                                      if (value == true) {
+                                        AppFunctions.setNewSheduleNotification(
+                                          id: widget.id!,
+                                          scheduledTime: dateTime,
+                                          body: timeCtr.text,
+                                          title: todoCtr.text,
+                                        );
+                                      }
+                                    });
+                                  }
+                                  Navigator.pop(context);
+                                  widget.onUpdate!();
+                                });
                               }
-                              Navigator.pop(context);
-                              widget.onUpdate!();
                             });
                           }
                         },

@@ -30,10 +30,10 @@ class OpenScheduleContainerWrapper extends StatelessWidget {
       },
       openColor: theme.cardColor,
       closedShape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(0)),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       closedElevation: 0,
-      closedColor: theme.cardColor,
+      closedColor: Colors.transparent,
       closedBuilder: (context, openContainer) {
         return InkWell(
           onTap: () {
@@ -73,7 +73,7 @@ class OpenNoteContainerWrapper extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.circular(0)),
       ),
       closedElevation: 0,
-      closedColor: theme.cardColor,
+      closedColor: Colors.transparent,
       onClosed: (data) => onUpdateComplete(),
       closedBuilder: (context, openContainer) {
         return InkWell(

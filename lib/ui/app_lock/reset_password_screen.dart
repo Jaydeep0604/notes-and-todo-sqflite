@@ -88,7 +88,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                   color: AppColors.greenSplashColor),
                               child: Padding(
                                 padding: const EdgeInsets.all(2),
-                                child: Icon(Icons.done,color: Theme.of(context).iconTheme.color, size: 14),
+                                child: Icon(Icons.done,
+                                    color: Theme.of(context).iconTheme.color,
+                                    size: 14),
                               ),
                             ),
                         ],
@@ -108,18 +110,26 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           },
                           maxLines: 1,
                           minLines: 1,
-                          style: TextStyle(
-                            fontSize:
-                                14, //fontFamily: KSMFontFamily.robotoRgular
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
+                                  color: Theme.of(context)
+                                      .scaffoldBackgroundColor),
                           decoration: InputDecoration(
                               fillColor: AppColors.blueGrayColor,
                               errorStyle: Theme.of(context)
                                   .textTheme
                                   .titleSmall
                                   ?.copyWith(color: Colors.red),
-                              hintStyle: Theme.of(context).textTheme.titleSmall,
-                              hintText: "${AppLocalization.of(context)?.getTranslatedValue('movie_name')}",
+                              hintStyle: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor),
+                              hintText:
+                                  "${AppLocalization.of(context)?.getTranslatedValue('movie_name')}",
                               filled: true,
                               contentPadding:
                                   EdgeInsets.only(left: 10, right: 10, top: 10),
@@ -206,7 +216,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                     color: AppColors.greenSplashColor),
                                 child: Padding(
                                   padding: const EdgeInsets.all(2),
-                                  child: Icon(Icons.done,color: Theme.of(context).iconTheme.color, size: 14),
+                                  child: Icon(Icons.done,
+                                      color: Theme.of(context).iconTheme.color,
+                                      size: 14),
                                 ),
                               ),
                           ],
@@ -220,19 +232,26 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             readOnly: seqQuestiontwoDone,
                             maxLines: 1,
                             minLines: 1,
-                            style: TextStyle(
-                              fontSize:
-                                  14, //fontFamily: KSMFontFamily.robotoRgular
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
                             decoration: InputDecoration(
                                 fillColor: AppColors.blueGrayColor,
                                 errorStyle: Theme.of(context)
                                     .textTheme
                                     .titleSmall
                                     ?.copyWith(color: Colors.red),
-                                hintStyle:
-                                    Theme.of(context).textTheme.titleSmall,
-                                hintText: "${AppLocalization.of(context)?.getTranslatedValue('movie_name')}",
+                                hintStyle: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor),
+                                hintText:
+                                    "${AppLocalization.of(context)?.getTranslatedValue('movie_name')}",
                                 filled: true,
                                 contentPadding: EdgeInsets.only(
                                     left: 10, right: 10, top: 10),
@@ -319,7 +338,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                     color: AppColors.greenSplashColor),
                                 child: Padding(
                                   padding: const EdgeInsets.all(2),
-                                  child: Icon(Icons.done,color: Theme.of(context).iconTheme.color, size: 14),
+                                  child: Icon(Icons.done,
+                                      color: Theme.of(context).iconTheme.color,
+                                      size: 14),
                                 ),
                               ),
                           ],
@@ -345,16 +366,26 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             inputFormatters: [
                               LengthLimitingTextInputFormatter(4)
                             ],
-                            style: TextStyle(fontSize: 14),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
                             decoration: InputDecoration(
                                 fillColor: AppColors.blueGrayColor,
                                 errorStyle: Theme.of(context)
                                     .textTheme
                                     .titleSmall
                                     ?.copyWith(color: Colors.red),
-                                hintStyle:
-                                    Theme.of(context).textTheme.titleSmall,
-                                hintText: "${AppLocalization.of(context)?.getTranslatedValue('password')}",
+                                hintStyle: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor),
+                                hintText:
+                                    "${AppLocalization.of(context)?.getTranslatedValue('password')}",
                                 filled: true,
                                 contentPadding: EdgeInsets.only(
                                     left: 10, right: 10, top: 10),
@@ -424,7 +455,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                       ?.copyWith(color: Colors.red),
                                   hintStyle:
                                       Theme.of(context).textTheme.titleSmall,
-                                  hintText: "${AppLocalization.of(context)?.getTranslatedValue('confirm_password')}",
+                                  hintText:
+                                      "${AppLocalization.of(context)?.getTranslatedValue('confirm_password')}",
                                   filled: true,
                                   contentPadding: EdgeInsets.only(
                                       left: 10, right: 10, top: 10),
@@ -471,7 +503,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     ),
                   ),
                 ),
-              
             ],
           ),
         ),
@@ -481,7 +512,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   checkSeqQuestionOne(String queOne) async {
     if (queOneCtr.text.isEmpty) {
-      AppMessage.showToast(context, "${AppLocalization.of(context)?.getTranslatedValue('please_fill_your_favorite_movie_name')}");
+      AppMessage.showToast(context,
+          "${AppLocalization.of(context)?.getTranslatedValue('please_fill_your_favorite_movie_name')}");
     } else {
       String movieName = await sharedStore.getSecurityPassWordMovieName();
       if (queOne == movieName) {
@@ -496,7 +528,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   checkSeqQuestionTwo(String quetwo) async {
     if (queTwoCtr.text.isEmpty) {
-      AppMessage.showToast(context, "${AppLocalization.of(context)?.getTranslatedValue('please_fill_your_favorite_teacher_s_name')}");
+      AppMessage.showToast(context,
+          "${AppLocalization.of(context)?.getTranslatedValue('please_fill_your_favorite_teacher_s_name')}");
     } else {
       String teacherName = await sharedStore.getSecurityPassWordTeacherName();
       if (quetwo == teacherName) {
@@ -511,28 +544,32 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   setNewPassword() async {
     if (passwordCtr.text.isEmpty) {
-      AppMessage.showToast(context, "${AppLocalization.of(context)?.getTranslatedValue('please_fill_password')}");
+      AppMessage.showToast(context,
+          "${AppLocalization.of(context)?.getTranslatedValue('please_fill_password')}");
     } else if (c_passwordCtr.text.isEmpty) {
-      AppMessage.showToast(context, "${AppLocalization.of(context)?.getTranslatedValue('please_fill_password')}");
+      AppMessage.showToast(context,
+          "${AppLocalization.of(context)?.getTranslatedValue('please_fill_password')}");
     } else if (passwordCtr.text.length < 4) {
-      AppMessage.showToast(context, "${AppLocalization.of(context)?.getTranslatedValue('password_length_must_be_atleast_4_digit')}");
+      AppMessage.showToast(context,
+          "${AppLocalization.of(context)?.getTranslatedValue('password_length_must_be_atleast_4_digit')}");
     } else if (c_passwordCtr.text.length < 4) {
-      AppMessage.showToast(
-          context, "${AppLocalization.of(context)?.getTranslatedValue('confirm_password_length_must_be_atleast_4_digit')}");
+      AppMessage.showToast(context,
+          "${AppLocalization.of(context)?.getTranslatedValue('confirm_password_length_must_be_atleast_4_digit')}");
     } else if (passwordCtr.text != c_passwordCtr.text) {
-      AppMessage.showToast(
-          context, "${AppLocalization.of(context)?.getTranslatedValue('confirm_password_must_be_same_as_password')}");
+      AppMessage.showToast(context,
+          "${AppLocalization.of(context)?.getTranslatedValue('confirm_password_must_be_same_as_password')}");
     } else {
       if (seqQuestionOneDone && seqQuestiontwoDone) {
         sharedStore.setAppLockPassword(c_passwordCtr.text).then((value) {
           if (value == true) {
-            AppMessage.showToast(context, "${AppLocalization.of(context)?.getTranslatedValue('new_password_set_successfull')}");
+            AppMessage.showToast(context,
+                "${AppLocalization.of(context)?.getTranslatedValue('new_password_set_successfull')}");
             setState(() {
               setPasswordDone = true;
             });
           } else {
-            AppMessage.showToast(
-                context, "${AppLocalization.of(context)?.getTranslatedValue('new_password_not_set_please_try_again_latter')}");
+            AppMessage.showToast(context,
+                "${AppLocalization.of(context)?.getTranslatedValue('new_password_not_set_please_try_again_latter')}");
           }
         });
       }

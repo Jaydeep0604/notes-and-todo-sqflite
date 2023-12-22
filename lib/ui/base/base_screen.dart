@@ -20,6 +20,7 @@ import 'package:notes_sqflite/ui/todo_screen/todo_detail_screen.dart';
 import 'package:notes_sqflite/ui/todo_screen/todo_screen.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:animations/animations.dart';
+import 'package:notes_sqflite/widget/theme_container.dart';
 
 class Base extends StatefulWidget {
   const Base({super.key});
@@ -215,388 +216,433 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: globalScaffoldKey,
-      appBar: AppBar(
-        leading: isNotes
-            ? Icon(
-                CupertinoIcons.pencil_outline,
-                color: Theme.of(context).iconTheme.color,
-              )
-            : IconButton(
-                onPressed: () {
-                  setState(() {
-                    isNotes = true;
-                    isTodos = false;
-                  });
-                },
-                icon: Icon(Icons.arrow_back,
-                    color: Theme.of(context).iconTheme.color),
-              ),
-        title: Text(
-          isNotes
-              ? "${AppLocalization.of(context)?.getTranslatedValue('notes')}"
-              : "${AppLocalization.of(context)?.getTranslatedValue('schedules')}",
-          style: TextStyle(
-              // color: AppColors.blackColor
-              ),
-        ),
-        actions: [
-          SizedBox(
-            width: 10,
-          ),
-          IconButton(
-              onPressed: () {
-                openDrawer();
-              },
-              icon: Icon(CupertinoIcons.text_alignright,
-                  color: Theme.of(context).iconTheme.color))
-        ],
-        centerTitle: true,
-      ),
-      endDrawer: Container(
-        width: MediaQuery.of(context).size.width * 0.5,
-        child: Drawer(
-          backgroundColor: AppColors.drawerBackgroundColor.withOpacity(0.9),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                height: 150,
-                child: Center(
-                    child: Icon(
+    return ThemedContainer(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        key: globalScaffoldKey,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          leading: isNotes
+              ? Icon(
                   CupertinoIcons.pencil_outline,
-                  color: AppColors.whiteColor,
-                  size: 35,
-                )),
-              ),
-              Divider(
-                color: AppColors.whiteColor.withOpacity(0.7),
-              ),
-              ListTile(
-                splashColor: AppColors.greenSplashColor,
-                onTap: () {
-                  Navigator.pop(context);
-
-                  Navigator.push(
-                    context,
-                    SlideAnimation.createRightRoute(
-                      TodoDoneScreen(),
-                    ),
-                  );
-                },
-                title: Text(
-                  "${AppLocalization.of(context)?.getTranslatedValue('finished')}",
-                  style: TextStyle(color: AppColors.whiteColor),
-                ),
-                leading: Icon(Icons.done_all, color: AppColors.whiteColor),
-              ),
-              Divider(
-                endIndent: 10,
-                indent: 10,
-                color: Colors.white38,
-              ),
-              ListTile(
-                splashColor: AppColors.orangeSplashColor,
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(context,
-                      SlideAnimation.createRightRoute(ArchiveNoteScreen()));
-                },
-                title: Text(
-                  "${AppLocalization.of(context)?.getTranslatedValue('archive')}",
-                  style: TextStyle(color: AppColors.whiteColor),
-                ),
-                leading:
-                    Icon(Icons.archive_outlined, color: AppColors.whiteColor),
-              ),
-              Divider(
-                endIndent: 10,
-                indent: 10,
-                color: Colors.white38,
-              ),
-              ListTile(
-                splashColor: AppColors.redColor,
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(context,
-                      SlideAnimation.createRightRoute(DeleteNoteScreen()));
-                },
-                title: Text(
-                  "${AppLocalization.of(context)?.getTranslatedValue('deleted')}",
-                  style: TextStyle(color: AppColors.whiteColor),
-                ),
-                leading:
-                    Icon(Icons.delete_forever, color: AppColors.whiteColor),
-              ),
-              Divider(
-                endIndent: 10,
-                indent: 10,
-                color: Colors.white38,
-              ),
-              ListTile(
-                splashColor: Colors.grey[400],
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                      context, SlideAnimation.createOpenRoute(SettingScreen()));
-                },
-                title: Text(
-                  "${AppLocalization.of(context)?.getTranslatedValue('settings')}",
-                  style: TextStyle(color: Colors.white),
-                ),
-                leading: Icon(Icons.settings, color: AppColors.whiteColor),
-              ),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: Material(
-        elevation: 20,
-        color: Theme.of(context).scaffoldBackgroundColor,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          color: Theme.of(context).scaffoldBackgroundColor,
-          height: 60,
-          child: Row(
-            children: [
-              AnimatedContainer(
-                width: isNotes
-                    ? isAdd
-                        ? MediaQuery.of(context).size.width * 0.2
-                        : MediaQuery.of(context).size.width * 0.5
-                    : MediaQuery.of(context).size.width * 0.2,
-                duration: Duration(milliseconds: 200),
-                // curve: Curves.bounceOut,
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: InkWell(
-                  splashFactory: NoSplash.splashFactory,
-                  highlightColor: Colors.transparent,
-                  onTap: () {
+                  color: Theme.of(context).iconTheme.color,
+                )
+              : IconButton(
+                  onPressed: () {
                     setState(() {
                       isNotes = true;
                       isTodos = false;
-                      isAdd = false;
                     });
                   },
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        border: isNotes && !isAdd
-                            ? Border.all(color: AppColors.blueGrayColor)
-                            : null,
-                        borderRadius: BorderRadius.circular(50)),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            CupertinoIcons.pencil_ellipsis_rectangle,
-                            color: Theme.of(context).highlightColor,
-                            size: isNotes ? 25 : 20,
-                          ),
-                          if (isNotes && !isAdd)
-                            SizedBox(
-                              width: 10,
-                            ),
-                          if (isNotes && !isAdd)
-                            Text(
-                                "${AppLocalization.of(context)?.getTranslatedValue('notes')}")
-                        ],
-                      ),
-                    ),
-                  ),
+                  icon: Icon(Icons.arrow_back,
+                      color: Theme.of(context).iconTheme.color),
                 ),
-              ),
-              Spacer(),
-              AnimatedContainer(
-                width: isAdd
-                    ? MediaQuery.of(context).size.width * 0.5
-                    : MediaQuery.of(context).size.width * 0.2,
-                duration: Duration(milliseconds: 200),
-                // curve: Curves.bounceOut,
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: InkWell(
-                  splashFactory: NoSplash.splashFactory,
-                  highlightColor: Colors.transparent,
-                  onTap: () {
-                    setState(() {
-                      isAdd = true;
-                    });
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        border: isAdd
-                            ? Border.all(color: AppColors.blueGrayColor)
-                            : null,
-                        borderRadius: BorderRadius.circular(50)),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            CupertinoIcons.add,
-                            color: Theme.of(context).highlightColor,
-                            size: isAdd ? 25 : 20,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+          title: Text(
+            isNotes
+                ? "${AppLocalization.of(context)?.getTranslatedValue('notes')}"
+                : "${AppLocalization.of(context)?.getTranslatedValue('schedules')}",
+            style: TextStyle(
+                // color: AppColors.blackColor
                 ),
-              ),
-              Spacer(),
-              AnimatedContainer(
-                width: isTodos
-                    ? isAdd
-                        ? MediaQuery.of(context).size.width * 0.2
-                        : MediaQuery.of(context).size.width * 0.5
-                    : MediaQuery.of(context).size.width * 0.2,
-                duration: Duration(milliseconds: 200),
-                // curve: Curves.easeIn,
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: InkWell(
-                  splashFactory: NoSplash.splashFactory,
-                  highlightColor: Colors.transparent,
-                  onTap: () {
-                    setState(() {
-                      isNotes = false;
-                      isTodos = true;
-                      isAdd = false;
-                    });
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        border: isTodos && !isAdd
-                            ? Border.all(color: AppColors.blueGrayColor)
-                            : null,
-                        borderRadius: BorderRadius.circular(50)),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            CupertinoIcons.list_bullet_indent,
-                            color: Theme.of(context).highlightColor,
-                            size: isTodos ? 25 : 20,
-                          ),
-                          if (isTodos && !isAdd)
-                            SizedBox(
-                              width: 10,
-                            ),
-                          if (isTodos && !isAdd)
-                            Text(
-                                "${AppLocalization.of(context)?.getTranslatedValue('schedules')}")
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              )
-            ],
           ),
+          actions: [
+            SizedBox(
+              width: 10,
+            ),
+            IconButton(
+                onPressed: () {
+                  openDrawer();
+                },
+                icon: Icon(CupertinoIcons.text_alignright,
+                    color: Theme.of(context).iconTheme.color))
+          ],
+          centerTitle: true,
         ),
-      ),
-      body: Stack(
-        children: [
-          isNotes ? NotesScreen() : TodoScreen(),
-          if (isAdd)
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 5),
-                child: Container(
-                  height: 30,
-                  child: ListView(
-                    padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width/3),
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      OpenContainer(
-                        transitionType: _containerTransitionType,
-                        transitionDuration: Duration(milliseconds: 400),
-                        openBuilder: (context, _) => NoteDetailScreen(
-                          isUpdateNote: false,
-                        ),
-                        closedElevation: 1,
-                        closedColor: AppColors.blueColor,
-                        openElevation: 1,
-                        closedShape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        closedBuilder: (context, _) => Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 5),
-                          child: Text(
-                            "${AppLocalization.of(context)?.getTranslatedValue('Add Note')}",
-                            style: TextStyle(color: AppColors.whiteColor),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      OpenContainer(
-                        transitionType: _containerTransitionType,
-                        transitionDuration: Duration(milliseconds: 400),
-                        closedElevation: 1,
-                        openElevation: 1,
-                        closedColor: AppColors.greenSplashColor,
-                        closedShape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        openBuilder: (context, _) => TodoDetailscreen(
-                          isUpdateTodo: false,
-                        ),
-                        closedBuilder: (context, _) => Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 5),
-                          child: Text(
-                            "${AppLocalization.of(context)?.getTranslatedValue('Add Schedule')}",
-                            style: TextStyle(color: AppColors.whiteColor),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      OpenContainer(
-                        transitionType: _containerTransitionType,
-                        transitionDuration: Duration(milliseconds: 400),
-                        closedElevation: 1,
-                        openElevation: 1,
-                        closedColor: AppColors.orangeSplashColor,
-                        closedShape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        openBuilder: (context, _) => TextRecognizerScreen(),
-                        closedBuilder: (context, _) => Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 5),
-                          child: Text(
-                            "${AppLocalization.of(context)?.getTranslatedValue('scane_note')}",
-                            style: TextStyle(color: AppColors.whiteColor),
-                          ),
-                        ),
-                      ),
-                    ],
+        endDrawer: Container(
+          width: MediaQuery.of(context).size.width * 0.5,
+          child: Drawer(
+            backgroundColor: AppColors.drawerBackgroundColor.withOpacity(0.9),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 20,
                   ),
-                ),
+                  SizedBox(
+                    height: 150,
+                    child: Center(
+                        child: Icon(
+                      CupertinoIcons.pencil_outline,
+                      color: AppColors.whiteColor,
+                      size: 35,
+                    )),
+                  ),
+                  Divider(
+                    color: AppColors.whiteColor.withOpacity(0.7),
+                  ),
+                  ListTile(
+                    splashColor: AppColors.greenSplashColor,
+                    onTap: () {
+                      Navigator.pop(context);
+
+                      Navigator.push(
+                        context,
+                        SlideAnimation.createRightRoute(
+                          TodoDoneScreen(),
+                        ),
+                      );
+                    },
+                    title: Text(
+                      "${AppLocalization.of(context)?.getTranslatedValue('finished')}",
+                      style: TextStyle(color: AppColors.whiteColor),
+                    ),
+                    leading: Icon(Icons.done_all, color: AppColors.whiteColor),
+                  ),
+                  Divider(
+                    endIndent: 10,
+                    indent: 10,
+                    color: Colors.white38,
+                  ),
+                  ListTile(
+                    splashColor: AppColors.orangeSplashColor,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(context,
+                          SlideAnimation.createRightRoute(ArchiveNoteScreen()));
+                    },
+                    title: Text(
+                      "${AppLocalization.of(context)?.getTranslatedValue('archive')}",
+                      style: TextStyle(color: AppColors.whiteColor),
+                    ),
+                    leading: Icon(Icons.archive_outlined,
+                        color: AppColors.whiteColor),
+                  ),
+                  Divider(
+                    endIndent: 10,
+                    indent: 10,
+                    color: Colors.white38,
+                  ),
+                  ListTile(
+                    splashColor: AppColors.redColor,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(context,
+                          SlideAnimation.createRightRoute(DeleteNoteScreen()));
+                    },
+                    title: Text(
+                      "${AppLocalization.of(context)?.getTranslatedValue('deleted')}",
+                      style: TextStyle(color: AppColors.whiteColor),
+                    ),
+                    leading:
+                        Icon(Icons.delete_forever, color: AppColors.whiteColor),
+                  ),
+                  Divider(
+                    endIndent: 10,
+                    indent: 10,
+                    color: Colors.white38,
+                  ),
+                  ListTile(
+                    splashColor: Colors.grey[400],
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(context,
+                          SlideAnimation.createRightRoute(SettingScreen()));
+                    },
+                    title: Text(
+                      "${AppLocalization.of(context)?.getTranslatedValue('settings')}",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    leading: Icon(Icons.settings, color: AppColors.whiteColor),
+                  ),
+                ],
               ),
             ),
-        ],
+          ),
+        ),
+        bottomNavigationBar: Material(
+          elevation: 20,
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            color: Theme.of(context).scaffoldBackgroundColor,
+            height: 60,
+            child: Row(
+              children: [
+                AnimatedContainer(
+                  width: isNotes
+                      ? isAdd
+                          ? MediaQuery.of(context).size.width * 0.2
+                          : MediaQuery.of(context).size.width * 0.5
+                      : MediaQuery.of(context).size.width * 0.2,
+                  duration: Duration(milliseconds: 200),
+                  // curve: Curves.bounceOut,
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  child: InkWell(
+                    splashFactory: NoSplash.splashFactory,
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      setState(() {
+                        isNotes = true;
+                        isTodos = false;
+                        isAdd = false;
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          border: isNotes && !isAdd
+                              ? Border.all(color: AppColors.blueGrayColor)
+                              : null,
+                          borderRadius: BorderRadius.circular(50)),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              CupertinoIcons.pencil_ellipsis_rectangle,
+                              color: Theme.of(context).highlightColor,
+                              size: isNotes ? 25 : 20,
+                            ),
+                            if (isNotes && !isAdd)
+                              SizedBox(
+                                width: 10,
+                              ),
+                            if (isNotes && !isAdd)
+                              Text(
+                                  "${AppLocalization.of(context)?.getTranslatedValue('notes')}")
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Spacer(),
+                AnimatedContainer(
+                  width: isAdd
+                      ? MediaQuery.of(context).size.width * 0.5
+                      : MediaQuery.of(context).size.width * 0.2,
+                  duration: Duration(milliseconds: 200),
+                  // curve: Curves.bounceOut,
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  child: InkWell(
+                    splashFactory: NoSplash.splashFactory,
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      setState(() {
+                        isAdd = true;
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          border: isAdd
+                              ? Border.all(color: AppColors.blueColor)
+                              : null,
+                          borderRadius: BorderRadius.circular(50)),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              CupertinoIcons.add,
+                              color: Theme.of(context).highlightColor,
+                              size: isAdd ? 25 : 20,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Spacer(),
+                AnimatedContainer(
+                  width: isTodos
+                      ? isAdd
+                          ? MediaQuery.of(context).size.width * 0.2
+                          : MediaQuery.of(context).size.width * 0.5
+                      : MediaQuery.of(context).size.width * 0.2,
+                  duration: Duration(milliseconds: 200),
+                  // curve: Curves.easeIn,
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  child: InkWell(
+                    splashFactory: NoSplash.splashFactory,
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      setState(() {
+                        isNotes = false;
+                        isTodos = true;
+                        isAdd = false;
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          border: isTodos && !isAdd
+                              ? Border.all(color: AppColors.blueGrayColor)
+                              : null,
+                          borderRadius: BorderRadius.circular(50)),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              CupertinoIcons.list_bullet_indent,
+                              color: Theme.of(context).highlightColor,
+                              size: isTodos ? 25 : 20,
+                            ),
+                            if (isTodos && !isAdd)
+                              SizedBox(
+                                width: 10,
+                              ),
+                            if (isTodos && !isAdd)
+                              Text(
+                                  "${AppLocalization.of(context)?.getTranslatedValue('schedules')}")
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+        body: Stack(
+          children: [
+            isNotes ? NotesScreen() : TodoScreen(),
+            if (isAdd)
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 5),
+                  child: Container(
+                    height: 35,
+                    foregroundDecoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Theme.of(context).scaffoldBackgroundColor,
+                          Theme.of(context).scaffoldBackgroundColor.withOpacity(0.1),
+                          Theme.of(context).scaffoldBackgroundColor.withOpacity(0),
+                          Theme.of(context).scaffoldBackgroundColor.withOpacity(0.1),
+                          Theme.of(context).scaffoldBackgroundColor,
+                        ],
+                      ),
+                    ),
+                    child: ListView(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width / 3),
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        OpenContainer(
+                          transitionType: _containerTransitionType,
+                          transitionDuration: Duration(milliseconds: 400),
+                          openBuilder: (context, closedContainer) =>
+                              NoteDetailScreen(
+                            isUpdateNote: false,
+                          ),
+                          openColor: Theme.of(context).cardColor,
+                          closedElevation: 0,
+                          openElevation: 0,
+                          closedColor:
+                              Theme.of(context).scaffoldBackgroundColor,
+                          closedBuilder: (context, openContainer) => Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: AppColors.blueColor),
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              child: Center(
+                                child: Text(
+                                  "${AppLocalization.of(context)?.getTranslatedValue('add_note')}",
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        OpenContainer(
+                          transitionType: _containerTransitionType,
+                          transitionDuration: Duration(milliseconds: 400),
+                          closedElevation: 0,
+                          openElevation: 0,
+                          openColor: Theme.of(context).cardColor,
+                          closedColor:
+                              Theme.of(context).scaffoldBackgroundColor,
+                          openBuilder: (context, _) {
+                            return TodoDetailscreen(
+                              isUpdateTodo: false,
+                            );
+                          },
+                          closedBuilder: (context, _) => Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: AppColors.blueColor),
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              child: Center(
+                                child: Text(
+                                  "${AppLocalization.of(context)?.getTranslatedValue('add_schedule')}",
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        OpenContainer(
+                          transitionType: _containerTransitionType,
+                          transitionDuration: Duration(milliseconds: 400),
+                          closedElevation: 0,
+                          openElevation: 0,
+                          closedColor:
+                              Theme.of(context).scaffoldBackgroundColor,
+                          openColor: Theme.of(context).cardColor,
+                          openBuilder: (context, _) => TextRecognizerScreen(),
+                          closedBuilder: (context, _) => Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: AppColors.blueColor),
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              child: Center(
+                                child: Text(
+                                  "${AppLocalization.of(context)?.getTranslatedValue('scane_note')}",
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                       
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -22,3 +22,4 @@ class FadeThroughTransitionSwitcher extends StatelessWidget {
    );
  }
 }
+
