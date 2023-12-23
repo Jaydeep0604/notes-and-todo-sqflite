@@ -34,7 +34,8 @@ class Base extends StatefulWidget {
   State<Base> createState() => _BaseState();
 }
 
-class _BaseState extends State<Base> with WidgetsBindingObserver {
+class _BaseState extends State<Base>
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   DBHelper? dbHelper;
 
   final LocalAuthentication auth = LocalAuthentication();
@@ -45,6 +46,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
   SupportState _supportState = SupportState.unknown;
 
   bool isNotes = true, isTodos = false, isAdd = false;
+  bool isNotesTextShow = true, isTodosTextShow = false, isAddTextShow = false;
 
   late GlobalKey<ScaffoldState> globalScaffoldKey;
 
@@ -147,7 +149,6 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.resumed:
-        print("app in resumed");
         if (isBiometricLock!) {
           if (!isAppActive) {
             if (state == AppLifecycleState.resumed) {
@@ -387,6 +388,16 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                         isTodos = false;
                         isAdd = false;
                       });
+                      Future.delayed(
+                        Duration(milliseconds: 70),
+                        () {
+                          setState(() {
+                            isNotesTextShow = true;
+                            isAddTextShow = false;
+                            isTodosTextShow = false;
+                          });
+                        },
+                      );
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -406,11 +417,11 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                               color: Theme.of(context).highlightColor,
                               size: isNotes ? 25 : 20,
                             ),
-                            if (isNotes && !isAdd)
+                            if (isNotes && !isAdd && isNotesTextShow)
                               SizedBox(
                                 width: 10,
                               ),
-                            if (isNotes && !isAdd)
+                            if (isNotes && !isAdd && isNotesTextShow)
                               Text(
                                   "${AppLocalization.of(context)?.getTranslatedValue('notes')}")
                           ],
@@ -435,6 +446,16 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                       setState(() {
                         isAdd = true;
                       });
+                      Future.delayed(
+                        Duration(milliseconds: 70),
+                        () {
+                          setState(() {
+                            isNotesTextShow = false;
+                            isAddTextShow = true;
+                            isTodosTextShow = false;
+                          });
+                        },
+                      );
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -445,7 +466,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                           borderRadius: BorderRadius.circular(50)),
                       child: Center(
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -480,6 +501,16 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                         isTodos = true;
                         isAdd = false;
                       });
+                      Future.delayed(
+                        Duration(milliseconds: 120),
+                        () {
+                          setState(() {
+                            isNotesTextShow = false;
+                            isAddTextShow = false;
+                            isTodosTextShow = true;
+                          });
+                        },
+                      );
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -490,7 +521,7 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                           borderRadius: BorderRadius.circular(50)),
                       child: Center(
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -499,13 +530,16 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                               color: Theme.of(context).highlightColor,
                               size: isTodos ? 25 : 20,
                             ),
-                            if (isTodos && !isAdd)
+                            if (isTodos && !isAdd && isTodosTextShow)
                               SizedBox(
                                 width: 10,
                               ),
-                            if (isTodos && !isAdd)
+                            if (isTodos && !isAdd && isTodosTextShow)
                               Text(
-                                  "${AppLocalization.of(context)?.getTranslatedValue('schedules')}")
+                                "${AppLocalization.of(context)?.getTranslatedValue('schedules')}",
+                                style:
+                                    TextStyle(overflow: TextOverflow.ellipsis),
+                              ),
                           ],
                         ),
                       ),
@@ -532,9 +566,15 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                         end: Alignment.centerRight,
                         colors: [
                           Theme.of(context).scaffoldBackgroundColor,
-                          Theme.of(context).scaffoldBackgroundColor.withOpacity(0.1),
-                          Theme.of(context).scaffoldBackgroundColor.withOpacity(0),
-                          Theme.of(context).scaffoldBackgroundColor.withOpacity(0.1),
+                          Theme.of(context)
+                              .scaffoldBackgroundColor
+                              .withOpacity(0.1),
+                          Theme.of(context)
+                              .scaffoldBackgroundColor
+                              .withOpacity(0),
+                          Theme.of(context)
+                              .scaffoldBackgroundColor
+                              .withOpacity(0.1),
                           Theme.of(context).scaffoldBackgroundColor,
                         ],
                       ),
@@ -635,7 +675,6 @@ class _BaseState extends State<Base> with WidgetsBindingObserver {
                             ),
                           ),
                         ),
-                       
                       ],
                     ),
                   ),

@@ -25,3 +25,4 @@ class FadeLiveWidget extends StatelessWidget {
     );
   }
 }
+

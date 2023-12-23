@@ -36,6 +36,8 @@ class OpenScheduleContainerWrapper extends StatelessWidget {
       closedColor: Colors.transparent,
       closedBuilder: (context, openContainer) {
         return InkWell(
+          highlightColor: Colors.transparent,
+          splashFactory: NoSplash.splashFactory,
           onTap: () {
             openContainer();
           },
@@ -73,10 +75,14 @@ class OpenNoteContainerWrapper extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.circular(0)),
       ),
       closedElevation: 0,
+      openElevation: 0,
       closedColor: Colors.transparent,
+      
       onClosed: (data) => onUpdateComplete(),
       closedBuilder: (context, openContainer) {
         return InkWell(
+          highlightColor: Colors.transparent,
+          splashFactory: NoSplash.splashFactory,
           onTap: () {
             openContainer();
           },

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:notes_sqflite/language/localisation.dart';
-import 'package:notes_sqflite/utils/app_colors.dart';
 import 'package:notes_sqflite/widget/theme_container.dart';
 
 class PrivacyPolicyScreen extends StatefulWidget {

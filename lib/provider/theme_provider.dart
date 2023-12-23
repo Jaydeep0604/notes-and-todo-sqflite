@@ -26,7 +26,6 @@ class ThemeProvider with ChangeNotifier {
     );
   }
 
-  // Helper functions to convert ThemeMode to/from string
   String themeModeToString(ThemeMode themeMode) {
     return themeMode.toString();
   }

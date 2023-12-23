@@ -6,6 +6,7 @@ import 'package:notes_sqflite/language/localisation.dart';
 import 'package:notes_sqflite/main.dart';
 import 'package:notes_sqflite/model/todo_model.dart';
 import 'package:notes_sqflite/utils/app_colors.dart';
+import 'package:notes_sqflite/utils/functions.dart';
 import 'package:notes_sqflite/widget/todo_widget.dart';
 
 class TodoScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class TodoScreen extends StatefulWidget {
 class _TodoScreenState extends State<TodoScreen> {
   DBHelper? dbHelper;
   late Future<List<TodoModel>> todoList;
+  DateTime dateTimeNow = DateTime.now();
 
   void initState() {
     super.initState();
@@ -64,69 +66,159 @@ class _TodoScreenState extends State<TodoScreen> {
                 ),
               );
             }
-            return ListView.separated(
-              padding: EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 10,
-              ),
-              itemCount: homeTodoCount,
-              // reverse: true,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return VerticalAnimation(
-                  index: index,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (snapshot.data![index].finished == 0)
-                        TodoWidget(
-                          id: snapshot.data![index].id!,
-                          todo: snapshot.data![index].todo,
-                          categoryName: snapshot.data![index].category,
-                          dueDate: snapshot.data![index].dueDate,
-                          dueTime: snapshot.data![index].dueTime,
-                          finished: snapshot.data![index].finished,
-                          onDelete: () {
-                            setState(() {
-                              dbHelper!.deleteTodo(snapshot.data![index].id!);
-                              todoList = dbHelper!.getTodosList();
-                            });
-                          },
-                          onUpdate: () {
-                            setState(() {
-                              todoList = dbHelper!.getTodosList();
-                            });
-                          },
-                          onFinish: (todo, date, time, status, category) {
-                            dbHelper!
-                                .updateTodo(TodoModel(
-                              id: snapshot.data![index].id,
-                              todo: todo,
-                              finished: status,
-                              dueDate: date,
-                              dueTime: time,
-                              category: category,
-                            ))
-                                .then(
-                              (value) {
-                                setState(
-                                  () {
-                                    todoList = dbHelper!.getTodosList();
+            return Column(
+              children: [
+                // FutureBuilder(
+                //   future: todoList,
+                //   builder: (context, snapshot) {
+                //     print("${snapshot.data!.last.dueDate}, ${snapshot.data!.last.dueTime}");
+                //     // DateTime date = AppFunctions.convertStringToDateTime(
+                //     //     "${snapshot.data!.last.dueDate}, ${snapshot.data!.last.dueTime}");
+                //     // print("----------------$date");
+                //     // int overDueTodoCount = snapshot.data != null &&
+                //     //         snapshot.data!.any((item) => item.dueDate == 0)
+                //     //     ? snapshot.data!.length
+                //     //     : 0;
+                //     if (snapshot.hasData) {
+                //       return Container();
+                //       // ListView.separated(
+                //       //   padding: EdgeInsets.symmetric(
+                //       //     horizontal: 10,
+                //       //     vertical: 10,
+                //       //   ),
+                //       //   itemCount: homeTodoCount,
+                //       //   shrinkWrap: true,
+                //       //   itemBuilder: (context, index) {
+                //       //     return VerticalAnimation(
+                //       //       index: index,
+                //       //       child: Column(
+                //       //         mainAxisSize: MainAxisSize.min,
+                //       //         children: [
+                //       //           if (snapshot.data![index].finished == 0)
+                //       //             TodoWidget(
+                //       //               id: snapshot.data![index].id!,
+                //       //               todo: snapshot.data![index].todo,
+                //       //               categoryName:
+                //       //                   snapshot.data![index].category,
+                //       //               dueDate: snapshot.data![index].dueDate,
+                //       //               dueTime: snapshot.data![index].dueTime,
+                //       //               finished: snapshot.data![index].finished,
+                //       //               onDelete: () {
+                //       //                 setState(() {
+                //       //                   dbHelper!.deleteTodo(
+                //       //                       snapshot.data![index].id!);
+                //       //                   todoList = dbHelper!.getTodosList();
+                //       //                 });
+                //       //               },
+                //       //               onUpdate: () {
+                //       //                 setState(() {
+                //       //                   todoList = dbHelper!.getTodosList();
+                //       //                 });
+                //       //               },
+                //       //               onFinish:
+                //       //                   (todo, date, time, status, category) {
+                //       //                 dbHelper!
+                //       //                     .updateTodo(TodoModel(
+                //       //                   id: snapshot.data![index].id,
+                //       //                   todo: todo,
+                //       //                   finished: status,
+                //       //                   dueDate: date,
+                //       //                   dueTime: time,
+                //       //                   category: category,
+                //       //                 ))
+                //       //                     .then(
+                //       //                   (value) {
+                //       //                     setState(
+                //       //                       () {
+                //       //                         todoList =
+                //       //                             dbHelper!.getTodosList();
+                //       //                       },
+                //       //                     );
+                //       //                   },
+                //       //                 );
+                //       //               },
+                //       //             ),
+                //       //         ],
+                //       //       ),
+                //       //     );
+                //       //   },
+                //       //   separatorBuilder: (context, index) {
+                //       //     return SizedBox(
+                //       //       height:
+                //       //           snapshot.data![index].finished == 0 ? 10 : 0,
+                //       //     );
+                //       //   },
+                //       // );
+                //     } else {
+                //       return Container();
+                //     }
+                //   },
+                // ),
+                ListView.separated(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 10,
+                  ),
+                  itemCount: homeTodoCount,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return VerticalAnimation(
+                      index: index,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (snapshot.data![index].finished == 0)
+                            TodoWidget(
+                              id: snapshot.data![index].id!,
+                              todo: snapshot.data![index].todo,
+                              categoryName: snapshot.data![index].category,
+                              dueDate: snapshot.data![index].dueDate,
+                              dueTime: snapshot.data![index].dueTime,
+                              finished: snapshot.data![index].finished,
+                              onDelete: () {
+                                setState(() {
+                                  dbHelper!
+                                      .deleteTodo(snapshot.data![index].id!);
+                                  todoList = dbHelper!.getTodosList();
+                                });
+                              },
+                              onUpdate: () {
+                                setState(() {
+                                  todoList = dbHelper!.getTodosList();
+                                });
+                              },
+                              onFinish: (todo, date, time, status, category) {
+                                dbHelper!
+                                    .updateTodo(TodoModel(
+                                  id: snapshot.data![index].id,
+                                  todo: todo,
+                                  finished: status,
+                                  dueDate: date,
+                                  dueTime: time,
+                                  category: category,
+                                ))
+                                    .then(
+                                  (value) {
+                                    setState(
+                                      () {
+                                        todoList = dbHelper!.getTodosList();
+                                      },
+                                    );
                                   },
                                 );
                               },
-                            );
-                          },
-                        ),
-                    ],
-                  ),
-                );
-              },
-              separatorBuilder: (context, index) {
-                return SizedBox(
-                  height: snapshot.data![index].finished == 0 ? 10 : 0,
-                );
-              },
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return SizedBox(
+                      height: snapshot.data![index].finished == 0 ? 10 : 0,
+                    );
+                  },
+                ),
+              ],
             );
           } else {
             return Center(
@@ -138,7 +230,7 @@ class _TodoScreenState extends State<TodoScreen> {
       ),
     );
   }
-  
+
   // Align(
   //   alignment: Alignment.bottomRight,
   //   child: Padding(

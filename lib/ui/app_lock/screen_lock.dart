@@ -15,9 +15,12 @@ class ScreenLock extends StatefulWidget {
   State<ScreenLock> createState() => _ScreenLockState();
 }
 
-class _ScreenLockState extends State<ScreenLock> {
+class _ScreenLockState extends State<ScreenLock>
+    with SingleTickerProviderStateMixin {
   late TextEditingController oneCtr, twoCtr, threeCtr, fourCtr;
   bool one = false, two = false, three = false, four = false;
+  final TextEditingController textController = TextEditingController();
+  late AnimationController controller;
   String? originalPass;
   void initState() {
     super.initState();
@@ -26,10 +29,9 @@ class _ScreenLockState extends State<ScreenLock> {
     twoCtr = TextEditingController();
     threeCtr = TextEditingController();
     fourCtr = TextEditingController();
-   
+    controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
   }
-
- 
 
   void dispose() {
     super.dispose();
@@ -63,9 +65,7 @@ class _ScreenLockState extends State<ScreenLock> {
         enteredPassword += digit;
       }
       if (enteredPassword.length == 4) {
-        Timer(Duration(milliseconds: 100), () {
-          checkPassword(enteredPassword);
-        });
+        checkPassword(enteredPassword);
       }
     });
   }
@@ -81,6 +81,14 @@ class _ScreenLockState extends State<ScreenLock> {
 
   @override
   Widget build(BuildContext context) {
+    final Animation<double> offsetAnimation = Tween(begin: 0.0, end: 24.0)
+        .chain(CurveTween(curve: Curves.elasticIn))
+        .animate(controller)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          controller.reverse();
+        }
+      });
     return WillPopScope(
       onWillPop: () async {
         SystemChannels.platform.invokeMethod('SystemNavigator.pop');
@@ -106,13 +114,34 @@ class _ScreenLockState extends State<ScreenLock> {
               SizedBox(
                 height: 50,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  4,
-                  (index) => _buildPasswordDot(enteredPassword.length > index),
-                ),
-              ),
+              AnimatedBuilder(
+                  animation: offsetAnimation,
+                  builder: (buildContext, child) {
+                    
+                    return Container(
+                      margin: EdgeInsets.symmetric(horizontal: 24.0),
+                      padding: EdgeInsets.only(
+                          left: offsetAnimation.value + 24.0,
+                          right: 24.0 - offsetAnimation.value),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            4,
+                            (index) => _buildPasswordDot(
+                                enteredPassword.length > index),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: List.generate(
+              //     4,
+              //     (index) => _buildPasswordDot(enteredPassword.length > index),
+              //   ),
+              // ),
 
               // Wrap(
               //   alignment: WrapAlignment.center,
@@ -184,7 +213,8 @@ class _ScreenLockState extends State<ScreenLock> {
                     onTap: () {
                       fillPassword("1");
                     },
-                    text: "${AppLocalization.of(context)?.getTranslatedValue('1')}",
+                    text:
+                        "${AppLocalization.of(context)?.getTranslatedValue('1')}",
                   ),
                   SizedBox(
                     width: 30,
@@ -193,7 +223,8 @@ class _ScreenLockState extends State<ScreenLock> {
                     onTap: () {
                       fillPassword("2");
                     },
-                    text: "${AppLocalization.of(context)?.getTranslatedValue('2')}",
+                    text:
+                        "${AppLocalization.of(context)?.getTranslatedValue('2')}",
                   ),
                   SizedBox(
                     width: 30,
@@ -202,7 +233,8 @@ class _ScreenLockState extends State<ScreenLock> {
                     onTap: () {
                       fillPassword("3");
                     },
-                    text: "${AppLocalization.of(context)?.getTranslatedValue('3')}",
+                    text:
+                        "${AppLocalization.of(context)?.getTranslatedValue('3')}",
                   ),
                 ],
               ),
@@ -216,7 +248,8 @@ class _ScreenLockState extends State<ScreenLock> {
                     onTap: () {
                       fillPassword("4");
                     },
-                    text: "${AppLocalization.of(context)?.getTranslatedValue('4')}",
+                    text:
+                        "${AppLocalization.of(context)?.getTranslatedValue('4')}",
                   ),
                   SizedBox(
                     width: 30,
@@ -225,7 +258,8 @@ class _ScreenLockState extends State<ScreenLock> {
                     onTap: () {
                       fillPassword("5");
                     },
-                    text: "${AppLocalization.of(context)?.getTranslatedValue('5')}",
+                    text:
+                        "${AppLocalization.of(context)?.getTranslatedValue('5')}",
                   ),
                   SizedBox(
                     width: 30,
@@ -234,7 +268,8 @@ class _ScreenLockState extends State<ScreenLock> {
                     onTap: () {
                       fillPassword("6");
                     },
-                    text: "${AppLocalization.of(context)?.getTranslatedValue('6')}",
+                    text:
+                        "${AppLocalization.of(context)?.getTranslatedValue('6')}",
                   ),
                 ],
               ),
@@ -248,7 +283,8 @@ class _ScreenLockState extends State<ScreenLock> {
                     onTap: () {
                       fillPassword("7");
                     },
-                    text: "${AppLocalization.of(context)?.getTranslatedValue('7')}",
+                    text:
+                        "${AppLocalization.of(context)?.getTranslatedValue('7')}",
                   ),
                   SizedBox(
                     width: 30,
@@ -257,7 +293,8 @@ class _ScreenLockState extends State<ScreenLock> {
                     onTap: () {
                       fillPassword("8");
                     },
-                    text: "${AppLocalization.of(context)?.getTranslatedValue('8')}",
+                    text:
+                        "${AppLocalization.of(context)?.getTranslatedValue('8')}",
                   ),
                   SizedBox(
                     width: 30,
@@ -266,7 +303,8 @@ class _ScreenLockState extends State<ScreenLock> {
                     onTap: () {
                       fillPassword("9");
                     },
-                    text: "${AppLocalization.of(context)?.getTranslatedValue('9')}",
+                    text:
+                        "${AppLocalization.of(context)?.getTranslatedValue('9')}",
                   ),
                 ],
               ),
@@ -288,7 +326,8 @@ class _ScreenLockState extends State<ScreenLock> {
                     onTap: () {
                       fillPassword("0");
                     },
-                    text: "${AppLocalization.of(context)?.getTranslatedValue('0')}",
+                    text:
+                        "${AppLocalization.of(context)?.getTranslatedValue('0')}",
                   ),
                   SizedBox(
                     width: 30,
@@ -356,20 +395,22 @@ class _ScreenLockState extends State<ScreenLock> {
     );
   }
 
-  checkPassword(String password)async {
+  checkPassword(String password) async {
     originalPass = await sharedStore.getAppLockPassword();
     if (password == originalPass) {
       setState(() {
         isDialogOpen = false;
         isAppActive = true;
       });
-      
+
       enteredPassword = '';
       Navigator.pop(context);
     } else {
-      setState(() {
-        enteredPassword = '';
-      });
+      HapticFeedback.vibrate();
+      controller.forward(from: 0.0).then((value) => setState(() {
+            enteredPassword = enteredPassword = enteredPassword.substring(
+                0, enteredPassword.length - enteredPassword.length);
+          }));
     }
   }
 

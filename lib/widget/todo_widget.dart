@@ -160,13 +160,15 @@ class _TodoWidgetState extends State<TodoWidget> {
                     setState(() {
                       isDone = newvalue!;
                     });
-                    widget.onFinish(
-                      todoCtr.text,
-                      dateCtr.text,
-                      timeCtr.text,
-                      isDone == true ? 1 : 0,
-                      widget.categoryName,
-                    );
+                    Future.delayed(Duration(milliseconds: 500), () {
+                      widget.onFinish(
+                        todoCtr.text,
+                        dateCtr.text,
+                        timeCtr.text,
+                        isDone == true ? 1 : 0,
+                        widget.categoryName,
+                      );
+                    });
                   },
                 ),
               ),
