@@ -24,6 +24,7 @@ FlutterLocalNotificationsPlugin localNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   initializeTimeZones();
   AppFunctions.requestStoragePermission();

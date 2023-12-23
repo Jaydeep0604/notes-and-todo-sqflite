@@ -91,8 +91,9 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
           backgroundColor: Colors.transparent,
           body: Form(
             key: formKey,
-            child:
-                widget.isUpdateTodo ? updateSheduleWidget() : newSheduleWidget(),
+            child: widget.isUpdateTodo
+                ? updateSheduleWidget()
+                : newSheduleWidget(),
           ),
         ),
       ),
@@ -103,6 +104,7 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
     DateTime currentDate = DateTime.now();
     DateTime? notificationDateTime;
     TimeOfDay timeOfDay = TimeOfDay.now();
+
     Future<void> _selectDate(BuildContext context) async {
       final DateTime? pickedDate = await showDatePicker(
         context: context,
@@ -125,6 +127,17 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
       var time = await showTimePicker(
         context: context,
         initialTime: timeOfDay,
+        builder: (context, child) {
+          return Localizations.override(
+            context: context,
+            locale: const Locale('en', 'US'),
+            child: MediaQuery(
+              data:
+                  MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+              child: child!,
+            ),
+          );
+        },
       );
       if (time != null) {
         if (mounted)
@@ -462,6 +475,17 @@ class _TodoDetailscreenState extends State<TodoDetailscreen> {
                 var time = await showTimePicker(
                   context: context,
                   initialTime: timeOfDay,
+                   builder: (context, child) {
+          return Localizations.override(
+            context: context,
+            locale: const Locale('en', 'US'),
+            child: MediaQuery(
+              data:
+                  MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+              child: child!,
+            ),
+          );
+        },
                 );
                 if (time != null) {
                   if (mounted)

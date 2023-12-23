@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notes_sqflite/utils/app_colors.dart';
 
 class CustomPasswordButton extends StatefulWidget {
   CustomPasswordButton({
@@ -17,6 +18,8 @@ class _CustomPasswordButtonState extends State<CustomPasswordButton> {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(50),
+      splashColor: AppColors.canvasColor.withOpacity(0.5),
+      highlightColor: Colors.transparent,
       onTap: widget.onTap,
       child: Container(
         height: 65,
@@ -28,10 +31,11 @@ class _CustomPasswordButtonState extends State<CustomPasswordButton> {
         //     ),
         //     shape: BoxShape.circle),
         child: Center(
-          child: Text(
-            "${widget.text}",
-            style: Theme.of(context).textTheme.titleLarge!.copyWith(fontSize: 22)
-          ),
+          child: Text("${widget.text}",
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge!
+                  .copyWith(fontSize: 22)),
         ),
       ),
     );

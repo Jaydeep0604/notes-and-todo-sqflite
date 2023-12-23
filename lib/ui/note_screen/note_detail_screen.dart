@@ -1467,6 +1467,17 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
             var time = await showTimePicker(
               context: context,
               initialTime: timeOfDay!,
+              builder: (context, child) {
+                return Localizations.override(
+                  context: context,
+                  locale: const Locale('en', 'US'),
+                  child: MediaQuery(
+                    data: MediaQuery.of(context)
+                        .copyWith(alwaysUse24HourFormat: false),
+                    child: child!,
+                  ),
+                );
+              },
             );
             if (time != null) {
               setState(

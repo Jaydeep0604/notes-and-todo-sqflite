@@ -31,7 +31,6 @@ class _ArchiveNoteScreenState extends State<ArchiveNoteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
     return WillPopScope(
       onWillPop: () async {
         setState(() {

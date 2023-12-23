@@ -78,15 +78,15 @@ dev_dependencies:
 flutter_native_splash:
   image: assets/icons/todo_main.png
   image_dark: assets/icons/todo_main.png
-  color: "#000000"
-  color_dark: "#FFFFFF"
+  color: "#FFFFFF"
+  color_dark: "#000000"
   android: true
   ios: true
   web: false
 
   android_12:
-    color: "#000000"
-    color_dark: "#FFFFFF"
+    color: "#FFFFFF"
+    color_dark: "#000000"
     image: assets/icons/todo_main.png
     image_dark: assets/icons/todo_main.png
 

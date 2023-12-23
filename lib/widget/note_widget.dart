@@ -74,6 +74,7 @@ class _NoteWidgetState extends State<NoteWidget> {
   @override
   Widget build(BuildContext context) {
     return OpenNoteContainerWrapper(
+      
       id: widget.id,
       onUpdateComplete: widget.onUpdateComplete,
       closedChild: Dismissible(
